@@ -72,6 +72,15 @@ has user_agent => (
     },
 );
 
+sub BUILD {
+    my ( $self, $args ) = @_;
+
+    if ( my $traits = delete $$args{traits} ) {
+        my @roles = map { s/^\+// ? $_ : "Twitter::API::Traits::$_" } @$traits;
+        Role::Tiny->apply_roles_to_object($self, @roles);
+    }
+}
+
 sub get  { shift->request( get => @_ ) }
 sub post { shift->request( post => @_ ) }
 
