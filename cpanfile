@@ -1,8 +1,8 @@
 requires 'Carp';
 requires 'Class::Load';
 requires 'Digest::SHA';
-requires 'HTTP::Request';
-requires 'HTTP::Tiny';
+requires 'HTTP::Request::Common';
+requires 'HTTP::Thin';
 requires 'IO::Socket::SSL';
 requires 'JSON::MaybeXS';
 requires 'Moo';
@@ -13,4 +13,4 @@ requires 'Throwable';
 requires 'Try::Tiny';
 
 requires 'AnyEvent';
-requires 'AnyEvent::HTTP';
+requires 'AnyEvent::HTTP::Message';

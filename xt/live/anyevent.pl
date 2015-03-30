@@ -15,7 +15,7 @@ my $api = Twitter::API::AnyEvent->new(
 my $cv = AE::cv;
 
 $api->get('account/verify_credentials', sub {
-    my ( $data, $c, $msg ) = @_;
+    my ( $data, $c, $res, $msg ) = @_;
 
     $cv->croak($msg) unless $data;
     $cv->send($data);

@@ -4,23 +4,15 @@ use Moo;
 use strictures 2;
 use namespace::autoclean;
 
-use overload '""' => 'message';
+use overload '""' => 'stringify';
 
 with 'Throwable';
 
-has message => (
+has [ qw/message context response twitter_error/ ] => (
     is       => 'rw',
     required => 1,
 );
 
-has context => (
-    is       => 'rw',
-    required => 1,
-);
-
-has twitter_error => (
-    is       => 'rw',
-    required => 1,
-);
+sub stringify { shift->message }
 
 1;

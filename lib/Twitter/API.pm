@@ -2,19 +2,22 @@ package Twitter::API;
 # Abstract: Twitter API library
 our $VERSION = 0.01000;
 
+use 5.12.1;
 use Moo;
 use strictures 2;
 use namespace::autoclean;
 use Carp;
 use Class::Load qw/load_class/;
 use JSON::MaybeXS qw/decode_json/;
-use HTTP::Request;
+use HTTP::Request::Common qw/GET POST/;
+use HTTP::Thin;
 use Net::OAuth;
 use Digest::SHA;
 use Try::Tiny;
 use Scalar::Util qw/reftype/;
 use URI;
 use URI::Escape ();
+use Encode qw/encode_utf8/;
 use Twitter::API::Error;
 
 has [ qw/consumer_key consumer_secret/ ] => (
@@ -62,7 +65,7 @@ has user_agent => (
         my $self = shift;
 
         load_class 'HTTP::Tiny';
-        HTTP::Tiny->new(
+        HTTP::Thin->new(
             timeout => $self->timeout,
             agent   => $self->agent,
         );
@@ -98,16 +101,17 @@ sub request {
 
     $self->preprocess_args($c);
     $self->preprocess_url($c);
-    $self->add_headers($c);
     $self->add_authentication($c);
-    $self->finalize_request($c);
-    $self->send_request($c);
+    my $req = $self->finalize_request($c);
+    $self->send_request($c, $req);
 }
 
 sub preprocess_args {
     my ( $self, $c ) = @_;
 
-    $self->flatten_array_args($c->{args});
+    if ( $c->{http_method} eq 'GET' ) {
+        $self->flatten_array_args($c->{args});
+    }
 }
 
 sub preprocess_url {
@@ -120,40 +124,57 @@ sub preprocess_url {
     }
 }
 
-sub add_headers {
-    my ( $self, $c ) = @_;
-
-    if ( $c->{http_method} eq 'POST' ) {
-        $c->{headers}{'Content-Type'} = 'application/x-www-form-urlencoded';
-    }
-}
-
 sub finalize_request {
     my ( $self, $c ) = @_;
 
-    my $uri = $c->{uri} = URI->new($c->{url});
-
-    # TODO: unless multi-part request
-    if ( my $encoded_args_string = $self->encode_args_string($c->{args}) ) {
-        if ( $c->{http_method} eq 'POST' ) {
-            $c->{body} = $encoded_args_string;
-        }
-        else {
-            $uri->query($encoded_args_string);
-        }
+    my $req;
+    for ( $c->{http_method} ) {
+        $req = $self->finalize_multipart_post($c)
+            when $_ eq 'POST' && $self->is_multipart($c->{args});
+        $req = $self->finalize_post($c)  when $_ eq 'POST';
+        $req = $self->finalize_get($c)   when $_ eq 'GET';
+        default { croak "unexpected HTTP method: $_" }
     }
+
+    $req;
+}
+
+sub finalize_multipart_post {
+    my ( $self, $c ) = @_;
+
+    POST $c->{url},
+        %{ $c->{headers} },
+        Content_Type => 'form-data',
+        Content      => [
+            map { ref $_ ? $_ : encode_utf8 $_ } %{ $c->{args} },
+        ];
+}
+
+sub finalize_post {
+    my ( $self, $c ) = @_;
+
+    POST $c->{url},
+        %{ $c->{headers} },
+        Content_Type => 'application/x-www-form-urlencoded',
+        Content      => $self->encode_args_string($c->{args});
+}
+
+sub finalize_get {
+    my ( $self, $c ) = @_;
+
+    my $uri = URI->new($c->{url});
+    if ( my $encoded = $self->encode_args_string($c->{args}) ) {
+        $uri->query($encoded);
+    }
+
+    GET $uri, %{ $c->{headers} };
 }
 
 around send_request => sub {
-    my ( $orig, $self, $c ) = @_;
+    my ( $orig, $self, $c, $req ) = @_;
 
-    my $res = $self->$orig($c->{http_method}, $c->{uri}, {
-        headers => $c->{headers},
-        content => $c->{body},
-    });
-
-    $c->{response} = $res;
-    return $self->process_response($c, $res);
+    my $res = $self->$orig($req);
+    $self->process_response($c, $res);
 };
 
 sub flatten_array_args {
@@ -180,34 +201,33 @@ sub encode_args_string {
 }
 
 sub process_response {
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $res ) = @_;
 
-    my $res = $c->{response};
-    my $data = try { decode_json($res->{content}) };
+    my $data = try { decode_json($res->decoded_content) };
 
-    if ( $data && $res->{success} ) {
-        return wantarray ? ( $data, $c ) : $data;
+    if ( $data && $res->is_success ) {
+        return $data;
     }
 
-    return $self->process_error_response($c, $data);
+    $self->process_error_response($c, $res, $data);
 }
 
 sub process_error_response {
-    my ( $self, $c, $data ) = @_;
+    my ( $self, $c, $res, $data ) = @_;
 
-    my $msg = $self->error_message($c, $data);
+    my $msg = $self->error_message($c, $res, $data);
     Twitter::API::Error->throw({
         message       => $msg,
         context       => $c,
+        response      => $res,
         twitter_error => $data,
     });
 }
 
 sub error_message {
-    my ( $self, $c, $data ) = @_;
+    my ( $self, $c, $res, $data ) = @_;
 
-    my $res  = $c->{response};
-    my $msg  = "$$res{status}: $$res{reason}";
+    my $msg  = join ': ', $res->code, $res->message;
     my $errors = try {
         join ', ' => map "$$_{code}: $$_{message}", @{ $$data{errors} };
     };
@@ -219,6 +239,7 @@ sub error_message {
 sub add_authentication {
     my ( $self, $c ) = @_;
 
+    my $args = $c->{args};
     my $req = Net::OAuth->request('protected resource')->new(
         consumer_key     => $self->consumer_key,
         consumer_secret  => $self->consumer_secret,
@@ -229,11 +250,14 @@ sub add_authentication {
         signature_method => 'HMAC-SHA1',
         timestamp        => time,
         nonce            => Digest::SHA::sha1_base64({} . time . $$ . rand),
-        extra_params     => $c->{args},
+        extra_params     => $self->is_multipart($args) ? {} : $args,
     );
 
     $req->sign;
     $c->{headers}{Authorization} =  $req->to_authorization_header;
 }
+
+# If any of the args are references, we'll assume it's a multipart request
+sub is_multipart { !!grep ref, values %{ $_[1] } }
 
 1;

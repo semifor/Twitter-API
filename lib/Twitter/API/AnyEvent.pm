@@ -5,7 +5,8 @@ use Moo;
 use namespace::autoclean;
 use strictures 2;
 use Carp;
-use AnyEvent::HTTP;
+use AnyEvent::HTTP::Request;
+use AnyEvent::HTTP::Response;
 use Scalar::Util qw/reftype weaken/;
 
 extends 'Twitter::API';
@@ -22,38 +23,30 @@ around request => sub {
 };
 
 sub send_request {
-    my ( $self, $c ) = @_;
+    my ( $self, $c, $req ) = @_;
     weaken $self;
 
     my $cb = pop @{ $$c{extra_args} };
-    my $w; $w = http_request(
-        $c->{http_method},
-        $c->{uri},
-        body    => $c->{body},
-        headers => $c->{headers},
-        timeout => $self->timeout,
-        sub {
+    my $w;
+    my $ae_req = AnyEvent::HTTP::Request->new($req, {
+        params => {
+            timeout => $self->timeout,
+        },
+        cb => sub {
             undef $w;
-            return unless $cb;
-            my ( $body, $headers ) = @_;
+            my $res = AnyEvent::HTTP::Response->new(@_);
 
-            # mock up an HTTP::Tiny response
-            $c->{response} = {
-                success => scalar $headers->{Status} =~ /^2/,
-                status  => $headers->{Status},
-                reason  => $headers->{Reason},
-                content => $body,
-                url     => $headers->{URL},
-            };
-            $cb->($self->process_response($c), $c);
+            $cb->($self->process_response($c, $res->to_http_message));
         }
-    );
+    });
+
+    $w = $ae_req->send;
 }
 
 sub process_error_response {
-    my ( $self, $c, $data ) = @_;
+    my ( $self, $c, $res, $data ) = @_;
 
-    return ( undef, $c, $self->error_message($c, $data)  );
+    return ( undef, $c, $res, $self->error_message($c, $res, $data)  );
 }
 
 1;
