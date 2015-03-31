@@ -50,7 +50,7 @@ has [ qw/access_token access_token_secret/ ] => (
 has default_headers => (
     is => 'ro',
     default => sub {
-        return {
+        {
             'X-Twitter-Client'         => 'Perl5-' . __PACKAGE__,
             'X-Twitter-Client-Version' => $VERSION,
             'X-Twitter-Client-URL'     => 'https://github.com/semifor/Twitter-API',
@@ -74,6 +74,8 @@ has user_agent => (
         send_request => 'request',
     },
 );
+
+sub authorized { shift->has_access_token }
 
 sub BUILD {
     my ( $self, $args ) = @_;
@@ -136,7 +138,7 @@ sub finalize_request {
         default { croak "unexpected HTTP method: $_" }
     }
 
-    $req;
+    $c->{http_request} = $req;
 }
 
 sub finalize_multipart_post {
@@ -197,7 +199,7 @@ sub encode_args_string {
         push @pairs, join '=', map $self->encode($_), $k, $$args{$k};
     }
 
-    return join '&', @pairs;
+    join '&', @pairs;
 }
 
 sub process_response {
@@ -233,7 +235,7 @@ sub error_message {
     };
 
     $msg = join ' => ', $msg, $errors if $errors;
-    return $msg;
+    $msg;
 }
 
 sub add_authentication {
