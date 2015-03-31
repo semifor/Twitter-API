@@ -6,6 +6,7 @@ requires 'HTTP::Thin';
 requires 'IO::Socket::SSL';
 requires 'JSON::MaybeXS';
 requires 'Moo';
+requires 'MooX::Aliases';
 requires 'namespace::autoclean';
 requires 'Net::OAuth';
 requires 'strictures';
