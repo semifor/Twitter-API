@@ -1,6 +1,8 @@
 requires 'Carp';
 requires 'Class::Load';
+requires 'Data::Visitor::Lite';
 requires 'Digest::SHA';
+requires 'HTML::Entities';
 requires 'HTTP::Request::Common';
 requires 'HTTP::Thin';
 requires 'IO::Socket::SSL';
