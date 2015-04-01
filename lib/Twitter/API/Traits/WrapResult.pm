@@ -5,7 +5,7 @@ use strictures 2;
 use Moo::Role;
 use Twitter::API::WrappedResult;
 
-around process_response => sub {
+around inflate_response => sub {
     my $orig = shift;
     my $self = shift;
     my ( $c, $res ) = @_;

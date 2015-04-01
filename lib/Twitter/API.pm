@@ -104,8 +104,9 @@ sub request {
     $self->preprocess_args($c);
     $self->preprocess_url($c);
     $self->add_authentication($c);
-    my $req = $self->finalize_request($c);
-    $self->send_request($c, $req);
+    $self->finalize_request($c);
+    my $res = $self->send_request($c) // return;
+    $self->inflate_response($c, $res);
 }
 
 sub preprocess_args {
@@ -173,10 +174,9 @@ sub finalize_get {
 }
 
 around send_request => sub {
-    my ( $orig, $self, $c, $req ) = @_;
+    my ( $orig, $self, $c ) = @_;
 
-    my $res = $self->$orig($req);
-    $self->process_response($c, $res);
+    $self->$orig($c->{http_request});
 };
 
 sub flatten_array_args {
@@ -202,7 +202,7 @@ sub encode_args_string {
     join '&', @pairs;
 }
 
-sub process_response {
+sub inflate_response {
     my ( $self, $c, $res ) = @_;
 
     my $data = try { decode_json($res->decoded_content) };

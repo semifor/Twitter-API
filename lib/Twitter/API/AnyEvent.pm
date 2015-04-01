@@ -23,24 +23,26 @@ around request => sub {
 };
 
 sub send_request {
-    my ( $self, $c, $req ) = @_;
+    my ( $self, $c ) = @_;
     weaken $self;
 
     my $cb = pop @{ $$c{extra_args} };
     my $w;
-    my $ae_req = AnyEvent::HTTP::Request->new($req, {
+    my $ae_req = AnyEvent::HTTP::Request->new($c->{http_request}, {
         params => {
             timeout => $self->timeout,
         },
         cb => sub {
             undef $w;
             my $res = AnyEvent::HTTP::Response->new(@_);
-
-            $cb->($self->process_response($c, $res->to_http_message));
+            $cb->($self->inflate_response($c, $res->to_http_message));
         }
     });
 
     $w = $ae_req->send;
+
+    # return false to exit the request early
+    return;
 }
 
 sub process_error_response {
