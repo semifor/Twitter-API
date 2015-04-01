@@ -101,12 +101,22 @@ sub request {
         extra_args  => \@_,
     };
 
+    $self->extract_synthetic_args($c);
     $self->preprocess_args($c);
     $self->preprocess_url($c);
     $self->add_authentication($c);
     $self->finalize_request($c);
     my $res = $self->send_request($c) // return;
     $self->inflate_response($c, $res);
+}
+
+sub extract_synthetic_args {
+    my ( $self, $c ) = @_;
+
+    my $args = $$c{args};
+    for ( keys %$args ) {
+        $$c{$_} = delete $$args{$_} if /^-/;
+    }
 }
 
 sub preprocess_args {
@@ -245,8 +255,8 @@ sub add_authentication {
     my $req = Net::OAuth->request('protected resource')->new(
         consumer_key     => $self->consumer_key,
         consumer_secret  => $self->consumer_secret,
-        token            => $self->access_token,
-        token_secret     => $self->access_token_secret,
+        token            => $$c{-access_token} // $self->access_token,
+        token_secret     => $$c{-access_token_secret} // $self->access_token_secret,
         request_url      => $c->{url},
         request_method   => $c->{http_method},
         signature_method => 'HMAC-SHA1',
