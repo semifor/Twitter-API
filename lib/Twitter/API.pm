@@ -81,7 +81,7 @@ sub BUILD {
     my ( $self, $args ) = @_;
 
     if ( my $traits = delete $$args{traits} ) {
-        my @roles = map { s/^\+// ? $_ : "Twitter::API::Traits::$_" } @$traits;
+        my @roles = map { s/^\+// ? $_ : "Twitter::API::Trait::$_" } @$traits;
         Role::Tiny->apply_roles_to_object($self, @roles);
     }
 }

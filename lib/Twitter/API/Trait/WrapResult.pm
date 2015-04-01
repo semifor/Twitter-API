@@ -1,4 +1,4 @@
-package Twitter::API::Traits::WrapResult;
+package Twitter::API::Trait::WrapResult;
 # Abstract: Return an object that includes HTTP response, etc.
 
 use strictures 2;

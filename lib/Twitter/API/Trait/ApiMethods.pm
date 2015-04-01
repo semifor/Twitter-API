@@ -1,4 +1,4 @@
-package Twitter::API::Traits::ApiMethods;
+package Twitter::API::Trait::ApiMethods;
 # Abstract: Net::Twitter like convenience methods
 
 use 5.12.1;
