@@ -15,7 +15,7 @@ sub mentions {
 alias $_ => 'mentions' for qw/replies mentions_timeline/;
 
 sub user_timeline {
-    shift->request(get => 'statuses/user_timeline', @_);
+    shift->_with_pos_args([ ':ID' ], get => 'statuses/user_timeline', @_);
 }
 
 sub home_timeline {

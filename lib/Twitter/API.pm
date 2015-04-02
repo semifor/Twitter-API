@@ -8,7 +8,7 @@ use strictures 2;
 use namespace::autoclean;
 use Carp;
 use Class::Load qw/load_class/;
-use JSON::MaybeXS qw/decode_json/;
+use JSON::MaybeXS ();
 use HTTP::Request::Common qw/GET POST/;
 use HTTP::Thin;
 use Net::OAuth;
@@ -71,8 +71,16 @@ has user_agent => (
         );
     },
     handles => {
-        send_request => 'request',
+        send_request   => 'request',
+        simple_request => 'request',
     },
+);
+
+has json_parser => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub { JSON::MaybeXS->new(utf8 => 1) },
+    handles => { from_json => 'decode' },
 );
 
 sub authorized { shift->has_access_token }
@@ -104,7 +112,7 @@ sub request {
     $self->extract_synthetic_args($c);
     $self->preprocess_args($c);
     $self->preprocess_url($c);
-    $self->add_authentication($c);
+    $self->add_authorization($c);
     $self->finalize_request($c);
     my $res = $self->send_request($c) // return;
     $self->inflate_response($c, $res);
@@ -215,7 +223,7 @@ sub encode_args_string {
 sub inflate_response {
     my ( $self, $c, $res ) = @_;
 
-    my $data = try { decode_json($res->decoded_content) };
+    my $data = try { $self->from_json($res->decoded_content) };
 
     if ( $data && $res->is_success ) {
         return $data;
@@ -248,7 +256,7 @@ sub error_message {
     $msg;
 }
 
-sub add_authentication {
+sub add_authorization {
     my ( $self, $c ) = @_;
 
     my $args = $c->{args};

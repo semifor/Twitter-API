@@ -56,7 +56,7 @@ around send_request => sub {
         # If this is an OAuth request, we need a new Authorization header
         # (the nonce may be invalid, now).
         if ( $is_oauth ) {
-            $msg->header(authorization => $self->add_authentication($c));
+            $msg->header(authorization => $self->add_authorization($c));
             $c->{http_request} = $msg;
         }
     }
