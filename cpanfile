@@ -13,6 +13,7 @@ requires 'namespace::autoclean';
 requires 'Net::OAuth';
 requires 'strictures';
 requires 'Throwable';
+requires 'Time::Piece';
 requires 'Try::Tiny';
 
 requires 'AnyEvent';
