@@ -261,6 +261,7 @@ sub add_authorization {
 
     my $args = $c->{args};
     my $req = Net::OAuth->request('protected resource')->new(
+        protocol_version => Net::OAuth::PROTOCOL_VERSION_1_0A,
         consumer_key     => $self->consumer_key,
         consumer_secret  => $self->consumer_secret,
         token            => $$c{-access_token} // $self->access_token,
