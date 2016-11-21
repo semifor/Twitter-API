@@ -209,15 +209,28 @@ sub suggestion_categories {
     shift->request(get => 'users/suggestions', @_);
 }
 
-# NT incompatibility - :slug was :category
+# Net::Twitter compatibility - rename category to slug
+my $rename_category = sub {
+    my $self = shift;
+
+    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+    $args->{slug} = delete $args->{category} if exists $args->{category};
+    return ( @_, $args );
+};
+
 sub user_suggestions_for {
-    shift->_with_pos_args([ 'slug' ], get => 'users/suggestions/:slug', @_);
+    my $self = shift;
+
+    $self->_with_pos_args([ 'slug' ], get => 'users/suggestions/:slug',
+        $self->$rename_category(@_));
 }
 alias follow_suggestions => 'user_suggestions_for';
 
-# NT incompatibility - :slug was :category
 sub user_suggestions {
-    shift->_with_pos_args([ 'slug' ], get => 'users/suggestions/:slug/members', @_);
+    my $self = shift;
+
+    $self->_with_pos_args([ 'slug' ], get => 'users/suggestions/:slug/members',
+        $self->$rename_category(@_));
 }
 
 sub favorites {
