@@ -10,7 +10,6 @@ use Carp;
 use Class::Load qw/load_class/;
 use JSON::MaybeXS ();
 use HTTP::Request::Common qw/GET POST/;
-use HTTP::Thin;
 use Net::OAuth;
 use Digest::SHA;
 use Try::Tiny;
@@ -64,7 +63,7 @@ has user_agent => (
     default => sub {
         my $self = shift;
 
-        load_class 'HTTP::Tiny';
+        load_class 'HTTP::Thin';
         HTTP::Thin->new(
             timeout => $self->timeout,
             agent   => $self->agent,
@@ -148,16 +147,14 @@ sub preprocess_url {
 sub finalize_request {
     my ( $self, $c ) = @_;
 
-    my $req;
-    for ( $c->{http_method} ) {
-        $req = $self->finalize_multipart_post($c)
-            when $_ eq 'POST' && $self->is_multipart($c->{args});
-        $req = $self->finalize_post($c)  when $_ eq 'POST';
-        $req = $self->finalize_get($c)   when $_ eq 'GET';
-        default { croak "unexpected HTTP method: $_" }
-    }
-
-    $c->{http_request} = $req;
+    my $method = $c->{http_method};
+    $c->{http_request} =
+        $method eq 'POST' ? (
+            $self->is_multipart($c->{args}) ? $self->finalize_multipart_post($c)
+            : $self->finalize_post($c)
+        )
+        : $method eq 'GET' ? $self->finalize_get($c)
+        : croak "unexpected HTTP method: $_";
 }
 
 sub finalize_multipart_post {

@@ -70,7 +70,7 @@ sub upload_media {
 }
 
 sub search {
-    shift->_with_pos_ards([ 'q' ], get => 'search/tweets', @_);
+    shift->_with_pos_args([ 'q' ], get => 'search/tweets', @_);
 }
 
 sub direct_messages {
@@ -169,7 +169,6 @@ sub update_profile {
 sub update_profile_background_image {
     shift->request(post => 'account/update_profile_background_image', @_);
 }
-
 
 sub update_profile_image {
     shift->_with_pos_args([ 'image' ], post => 'account/update_profile_image', @_);
@@ -440,7 +439,7 @@ sub _with_pos_args {
     }
 
     # transform inferred id type
-    if ( my $_ = delete $pos_args{':ID'} ) {
+    if ( local $_ = delete $pos_args{':ID'} ) {
         $pos_args{ /\D/ ? 'screen_name' : 'user_id' } = $_;
     }
 

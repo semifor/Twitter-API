@@ -1,4 +1,4 @@
-package Twitter::API::Traits::RetryOnError;
+package Twitter::API::Trait::RetryOnError;
 # Abstract: Automatically retry API calls with progressive fallback
 
 use strictures 2;
