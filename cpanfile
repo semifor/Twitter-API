@@ -16,7 +16,3 @@ requires 'strictures';
 requires 'Throwable';
 requires 'Time::Piece';
 requires 'Try::Tiny';
-
-# AnyEvent subclass
-requires 'AnyEvent';
-requires 'AnyEvent::HTTP::Message';
