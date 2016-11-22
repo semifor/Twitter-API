@@ -47,11 +47,6 @@ sub retweet {
     shift->_with_pos_args([ 'id' ], post => 'statuses/retweet/:id', @_);
 }
 
-sub update_with_media {
-    shift->_with_pos_args([ qw/status media[]/ ],
-        post => 'statuses/update_with_media', @_);
-}
-
 sub oembed {
     shift->request(get => 'statuses/oembed', @_);
 }
@@ -156,10 +151,6 @@ sub verify_credentials {
 
 sub update_account_settings {
     shift->request(post => 'account/settings', @_);
-}
-
-sub update_delivery_device {
-    shift->_with_pos_args([ 'device' ], post => 'account/update_delivery_device', @_);
 }
 
 sub update_profile {
@@ -437,6 +428,50 @@ sub create_mute {
 
 sub destroy_mute {
     shift->_with_pos_args([ 'id' ], post => 'mutes/users/destroy', @_);
+}
+
+sub collection_entries {
+    shift->_with_pos_args([ 'id' ], get => 'collections/entries', @_);
+}
+
+sub collections {
+    shift->_with_pos_args([ ':ID' ], get => 'collections/list', @_);
+}
+
+sub create_collection {
+    shift->_with_pos_args([ 'name' ], post => 'collections/create', @_);
+}
+
+sub destroy_collection {
+    shift->_with_pos_args([ 'id' ], post => 'collections/destroy', @_);
+}
+
+sub add_collection_entry {
+    shift->_with_pos_args([ qw/id tweet_id /],
+        post => 'collections/entries/add', @_);
+}
+
+sub curate_collection {
+    # TODO: post json body
+    shift->post('collections/entries/curate', @_);
+}
+
+sub move_collection_entry {
+    shift->_with_pos_args([ qw/id tweet_id relative_to /],
+        post => 'collections/entries/move', @_);
+}
+
+sub remove_collection_entry {
+    shift->_with_pos_args([ qw/id tweet_id/ ],
+        post => 'collections/entries/remove', @_);
+}
+
+sub update_collection {
+    shift->_with_pos_args([ 'id' ], post => 'collections/update', @_);
+}
+
+sub unretweet {
+    shift->_with_pos_args([ 'id' ], post => 'statuses/unretweet/:id', @_);
 }
 
 sub _with_pos_args {
