@@ -204,14 +204,14 @@ sub flatten_array_args {
     }
 }
 
-sub encode { URI::Escape::uri_escape_utf8($_[1],'^\w.~-') }
+sub uri_escape { URI::Escape::uri_escape_utf8($_[1],'^\w.~-') }
 
 sub encode_args_string {
     my ( $self, $args ) = @_;
 
     my @pairs;
     for my $k ( sort keys %$args ) {
-        push @pairs, join '=', map $self->encode($_), $k, $$args{$k};
+        push @pairs, join '=', map $self->uri_escape($_), $k, $$args{$k};
     }
 
     join '&', @pairs;
