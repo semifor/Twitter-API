@@ -88,6 +88,12 @@ sub BUILD {
     my ( $self, $args ) = @_;
 
     if ( my $traits = delete $$args{traits} ) {
+        for my $i ( 0..$#$traits ) {
+            splice @$traits, $i, 1, qw/
+                ApiMethods RetryOnError DecodeHtmlEntities NormalizeBooleans
+                WrapResult
+            / and last if $$traits[$i] eq '@enchilada';
+        }
         my @roles = map { s/^\+// ? $_ : "Twitter::API::Trait::$_" } @$traits;
         Role::Tiny->apply_roles_to_object($self, @roles);
     }
