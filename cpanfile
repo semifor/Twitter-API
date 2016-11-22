@@ -20,9 +20,3 @@ requires 'Try::Tiny';
 # AnyEvent subclass
 requires 'AnyEvent';
 requires 'AnyEvent::HTTP::Message';
-
-# InflateObjects trait
-requires 'Data::Visitor::Callback';
-requires 'Hash::Objectify';
-requires 'Regexp::Common';
-requires 'Regexp::Common::time';
