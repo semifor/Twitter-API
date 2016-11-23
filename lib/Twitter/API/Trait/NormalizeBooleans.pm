@@ -3,7 +3,8 @@ use Moo::Role;
 
 use 5.12.1;
 use strictures 2;
-use namespace::autoclean;
+
+use namespace::clean;
 
 requires 'preprocess_args';
 

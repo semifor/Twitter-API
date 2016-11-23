@@ -3,12 +3,13 @@ package Twitter::API::Trait::ApiMethods;
 
 use 5.12.1;
 use strictures 2;
-use namespace::autoclean;
 
 use Carp;
 use Moo::Role;
 use MooX::Aliases;
 use Scalar::Util qw/reftype/;
+
+use namespace::clean;
 
 sub mentions {
     shift->request(get => 'statuses/mentions_timeline', @_);

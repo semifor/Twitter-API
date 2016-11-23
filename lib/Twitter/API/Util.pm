@@ -3,7 +3,7 @@ package Twitter::API::Util;
 
 use strictures 2;
 use Time::Piece;
-use Sub::Exporter -setup => {
+use Sub::Exporter::Progressive -setup => {
     exports => [ qw/timestamp_to_timepiece timestamp_to_epoch/ ],
 };
 

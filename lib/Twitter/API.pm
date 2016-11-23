@@ -5,7 +5,6 @@ our $VERSION = 0.01000;
 use 5.12.1;
 use Moo;
 use strictures 2;
-use namespace::autoclean;
 use Carp;
 use Class::Load qw/load_class/;
 use JSON::MaybeXS ();
@@ -18,6 +17,8 @@ use URI;
 use URI::Escape ();
 use Encode qw/encode_utf8/;
 use Twitter::API::Error;
+
+use namespace::clean;
 
 has [ qw/consumer_key consumer_secret/ ] => (
     is       => 'ro',

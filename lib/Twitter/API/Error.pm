@@ -2,7 +2,7 @@ package Twitter::API::Error;
 
 use Moo;
 use strictures 2;
-use namespace::autoclean;
+use namespace::clean;
 
 use overload '""' => 'stringify';
 
