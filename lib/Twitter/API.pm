@@ -79,7 +79,10 @@ has json_parser => (
     is      => 'ro',
     lazy    => 1,
     default => sub { JSON::MaybeXS->new(utf8 => 1) },
-    handles => { from_json => 'decode' },
+    handles => {
+        from_json => 'decode',
+        to_json   => 'encode',
+    },
 );
 
 sub authorized { shift->has_access_token }
@@ -157,6 +160,7 @@ sub finalize_request {
     $c->{http_request} =
         $method eq 'POST' ? (
             $self->is_multipart($c->{args}) ? $self->finalize_multipart_post($c)
+            : $c->{-to_json} ? $self->finalize_json_post($c)
             : $self->finalize_post($c)
         )
         : $method eq 'GET' ? $self->finalize_get($c)
@@ -172,6 +176,15 @@ sub finalize_multipart_post {
         Content      => [
             map { ref $_ ? $_ : encode_utf8 $_ } %{ $c->{args} },
         ];
+}
+
+sub finalize_json_post {
+    my ( $self, $c ) = @_;
+
+    POST $c->{url},
+        %{ $c->{headers} },
+        Content_Type => 'application/json',
+        Content      => $self->to_json($c->{-to_json});
 }
 
 sub finalize_post {

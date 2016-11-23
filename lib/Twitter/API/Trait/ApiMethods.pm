@@ -5,6 +5,7 @@ use 5.12.1;
 use strictures 2;
 use namespace::autoclean;
 
+use Carp;
 use Moo::Role;
 use MooX::Aliases;
 use Scalar::Util qw/reftype/;
@@ -452,8 +453,12 @@ sub add_collection_entry {
 }
 
 sub curate_collection {
-    # TODO: post json body
-    shift->post('collections/entries/curate', @_);
+    my ( $self, $to_json ) = @_;
+
+    croak 'unexpected extra args' if @_ > 2;
+    $self->request(post => 'collections/entries/curate', {
+        -to_json => $to_json,
+    });
 }
 
 sub move_collection_entry {
