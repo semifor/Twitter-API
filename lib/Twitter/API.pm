@@ -51,6 +51,7 @@ has default_headers => (
     is => 'ro',
     default => sub {
         {
+            'Accept'                   => 'application/json',
             'X-Twitter-Client'         => 'Perl5-' . __PACKAGE__,
             'X-Twitter-Client-Version' => $VERSION,
             'X-Twitter-Client-URL'     => 'https://github.com/semifor/Twitter-API',
@@ -184,7 +185,7 @@ sub finalize_json_post {
 
     POST $c->{url},
         %{ $c->{headers} },
-        Content_Type => 'application/json',
+        Content_Type => 'application/json;charset=utf-8',
         Content      => $self->to_json($c->{-to_json});
 }
 
