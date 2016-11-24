@@ -7,7 +7,7 @@ use open qw/:std :utf8/;
 use Twitter::API;
 
 my $api = Twitter::API->new(
-    traits => [ qw/ApiMethods WrapResult RetryOnError/ ],
+    traits => [ qw/ApiMethods RetryOnError/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},
     access_token        => $ENV{ACCESS_TOKEN},
@@ -15,6 +15,5 @@ my $api = Twitter::API->new(
 );
 
 my $r = $api->verify_credentials;
-say "${ \$r->result->{screen_name} } is authorized";
-say "Rate limit: ${ \$r->rate_limit }, remaining: ${ \$r->rate_limit_remaining }";
+say "$$r{screen_name} is authorized";
 

@@ -7,16 +7,15 @@ use open qw/:std :utf8/;
 use Twitter::API;
 
 my $api = Twitter::API->new(
-    traits => [ qw/AppAuth ApiMethods WrapResult/ ],
+    traits => [ qw/AppAuth ApiMethods/ ],
     consumer_key    => $ENV{CONSUMER_KEY},
     consumer_secret => $ENV{CONSUMER_SECRET},
 );
 
 $api->request_access_token;
 my $r = $api->user_timeline(twitterapi => { count => 10 });
-say "Rate limit: ${ \$r->rate_limit }, remaining: ${ \$r->rate_limit_remaining }";
 
-for my $status ( @{ $r->result } ) {
+for my $status ( @$r ) {
     say "$status->{user}{screen_name}: $status->{text}";
 }
 

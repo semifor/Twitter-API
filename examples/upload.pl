@@ -12,8 +12,6 @@ my $api = Twitter::API->new(
     access_token_secret => $ENV{ACCESS_TOKEN_SECRET},
 );
 
-my $r = $api->post('https://upload.twitter.com/1.1/media/upload.json', {
-    media => [ "$ENV{HOME}/Downloads/hello-world.png" ]
-});
+my $r = $api->upload_media([ "$ENV{HOME}/Downloads/hello-world.png" ]);
 
 say "media_id: $$r{media_id}";
