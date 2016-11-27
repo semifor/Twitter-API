@@ -55,10 +55,11 @@ has default_headers => (
     is => 'ro',
     default => sub {
         {
-            'Accept'                   => 'application/json',
-            'X-Twitter-Client'         => 'Perl5-' . __PACKAGE__,
-            'X-Twitter-Client-Version' => $VERSION,
-            'X-Twitter-Client-URL'     => 'https://github.com/semifor/Twitter-API',
+            accept                   => 'application/json',
+            content_type             => 'application/json;charset=utf8',
+            x_twitter_client         => 'Perl5-' . __PACKAGE__,
+            x_twitter_client_version => $VERSION,
+            x_twitter_client_url     => 'https://github.com/semifor/Twitter-API',
         };
     },
 );
@@ -182,11 +183,14 @@ sub add_authorization {
     );
 
     $req->sign;
-    $c->{headers}{Authorization} =  $req->to_authorization_header;
+    $c->{headers}{authorization} =  $req->to_authorization_header;
 }
 
 sub finalize_request {
     my ( $self, $c ) = @_;
+
+    # possible override Accept header
+    $c->{headers}{accept} = $c->{-accept} if exists $c->{-accept};
 
     my $method = $c->{http_method};
     $c->{http_request} =
@@ -202,10 +206,11 @@ sub finalize_request {
 sub finalize_multipart_post {
     my ( $self, $c ) = @_;
 
+    my $headers = $c->{headers};
+    $headers->{content_type} = 'multipart/form-data;charset=utf-8';
     POST $c->{url},
-        %{ $c->{headers} },
-        Content_Type => 'form-data',
-        Content      => [
+        %$headers,
+        Content => [
             map { ref $_ ? $_ : encode_utf8 $_ } %{ $c->{args} },
         ];
 }
@@ -215,17 +220,17 @@ sub finalize_json_post {
 
     POST $c->{url},
         %{ $c->{headers} },
-        Content_Type => 'application/json;charset=utf-8',
-        Content      => $self->to_json($c->{-to_json});
+        Content => $self->to_json($c->{-to_json});
 }
 
 sub finalize_post {
     my ( $self, $c ) = @_;
 
+    my $headers = $c->{headers};
+    $headers->{content_type} = 'application/x-www-form-urlencoded;charset=utf-8';
     POST $c->{url},
-        %{ $c->{headers} },
-        Content_Type => 'application/x-www-form-urlencoded',
-        Content      => $self->encode_args_string($c->{args});
+        %$headers,
+        Content => $self->encode_args_string($c->{args});
 }
 
 sub finalize_get {
@@ -253,8 +258,17 @@ sub inflate_response {
         if ( $res->content_type eq 'application/json' ) {
             $data = $self->from_json($res->content);
         }
-        else {
-            # /oauth/* endpoinds return text/html with
+        elsif ( ($c->{-accept} // '') eq 'application/x-www-form-urlencoded' ) {
+
+            # Twitter sets Content-Type: text/html for /oauth/request_token and
+            # /oauth/access_token even though they return url encoded form
+            # data. So we'll decode based on what we expected when we set the
+            # Accept header. We don't want to assume form data when we didn't
+            # request it, because sometimes twitter returns 200 OK with actual
+            # HTML content. We don't want to decode and return that. It's an
+            # error. We'll just leave $data unset if we don't have a reasonable
+            # expectation of the content type.
+
             $data = URL::Encode::url_params_mixed($res->content, 1);
         }
     }
@@ -335,8 +349,9 @@ sub get_request_token {
 
     $args->{callback} //= 'oob';
     return $self->request(post => $self->oauth_url_for('request_token'), {
-        -oauth_type     => 'request token',
-        -oauth_args     => $args,
+        -accept     => 'application/x-www-form-urlencoded',
+        -oauth_type => 'request token',
+        -oauth_args => $args,
     });
 }
 
@@ -356,6 +371,7 @@ sub get_access_token {
 
     $args->{-oauth_type} = 'access token';
     $self->request(post => $self->oauth_url_for('access_token'), {
+        -accept     => 'application/x-www-form-urlencoded',
         -oauth_type => 'access_token',
         -oauth_args => $args,
     });
