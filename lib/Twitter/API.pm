@@ -129,8 +129,9 @@ sub request {
     $self->preprocess_url($c);
     $self->add_authorization($c);
     $self->finalize_request($c);
-    my $res = $self->send_request($c) // return;
-    $self->inflate_response($c, $res);
+    $c->{http_response} = $self->send_request($c) // return;
+
+    $self->inflate_response($c);
 }
 
 sub extract_synthetic_args {
@@ -251,8 +252,9 @@ around send_request => sub {
 };
 
 sub inflate_response {
-    my ( $self, $c, $res ) = @_;
+    my ( $self, $c ) = @_;
 
+    my $res = $c->{http_response};
     my $data;
     try {
         if ( $res->content_type eq 'application/json' ) {
@@ -283,7 +285,7 @@ sub inflate_response {
         return $data;
     }
 
-    $self->process_error_response($c, $res, $data);
+    $self->process_error_response($c, $data);
 }
 
 sub flatten_array_args {
@@ -310,20 +312,20 @@ sub encode_args_string {
 sub uri_escape { URL::Encode::url_encode_utf8($_[1]) }
 
 sub process_error_response {
-    my ( $self, $c, $res, $data ) = @_;
+    my ( $self, $c, $data ) = @_;
 
-    my $msg = $self->error_message($c, $res, $data);
+    my $msg = $self->error_message($c, $data);
     Twitter::API::Error->throw({
-        message       => $msg,
-        context       => $c,
-        response      => $res,
-        twitter_error => $data,
+        message           => $msg,
+        context           => $c,
+        twitter_error     => $data,
     });
 }
 
 sub error_message {
-    my ( $self, $c, $res, $data ) = @_;
+    my ( $self, $c, $data ) = @_;
 
+    my $res = $c->{http_response};
     my $msg  = join ': ', $res->code, $res->message;
     my $errors = try {
         join ', ' => map "$$_{code}: $$_{message}", @{ $$data{errors} };
