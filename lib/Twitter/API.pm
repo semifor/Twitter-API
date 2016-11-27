@@ -1,6 +1,5 @@
 package Twitter::API;
-# Abstract: Twitter API library
-our $VERSION = 0.01000;
+our $VERSION = '1.0000';
 
 use 5.12.1;
 use Moo;
@@ -14,7 +13,7 @@ use Digest::SHA;
 use Try::Tiny;
 use Scalar::Util qw/reftype/;
 use URI;
-use URI::Escape ();
+use URL::Encode ();
 use Encode qw/encode_utf8/;
 use Twitter::API::Error;
 
@@ -25,9 +24,19 @@ has [ qw/consumer_key consumer_secret/ ] => (
     required => 1,
 );
 
+has [ qw/access_token access_token_secret/ ] => (
+    is        => 'rw',
+    predicate => 1,
+);
+
 has api_url => (
     is      => 'ro',
-    default => sub { 'https://api.twitter.com/1.1' },
+    default => sub { 'https://api.twitter.com' },
+);
+
+has api_version => (
+    is      => 'ro',
+    default => sub { '1.1' },
 );
 
 has agent => (
@@ -40,11 +49,6 @@ has agent => (
 has timeout => (
     is      => 'ro',
     default => sub { 10 },
-);
-
-has [ qw/access_token access_token_secret/ ] => (
-    is        => 'rw',
-    predicate => 1,
 );
 
 has default_headers => (
@@ -87,7 +91,7 @@ has json_parser => (
     },
 );
 
-sub authorized { shift->has_access_token }
+sub authorized { $_[0]->has_access_token && $_[0]->has_access_token_secret }
 
 sub BUILD {
     my ( $self, $args ) = @_;
@@ -151,8 +155,34 @@ sub preprocess_url {
     my ( $url, $args ) = @{ $c }{qw/url args/};
     unless ( $url =~ m(^https?://) ) {
         $url =~ s/:(\w+)/delete $$args{$1}/eg;
-        $c->{url} = join('/', $self->api_url, $url) . '.json';
+        $c->{url} = join('/', $self->api_url, $self->api_version, $url)
+            . '.json';
     }
+}
+
+sub add_authorization {
+    my ( $self, $c ) = @_;
+
+    my $oauth_type = $$c{-oauth_type} // 'protected resource';
+    my $oauth_args = $$c{-oauth_args } // {
+        token        => $$c{-token} // $self->access_token,
+        token_secret => $$c{-token_secret} // $self->access_token_secret,
+    };
+    my $args = $c->{args};
+    my $req = Net::OAuth->request($oauth_type)->new(%$oauth_args,
+        protocol_version => Net::OAuth::PROTOCOL_VERSION_1_0A,
+        consumer_key     => $self->consumer_key,
+        consumer_secret  => $self->consumer_secret,
+        request_url      => $c->{url},
+        request_method   => $c->{http_method},
+        signature_method => 'HMAC-SHA1',
+        timestamp        => time,
+        nonce            => Digest::SHA::sha1_base64({} . time . $$ . rand),
+        extra_params     => $self->is_multipart($args) ? {} : $args,
+    );
+
+    $req->sign;
+    $c->{headers}{Authorization} =  $req->to_authorization_header;
 }
 
 sub finalize_request {
@@ -215,6 +245,33 @@ around send_request => sub {
     $self->$orig($c->{http_request});
 };
 
+sub inflate_response {
+    my ( $self, $c, $res ) = @_;
+
+    my $data;
+    try {
+        if ( $res->content_type eq 'application/json' ) {
+            $data = $self->from_json($res->content);
+        }
+        else {
+            # /oauth/* endpoinds return text/html with
+            $data = URL::Encode::url_params_mixed($res->content, 1);
+        }
+    }
+    catch {
+        # Failed to decode the response body, synthesize an error response
+        s/ at .* line \d+.*//s;  # remove file/line number
+        $res->code(500);
+        $res->status($_);
+    };
+
+    if ( $data && $res->is_success ) {
+        return $data;
+    }
+
+    $self->process_error_response($c, $res, $data);
+}
+
 sub flatten_array_args {
     my ( $self, $args ) = @_;
 
@@ -224,8 +281,6 @@ sub flatten_array_args {
         $$args{$k} = join ',' => @$v if ref $v && reftype $v eq 'ARRAY';
     }
 }
-
-sub uri_escape { URI::Escape::uri_escape_utf8($_[1],'^\w.~-') }
 
 sub encode_args_string {
     my ( $self, $args ) = @_;
@@ -238,17 +293,7 @@ sub encode_args_string {
     join '&', @pairs;
 }
 
-sub inflate_response {
-    my ( $self, $c, $res ) = @_;
-
-    my $data = try { $self->from_json($res->decoded_content) };
-
-    if ( $data && $res->is_success ) {
-        return $data;
-    }
-
-    $self->process_error_response($c, $res, $data);
-}
+sub uri_escape { URL::Encode::url_encode_utf8($_[1]) }
 
 sub process_error_response {
     my ( $self, $c, $res, $data ) = @_;
@@ -274,29 +319,48 @@ sub error_message {
     $msg;
 }
 
-sub add_authorization {
-    my ( $self, $c ) = @_;
-
-    my $args = $c->{args};
-    my $req = Net::OAuth->request('protected resource')->new(
-        protocol_version => Net::OAuth::PROTOCOL_VERSION_1_0A,
-        consumer_key     => $self->consumer_key,
-        consumer_secret  => $self->consumer_secret,
-        token            => $$c{-access_token} // $self->access_token,
-        token_secret     => $$c{-access_token_secret} // $self->access_token_secret,
-        request_url      => $c->{url},
-        request_method   => $c->{http_method},
-        signature_method => 'HMAC-SHA1',
-        timestamp        => time,
-        nonce            => Digest::SHA::sha1_base64({} . time . $$ . rand),
-        extra_params     => $self->is_multipart($args) ? {} : $args,
-    );
-
-    $req->sign;
-    $c->{headers}{Authorization} =  $req->to_authorization_header;
-}
-
 # If any of the args are references, we'll assume it's a multipart request
 sub is_multipart { !!grep ref, values %{ $_[1] } }
+
+# OAuth handshake
+
+sub oauth_url_for {
+    my ( $self, $endpoint ) = @_;
+
+    join '/', $self->api_url, 'oauth', $endpoint;
+}
+
+sub get_request_token {
+    my ( $self, $args ) = @_;
+
+    $args->{callback} //= 'oob';
+    return $self->request(post => $self->oauth_url_for('request_token'), {
+        -oauth_type     => 'request token',
+        -oauth_args     => $args,
+    });
+}
+
+my $auth_url = sub {
+    my ( $self, $endpoint, $args ) = @_;
+
+    my $uri = URI->new($self->oauth_url_for($endpoint));
+    $uri->query_form($args);
+    return $uri;
+};
+
+sub get_authentication_url { shift->$auth_url(authenticate => @_) }
+sub get_authorization_url  { shift->$auth_url(authorize    => @_) }
+
+sub get_access_token {
+    my ( $self, $args ) = @_;
+
+    $args->{-oauth_type} = 'access token';
+    $self->request(post => $self->oauth_url_for('access_token'), {
+        -oauth_type => 'access_token',
+        -oauth_args => $args,
+    });
+}
+
+# ABSTRACT: A Twitter REST API library for Perl
 
 1;

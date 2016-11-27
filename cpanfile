@@ -16,3 +16,4 @@ requires 'strictures';
 requires 'Throwable';
 requires 'Time::Piece';
 requires 'Try::Tiny';
+requires 'URL::Encode';
