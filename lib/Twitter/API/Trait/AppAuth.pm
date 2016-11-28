@@ -50,13 +50,13 @@ around add_authorization => sub {
     return if $$c{-add_consumer_auth_header};
 
     if ( $$c{-add_consumer_auth_header} ) {
-        $self->$add_consumer_auth_header($$c{http_request});
+        $self->$add_consumer_auth_header($c->http_request);
         return;
     }
 
     my $token = $$c{-token} // $self->access_token // return;
 
-    $c->{headers}{authorization} = join ' ', Bearer => $token;
+    $c->set_header(authorization => join ' ', Bearer => $token);
 };
 
 around finalize_request => sub {
@@ -65,7 +65,7 @@ around finalize_request => sub {
     $self->$next($c);
     return unless $$c{-add_consumer_auth_header};
 
-    $self->$add_consumer_auth_header($$c{http_request});
+    $self->$add_consumer_auth_header($c->http_request);
 };
 
 1;

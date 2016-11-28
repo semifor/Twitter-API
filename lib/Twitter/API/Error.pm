@@ -2,20 +2,39 @@ package Twitter::API::Error;
 
 use Moo;
 use strictures 2;
+use Try::Tiny;
 use namespace::clean;
 
-use overload '""' => 'stringify';
+use overload '""' => sub { shift->message };
 
 with 'Throwable';
 
-has [ qw/message context twitter_error/ ] => (
+has context => (
     is       => 'ro',
     required => 1,
+    handles  => [ qw/
+        http_request
+        http_response
+        result
+    /],
 );
 
-sub http_request  { shift->context->{http_request}  }
-sub http_response { shift->context->{http_response} }
+has message => (
+    is => 'lazy',
+);
 
-sub stringify { shift->message }
+sub _build_message {
+    my $self = shift;
+
+    my $res = $self->http_response;
+    my $data = $self->result;
+    my $msg  = join ': ', $res->code, $res->message;
+    my $errors = try {
+        join ', ' => map "$$_{code}: $$_{message}", @{ $data->{errors} };
+    };
+
+    $msg = join ' => ', $msg, $errors if $errors;
+    $msg;
+}
 
 1;

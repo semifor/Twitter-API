@@ -12,7 +12,7 @@ around preprocess_args => sub {
     my ( $next, $self, $c ) = @_;
 
     $self->$next($c);
-    $self->normalize_bools($c->{args});
+    $self->normalize_bools($c->args);
 };
 
 # Twitter usually accepts 1, 't', 'true', or false for booleans, but they

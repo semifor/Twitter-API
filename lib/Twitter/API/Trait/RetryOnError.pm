@@ -37,7 +37,7 @@ around send_request => sub {
     my $self = shift;
     my ( $c ) = @_;
 
-    my $msg = $c->{http_request};
+    my $msg = $c->http_request;
     my $is_oauth = ( $msg->header('authorization') // '' ) =~ /^OAuth /;
 
     my $delay = $self->initial_retry_delay;
@@ -57,7 +57,6 @@ around send_request => sub {
         # (the nonce may be invalid, now).
         if ( $is_oauth ) {
             $msg->header(authorization => $self->add_authorization($c));
-            $c->{http_request} = $msg;
         }
     }
 

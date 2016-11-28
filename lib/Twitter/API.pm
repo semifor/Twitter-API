@@ -15,6 +15,7 @@ use Scalar::Util qw/reftype/;
 use URI;
 use URL::Encode ();
 use Encode qw/encode_utf8/;
+use Twitter::API::Context;
 use Twitter::API::Error;
 
 use namespace::clean;
@@ -107,7 +108,6 @@ sub BUILD {
         for my $i ( 0..$#$traits ) {
             splice @$traits, $i, 1, qw/
                 ApiMethods RetryOnError DecodeHtmlEntities NormalizeBooleans
-                WrapResult
             / and last if $$traits[$i] eq '@enchilada';
         }
         my @roles = map { s/^\+// ? $_ : "Twitter::API::Trait::$_" } @$traits;
@@ -121,29 +121,32 @@ sub post { shift->request( post => @_ ) }
 sub request {
     my $self = shift;
 
-    my $c = {
+    my $c = Twitter::API::Context->new({
         http_method => uc shift,
         url         => shift,
         args        => shift || {},
         # shallow copy so we don't spoil the defaults
         headers     => { %{ $self->default_headers } },
         extra_args  => \@_,
-    };
+    });
 
     $self->extract_synthetic_args($c);
     $self->preprocess_args($c);
     $self->preprocess_url($c);
     $self->add_authorization($c);
     $self->finalize_request($c);
-    $c->{http_response} = $self->send_request($c) // return;
+
+    # Allow early exit for Twitter::API::AnyEvent
+    $c->set_http_response($self->send_request($c) // return);
 
     $self->inflate_response($c);
+    return wantarray ? ( $c->result, $c ) : $c->result;
 }
 
 sub extract_synthetic_args {
     my ( $self, $c ) = @_;
 
-    my $args = $$c{args};
+    my $args = $c->args;
     for ( keys %$args ) {
         $$c{$_} = delete $$args{$_} if /^-/;
     }
@@ -152,19 +155,20 @@ sub extract_synthetic_args {
 sub preprocess_args {
     my ( $self, $c ) = @_;
 
-    if ( $c->{http_method} eq 'GET' ) {
-        $self->flatten_array_args($c->{args});
+    if ( $c->http_method eq 'GET' ) {
+        $self->flatten_array_args($c->args);
     }
 }
 
 sub preprocess_url {
     my ( $self, $c ) = @_;
 
-    my ( $url, $args ) = @{ $c }{qw/url args/};
+    my $url = $c->url;
+    my $args = $c->args;
     unless ( $url =~ m(^https?://) ) {
         $url =~ s/:(\w+)/delete $$args{$1}/eg;
-        $c->{url} = join('/', $self->api_url, $self->api_version, $url)
-            . '.json';
+        $c->set_url(join('/', $self->api_url, $self->api_version, $url)
+            . '.json');
     }
 }
 
@@ -176,13 +180,13 @@ sub add_authorization {
         token        => $$c{-token} // $self->access_token,
         token_secret => $$c{-token_secret} // $self->access_token_secret,
     };
-    my $args = $c->{args};
+    my $args = $c->args;
     my $req = Net::OAuth->request($oauth_type)->new(%$oauth_args,
         protocol_version => Net::OAuth::PROTOCOL_VERSION_1_0A,
         consumer_key     => $self->consumer_key,
         consumer_secret  => $self->consumer_secret,
-        request_url      => $c->{url},
-        request_method   => $c->{http_method},
+        request_url      => $c->url,
+        request_method   => $c->http_method,
         signature_method => 'HMAC-SHA1',
         timestamp        => time,
         nonce            => Digest::SHA::sha1_base64({} . time . $$ . rand),
@@ -190,83 +194,83 @@ sub add_authorization {
     );
 
     $req->sign;
-    $c->{headers}{authorization} =  $req->to_authorization_header;
+    $c->set_header(authorization => $req->to_authorization_header);
 }
 
 sub finalize_request {
     my ( $self, $c ) = @_;
 
     # possible override Accept header
-    $c->{headers}{accept} = $c->{-accept} if exists $c->{-accept};
+    $c->set_header(accept => $$c{-accept}) if exists $$c{-accept};
 
-    my $method = $c->{http_method};
-    $c->{http_request} =
+    my $method = $c->http_method;
+    $c->set_http_request(
         $method eq 'POST' ? (
-            $self->is_multipart($c->{args}) ? $self->finalize_multipart_post($c)
-            : $c->{-to_json} ? $self->finalize_json_post($c)
+            $self->is_multipart($c->args) ? $self->finalize_multipart_post($c)
+            : $$c{-to_json} ? $self->finalize_json_post($c)
             : $self->finalize_post($c)
         )
         : $method eq 'GET' ? $self->finalize_get($c)
-        : croak "unexpected HTTP method: $_";
+        : croak "unexpected HTTP method: $_"
+    );
 }
 
 sub finalize_multipart_post {
     my ( $self, $c ) = @_;
 
-    my $headers = $c->{headers};
-    $headers->{content_type} = 'multipart/form-data;charset=utf-8';
-    POST $c->{url},
-        %$headers,
+    $c->set_header(content_type => 'multipart/form-data;charset=utf-8');
+    POST $c->url,
+        %{ $c->headers },
         Content => [
-            map { ref $_ ? $_ : encode_utf8 $_ } %{ $c->{args} },
+            map { ref $_ ? $_ : encode_utf8 $_ } %{ $c->args },
         ];
 }
 
 sub finalize_json_post {
     my ( $self, $c ) = @_;
 
-    POST $c->{url},
-        %{ $c->{headers} },
-        Content => $self->to_json($c->{-to_json});
+    POST $c->url,
+        %{ $c->headers },
+        Content => $self->to_json($$c{-to_json});
 }
 
 sub finalize_post {
     my ( $self, $c ) = @_;
 
-    my $headers = $c->{headers};
-    $headers->{content_type} = 'application/x-www-form-urlencoded;charset=utf-8';
-    POST $c->{url},
-        %$headers,
-        Content => $self->encode_args_string($c->{args});
+    $c->set_header(
+        content_type => 'application/x-www-form-urlencoded;charset=utf-8');
+    POST $c->url,
+        %{ $c->headers },
+        Content => $self->encode_args_string($c->args);
 }
 
 sub finalize_get {
     my ( $self, $c ) = @_;
 
-    my $uri = URI->new($c->{url});
-    if ( my $encoded = $self->encode_args_string($c->{args}) ) {
+    my $uri = URI->new($c->url);
+    if ( my $encoded = $self->encode_args_string($c->args) ) {
         $uri->query($encoded);
     }
 
-    GET $uri, %{ $c->{headers} };
+    GET $uri, %{ $c->headers };
 }
 
 around send_request => sub {
     my ( $orig, $self, $c ) = @_;
 
-    $self->$orig($c->{http_request});
+    $self->$orig($c->http_request);
 };
 
 sub inflate_response {
     my ( $self, $c ) = @_;
 
-    my $res = $c->{http_response};
+    my $res = $c->http_response;
     my $data;
     try {
         if ( $res->content_type eq 'application/json' ) {
             $data = $self->from_json($res->content);
         }
-        elsif ( ($c->{-accept} // '') eq 'application/x-www-form-urlencoded' ) {
+        elsif ( ($$c{-accept} // '') eq 'application/x-www-form-urlencoded' ) {
 
             # Twitter sets Content-Type: text/html for /oauth/request_token and
             # /oauth/access_token even though they return url encoded form
@@ -287,11 +291,10 @@ sub inflate_response {
         $res->status($_);
     };
 
-    if ( $data && $res->is_success ) {
-        return $data;
-    }
+    $c->set_result($data);
+    return if $data && $res->is_success;
 
-    $self->process_error_response($c, $data);
+    $self->process_error_response($c);
 }
 
 sub flatten_array_args {
@@ -318,27 +321,7 @@ sub encode_args_string {
 sub uri_escape { URL::Encode::url_encode_utf8($_[1]) }
 
 sub process_error_response {
-    my ( $self, $c, $data ) = @_;
-
-    my $msg = $self->error_message($c, $data);
-    Twitter::API::Error->throw({
-        message           => $msg,
-        context           => $c,
-        twitter_error     => $data,
-    });
-}
-
-sub error_message {
-    my ( $self, $c, $data ) = @_;
-
-    my $res = $c->{http_response};
-    my $msg  = join ': ', $res->code, $res->message;
-    my $errors = try {
-        join ', ' => map "$$_{code}: $$_{message}", @{ $$data{errors} };
-    };
-
-    $msg = join ' => ', $msg, $errors if $errors;
-    $msg;
+    Twitter::API::Error->throw({ context => $_[1] });
 }
 
 # If any of the args are references, we'll assume it's a multipart request
