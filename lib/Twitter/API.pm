@@ -27,7 +27,13 @@ has [ qw/consumer_key consumer_secret/ ] => (
 has [ qw/access_token access_token_secret/ ] => (
     is        => 'rw',
     predicate => 1,
+    clearer   => 1,
 );
+
+# The secret is no good without the token.
+after clear_access_token => sub {
+    shift->clear_access_token_secret;
+};
 
 has api_url => (
     is      => 'ro',
@@ -42,7 +48,7 @@ has api_version => (
 has agent => (
     is      => 'ro',
     default => sub {
-        join('/', __PACKAGE__, $VERSION) =~ s/::/-/gr;
+        (join('/', __PACKAGE__, $VERSION) =~ s/::/-/gr) . ' (Perl)';
     },
 );
 
@@ -54,10 +60,12 @@ has timeout => (
 has default_headers => (
     is => 'ro',
     default => sub {
+        my $agent = shift->agent;
         {
             accept                   => 'application/json',
             content_type             => 'application/json;charset=utf8',
-            x_twitter_client         => 'Perl5-' . __PACKAGE__,
+            user_agent               => $agent,
+            x_twitter_client         => $agent,
             x_twitter_client_version => $VERSION,
             x_twitter_client_url     => 'https://github.com/semifor/Twitter-API',
         };
@@ -91,8 +99,6 @@ has json_parser => (
         to_json   => 'encode',
     },
 );
-
-sub authorized { $_[0]->has_access_token && $_[0]->has_access_token_secret }
 
 sub BUILD {
     my ( $self, $args ) = @_;
