@@ -374,8 +374,28 @@ sub get_access_token {
     $args->{-oauth_type} = 'access token';
     $self->request(post => $self->oauth_url_for('access_token'), {
         -accept     => 'application/x-www-form-urlencoded',
-        -oauth_type => 'access_token',
+        -oauth_type => 'access token',
         -oauth_args => $args,
+    });
+}
+
+sub xauth {
+    my ( $self, $args ) = @_;
+
+    my $username = delete $args->{username} // croak 'username required';
+    my $password = delete $args->{password} // croak 'password required';
+    if ( my $unexpected = join ', ' => keys %$args ) {
+        croak "unexpected arguments: $unexpected";
+    }
+
+    $self->request(post => $self->oauth_url_for('access_token'), {
+        -accept     => 'application/x-www-form-urlencoded',
+        -oauth_type => 'XauthAccessToken',
+        -oauth_args => {
+            x_auth_mode     => 'client_auth',
+            x_auth_password => $password,
+            x_auth_username => $username,
+        },
     });
 }
 
