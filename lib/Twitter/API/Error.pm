@@ -117,8 +117,10 @@ sub is_token_error {
     return 0;
 }
 
+sub http_response_code { shift->http_response->code }
+
 # Expect the same error if you retry right away
-sub is_permanent_error { shift->http_response->code < 500 }
+sub is_permanent_error { shift->http_response_code < 500 }
 
 # Might work if you retry again right away
 sub is_temporary_error { !shift->is_permanent_error }

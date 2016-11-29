@@ -391,3 +391,66 @@ sub xauth {
 # ABSTRACT: A Twitter REST API library for Perl
 
 1;
+
+__END__
+
+=pod
+
+=head1 SYNOPSIS
+
+Common usage:
+
+    use Twitter::API;
+    my $api = Twitter::API->new(
+        traits              => [ '@enchilada' ],
+        consumer_key        => $YOUR_CONSUMER_KEY,
+        consumer_secret     => $YOUR_CONSUMER_SECRET,
+        access_token        => $YOUR_ACCESS_TOKEN
+        access_token_secret => $YOUR_ACCESS_TOKEN_SECRET,
+    );
+
+    my $me   = $api->verify_credentials;
+    my $user = $api->show_user('twitter');
+
+    # In list context, both the Twitter API result and a Twitter::API::Context
+    # object are returned.
+    my ($r, $context) = $api->home_timeline({ count => 200, trim_user => 1 });
+    my $remaning = $context->rate_limit_remaining;
+    my $until    = $context->rate_limit_reset;
+
+No frills:
+
+    my $api = Twitter::API->new(
+        consumer_key    => $YOUR_CONSUMER_KEY,
+        consumer_secret => $YOUR_CONSUMER_SECRET,
+    );
+
+    my $r = $api->get('account/verify_credentials', {
+        -token        => $an_access_token,
+        -token_secret => $an_access_token_secret,
+    });
+
+Error handling:
+
+    use Scalar::Util 'blessed';
+    use Try::Tiny;
+
+    try {
+        my $r = $api->verify_credentials;
+    }
+    catch {
+        die $_ unless blessed $_ && $_->isa('Twitter::API::Error');
+
+        # The error object includes plenty of information
+        say $_->http_request->as_string;
+        say $_->http_response->as_string;
+        say 'No use retrying right away' if $_->is_permanent_error;
+        if ( $_->is_token_error ) {
+            say "There's something wrong with this token."
+        }
+        if ( $_->twitter_error_code == 326 ) {
+            say "Oops! Twitter thinks you're spam bot!";
+        }
+    };
+
+=cut
