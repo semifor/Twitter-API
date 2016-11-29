@@ -1,9 +1,9 @@
 package Twitter::API::Trait::RetryOnError;
 # Abstract: Automatically retry API calls with progressive fallback
 
-use strictures 2;
 use Moo::Role;
 use Time::HiRes;
+use namespace::clean;
 
 has initial_retry_delay => (
     is      => 'rw',

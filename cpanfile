@@ -14,7 +14,6 @@ requires 'MooX::Traits';
 requires 'namespace::clean';
 requires 'Net::OAuth';
 requires 'Sub::Exporter::Progressive';
-requires 'strictures';
 requires 'Throwable';
 requires 'Time::Piece';
 requires 'Try::Tiny';

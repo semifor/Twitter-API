@@ -2,13 +2,10 @@ package Twitter::API::Trait::ApiMethods;
 # Abstract: Net::Twitter like convenience methods
 
 use 5.12.1;
-use strictures 2;
-
 use Carp;
 use Moo::Role;
 use MooX::Aliases;
 use Scalar::Util qw/reftype/;
-
 use namespace::clean;
 
 sub mentions {

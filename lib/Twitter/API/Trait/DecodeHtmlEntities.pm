@@ -2,9 +2,9 @@ package Twitter::API::Trait::DecodeHtmlEntities;
 # Abstract: Decode HTML entities in strings
 
 use Moo::Role;
-use strictures 2;
 use Data::Visitor::Lite;
 use HTML::Entities qw/decode_entities/;
+use namespace::clean;
 
 has _entities_visitor => (
     is      => 'ro',

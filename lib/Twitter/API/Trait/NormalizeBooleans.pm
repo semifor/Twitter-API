@@ -1,9 +1,7 @@
 package Twitter::API::Trait::NormalizeBooleans;
-use Moo::Role;
 
 use 5.12.1;
-use strictures 2;
-
+use Moo::Role;
 use namespace::clean;
 
 requires 'preprocess_args';

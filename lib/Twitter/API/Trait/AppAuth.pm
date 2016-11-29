@@ -1,8 +1,6 @@
 package Twitter::API::Trait::AppAuth;
 # Abstract: App-only (OAuth2) trait for Twitter::API
 
-use strictures 2;
-
 use Moo::Role;
 use Carp;
 use HTTP::Request::Common qw/POST/;

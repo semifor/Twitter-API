@@ -3,7 +3,6 @@ our $VERSION = '1.0000';
 
 use 5.12.1;
 use Moo;
-use strictures 2;
 use Carp;
 use Class::Load qw/load_class/;
 use JSON::MaybeXS ();

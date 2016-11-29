@@ -1,7 +1,6 @@
 package Twitter::API::Error;
 
 use Moo;
-use strictures 2;
 use Try::Tiny;
 use Devel::StackTrace;
 use namespace::clean;

@@ -1,8 +1,8 @@
 package Twitter::API::Context;
 # Abstract: Wraps a twitter response and the http request/response objects
 
-use strictures 2;
 use Moo;
+use namespace::clean;
 
 has [ qw/http_method args headers extra_args/ ] => (
     is => 'ro',

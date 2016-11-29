@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 use 5.12.1;
-use strictures 2;
+use warnings;
 use utf8;
 use open qw/:std :utf8/;
 use Test::More;
