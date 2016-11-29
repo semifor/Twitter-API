@@ -103,35 +103,6 @@ has json_parser => (
     },
 );
 
-# the whole enchilada
-my @enchilada = qw/ApiMethods RetryOnError DecodeHtmlEntities NormalizeBooleans/;
-
-around new_with_traits => sub {
-    my ( $next, $class ) = splice @_, 0, 2;
-
-    my ( %args, $pass_by_ref );
-    if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
-        %args = %{$_[0]};
-        $pass_by_ref = !!1;
-    }
-    else {
-        %args = @_;
-        $pass_by_ref = !!0;
-    }
-
-    # expand trait '@enchilda' to the whole enchilada
-    if ( my $traits = delete $args{traits} ) {
-        my @traits = ref $traits ? @$traits : $traits;
-        for my $i ( 0..$#traits ) {
-            splice @traits, $i, 1, @enchilada and last
-                if $traits[$i] eq '@enchilada';
-        }
-        $args{traits} = \@traits;
-    }
-
-    return $class->$next($pass_by_ref ? \%args : %args);
-};
-
 sub get  { shift->request( get => @_ ) }
 sub post { shift->request( post => @_ ) }
 
@@ -419,7 +390,7 @@ Common usage:
 
     use Twitter::API;
     my $api = Twitter::API->new_with_traits(
-        traits              => '@enchilada',
+        traits              => 'Enchilada',
         consumer_key        => $YOUR_CONSUMER_KEY,
         consumer_secret     => $YOUR_CONSUMER_SECRET,
         access_token        => $YOUR_ACCESS_TOKEN

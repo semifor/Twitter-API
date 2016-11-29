@@ -10,7 +10,7 @@ use Twitter::API;
 # You can replace the consumer key/secret with your own.  These credentials are
 # for the Net::Twitter example app.
 my $api = Twitter::API->new_with_traits(
-    traits          => [ '@enchilada' ],
+    traits          => 'Enchilada',
     consumer_key    => 'v8t3JILkStylbgnxGLOQ',
     consumer_secret => '5r31rSMc0NPtBpHcK8MvnCLg2oAyFLx5eGOMkXM',
 );
