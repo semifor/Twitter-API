@@ -5,7 +5,7 @@ use strictures 2;
 use Moo;
 
 has [ qw/http_method args headers extra_args/ ] => (
-    is => 'rw',
+    is => 'ro',
 );
 
 for my $attr ( qw/url result http_response http_request/ ) {
@@ -14,6 +14,15 @@ for my $attr ( qw/url result http_response http_request/ ) {
         is     => 'ro',
     );
 }
+
+has options => (
+    is      => 'ro',
+    default => sub { {} },
+);
+
+sub get_option { $_[0]->options->{$_[1]}         }
+sub has_option { exists $_[0]->options->{$_[1]}  }
+sub set_option { $_[0]->options->{$_[1]} = $_[2] }
 
 # private method
 my $limit = sub {

@@ -35,7 +35,6 @@ sub invalidate_token {
 
     $self->request(post =>$self->$oauth2_url_for('invalidate_token'), {
         -add_consumer_auth_header => 1,
-        -accept                   => '*/*',
         access_token              => $token,
     });
 }
@@ -47,14 +46,9 @@ around add_authorization => sub {
     my ( $self, $c ) = @_;
 
     # We do this in finalize_request after we have an HTTP::Request
-    return if $$c{-add_consumer_auth_header};
+    return if $c->get_option('add_consumer_auth_header');
 
-    if ( $$c{-add_consumer_auth_header} ) {
-        $self->$add_consumer_auth_header($c->http_request);
-        return;
-    }
-
-    my $token = $$c{-token} // $self->access_token // return;
+    my $token = $c->get_option('token') // $self->access_token // return;
 
     $c->set_header(authorization => join ' ', Bearer => $token);
 };
@@ -63,7 +57,7 @@ around finalize_request => sub {
     my ( $next, $self, $c ) = @_;
 
     $self->$next($c);
-    return unless $$c{-add_consumer_auth_header};
+    return unless $c->get_option('add_consumer_auth_header');
 
     $self->$add_consumer_auth_header($c->http_request);
 };

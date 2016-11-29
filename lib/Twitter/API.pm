@@ -148,7 +148,7 @@ sub extract_synthetic_args {
 
     my $args = $c->args;
     for ( keys %$args ) {
-        $$c{$_} = delete $$args{$_} if /^-/;
+        $c->set_option($1, delete $$args{$_}) if /^-(.+)/;
     }
 }
 
@@ -175,10 +175,10 @@ sub preprocess_url {
 sub add_authorization {
     my ( $self, $c ) = @_;
 
-    my $oauth_type = $$c{-oauth_type} // 'protected resource';
-    my $oauth_args = $$c{-oauth_args } // {
-        token        => $$c{-token} // $self->access_token,
-        token_secret => $$c{-token_secret} // $self->access_token_secret,
+    my $oauth_type = $c->get_option('oauth_type') // 'protected resource';
+    my $oauth_args = $c->get_option('oauth_args') // {
+        token        => $c->get_option('token') // $self->access_token,
+        token_secret => $c->get_option('token_secret') // $self->access_token_secret,
     };
     my $args = $c->args;
     my $req = Net::OAuth->request($oauth_type)->new(%$oauth_args,
@@ -201,13 +201,14 @@ sub finalize_request {
     my ( $self, $c ) = @_;
 
     # possible override Accept header
-    $c->set_header(accept => $$c{-accept}) if exists $$c{-accept};
+    $c->set_header(accept => $c->get_option('accept'))
+        if $c->has_option('accept');
 
     my $method = $c->http_method;
     $c->set_http_request(
         $method eq 'POST' ? (
             $self->is_multipart($c->args) ? $self->finalize_multipart_post($c)
-            : $$c{-to_json} ? $self->finalize_json_post($c)
+            : $c->has_option('to_json')   ? $self->finalize_json_post($c)
             : $self->finalize_post($c)
         )
         : $method eq 'GET' ? $self->finalize_get($c)
@@ -231,7 +232,7 @@ sub finalize_json_post {
 
     POST $c->url,
         %{ $c->headers },
-        Content => $self->to_json($$c{-to_json});
+        Content => $self->to_json($c->get_option('to_json'));
 }
 
 sub finalize_post {
@@ -270,7 +271,7 @@ sub inflate_response {
         if ( $res->content_type eq 'application/json' ) {
             $data = $self->from_json($res->content);
         }
-        elsif ( ($$c{-accept} // '') eq 'application/x-www-form-urlencoded' ) {
+        elsif ( ($c->get_option('accept') // '') eq 'application/x-www-form-urlencoded' ) {
 
             # Twitter sets Content-Type: text/html for /oauth/request_token and
             # /oauth/access_token even though they return url encoded form
@@ -360,7 +361,6 @@ sub get_authorization_url  { shift->$auth_url(authorize    => @_) }
 sub get_access_token {
     my ( $self, $args ) = @_;
 
-    $args->{-oauth_type} = 'access token';
     $self->request(post => $self->oauth_url_for('access_token'), {
         -accept     => 'application/x-www-form-urlencoded',
         -oauth_type => 'access token',
