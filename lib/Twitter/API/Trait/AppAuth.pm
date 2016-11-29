@@ -71,7 +71,8 @@ __END__
 =head1 SYNOPSIS
 
     use Twitter::API;
-    my $api = Twitter::API->new(traits => [ qw/ApiMethods AppAuth/ ]);
+    my $api = Twitter::API->new_with_traits(
+        traits => [ qw/ApiMethods AppAuth/ ]);
 
     my $r = $api->get_bearer_token;
     # return value is hash ref:

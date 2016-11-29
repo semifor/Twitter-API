@@ -6,7 +6,7 @@ use open qw/:std :utf8/;
 
 use Twitter::API;
 
-my $api = Twitter::API->new(
+my $api = Twitter::API->new_with_traits(
     traits => [ qw/ApiMethods RetryOnError/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},

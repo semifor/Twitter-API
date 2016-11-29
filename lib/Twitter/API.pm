@@ -17,8 +17,10 @@ use URL::Encode ();
 use Encode qw/encode_utf8/;
 use Twitter::API::Context;
 use Twitter::API::Error;
-
 use namespace::clean;
+
+with 'MooX::Traits';
+sub _trait_namespace { 'Twitter::API::Trait' }
 
 has [ qw/consumer_key consumer_secret/ ] => (
     is       => 'ro',
@@ -101,19 +103,34 @@ has json_parser => (
     },
 );
 
-sub BUILD {
-    my ( $self, $args ) = @_;
+# the whole enchilada
+my @enchilada = qw/ApiMethods RetryOnError DecodeHtmlEntities NormalizeBooleans/;
 
-    if ( my $traits = delete $$args{traits} ) {
-        for my $i ( 0..$#$traits ) {
-            splice @$traits, $i, 1, qw/
-                ApiMethods RetryOnError DecodeHtmlEntities NormalizeBooleans
-            / and last if $$traits[$i] eq '@enchilada';
-        }
-        my @roles = map { s/^\+// ? $_ : "Twitter::API::Trait::$_" } @$traits;
-        Role::Tiny->apply_roles_to_object($self, @roles);
+around new_with_traits => sub {
+    my ( $next, $class ) = splice @_, 0, 2;
+
+    my ( %args, $pass_by_ref );
+    if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
+        %args = %{$_[0]};
+        $pass_by_ref = !!1;
     }
-}
+    else {
+        %args = @_;
+        $pass_by_ref = !!0;
+    }
+
+    # expand trait '@enchilda' to the whole enchilada
+    if ( my $traits = delete $args{traits} ) {
+        my @traits = ref $traits ? @$traits : $traits;
+        for my $i ( 0..$#traits ) {
+            splice @traits, $i, 1, @enchilada and last
+                if $traits[$i] eq '@enchilada';
+        }
+        $args{traits} = \@traits;
+    }
+
+    return $class->$next($pass_by_ref ? \%args : %args);
+};
 
 sub get  { shift->request( get => @_ ) }
 sub post { shift->request( post => @_ ) }
@@ -401,8 +418,8 @@ __END__
 Common usage:
 
     use Twitter::API;
-    my $api = Twitter::API->new(
-        traits              => [ '@enchilada' ],
+    my $api = Twitter::API->new_with_traits(
+        traits              => '@enchilada',
         consumer_key        => $YOUR_CONSUMER_KEY,
         consumer_secret     => $YOUR_CONSUMER_SECRET,
         access_token        => $YOUR_ACCESS_TOKEN

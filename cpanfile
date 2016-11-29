@@ -10,6 +10,7 @@ requires 'IO::Socket::SSL';
 requires 'JSON::MaybeXS';
 requires 'Moo';
 requires 'MooX::Aliases';
+requires 'MooX::Traits';
 requires 'namespace::clean';
 requires 'Net::OAuth';
 requires 'Sub::Exporter::Progressive';

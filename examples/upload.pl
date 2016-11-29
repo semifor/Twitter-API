@@ -4,7 +4,7 @@ use strictures 2;
 
 use Twitter::API;
 
-my $api = Twitter::API->new(
+my $api = Twitter::API->new_with_traits(
     traits => [ qw/ApiMethods/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},

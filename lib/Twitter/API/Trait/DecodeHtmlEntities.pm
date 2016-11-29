@@ -18,10 +18,11 @@ has _entities_visitor => (
 );
 
 around inflate_response => sub {
-    my $orig = shift;
-    my $self = shift;
+    my ( $orig, $self, $c ) = @_;
 
-    $self->_decode_html_entities( $self->$orig(@_) );
+    $self->$orig($c);
+    my $r = $self->_decode_html_entities($c->result);
+    $c->set_result($r);
 };
 
 1;

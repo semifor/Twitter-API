@@ -6,13 +6,14 @@ use open qw/:std :utf8/;
 
 use Twitter::API;
 
-my $api = Twitter::API->new(
+my $api = Twitter::API->new_with_traits(
     traits => [ qw/AppAuth ApiMethods/ ],
     consumer_key    => $ENV{CONSUMER_KEY},
     consumer_secret => $ENV{CONSUMER_SECRET},
 );
 
-$api->request_access_token;
+my $token = $api->get_bearer_token;
+$api->access_token($$token{access_token});
 my $r = $api->user_timeline(twitterapi => { count => 10 });
 
 for my $status ( @$r ) {
