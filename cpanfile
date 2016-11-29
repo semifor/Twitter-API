@@ -1,6 +1,7 @@
 requires 'Carp';
 requires 'Class::Load';
 requires 'Data::Visitor::Lite';
+requires 'Devel::StackTrace';
 requires 'Digest::SHA';
 requires 'HTML::Entities';
 requires 'HTTP::Request::Common';
