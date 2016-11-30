@@ -1,5 +1,5 @@
 package Twitter::API::Trait::RetryOnError;
-# Abstract: Automatically retry API calls with progressive fallback
+# ABSTRACT: Automatically retry API calls
 
 use Moo::Role;
 use Time::HiRes;

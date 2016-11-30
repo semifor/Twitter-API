@@ -1,4 +1,5 @@
 package Twitter::API::Trait::NormalizeBooleans;
+# ABSTRACT: Normalize Booleans
 
 use 5.12.1;
 use Moo::Role;

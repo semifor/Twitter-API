@@ -18,3 +18,7 @@ requires 'Throwable';
 requires 'Time::Piece';
 requires 'Try::Tiny';
 requires 'URL::Encode';
+
+on test => sub {
+    requires 'Test::More';
+};

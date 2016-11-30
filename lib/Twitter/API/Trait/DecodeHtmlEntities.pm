@@ -1,5 +1,5 @@
 package Twitter::API::Trait::DecodeHtmlEntities;
-# Abstract: Decode HTML entities in strings
+# ABSTRACT: Decode HTML entities in strings
 
 use Moo::Role;
 use Data::Visitor::Lite;

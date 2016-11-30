@@ -1,4 +1,5 @@
 package Twitter::API::Error;
+# ABSTRACT: Twitter API Error Object
 
 use Moo;
 use Try::Tiny;

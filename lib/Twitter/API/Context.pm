@@ -1,5 +1,5 @@
 package Twitter::API::Context;
-# Abstract: Wraps a twitter response and the http request/response objects
+# ABSTRACT: Encapsulated state for a request/response
 
 use Moo;
 use namespace::clean;

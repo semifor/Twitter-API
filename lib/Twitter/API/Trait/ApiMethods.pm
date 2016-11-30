@@ -1,5 +1,5 @@
 package Twitter::API::Trait::ApiMethods;
-# Abstract: Net::Twitter like convenience methods
+# ABSTRACT: Convenient API Methods
 
 use 5.12.1;
 use Carp;
