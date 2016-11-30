@@ -445,34 +445,28 @@ __END__
 Twitter::API provides an interface to the Twitter REST API for perl.
 
 Features:
+
 =for :list
 * full support for all Twitter REST API endpoints
-* optionally, specify access tokens per API call - no need to construct a new
-client fo to use different user credentials
-* error handling via an exception object that captures the full reqest/response
-context
+* optionally, specify access tokens per API call - no need to construct a new client fo to use different user credentials * error handling via an exception object that captures the full reqest/response context
 * full support for OAuth handshake and xauth authentication
 
 Additionl features are availble via optional traits:
+
 =for :list
-* convenient methods for API endpoints with simplified argument handling via
-L<ApiMethods|Twitter::API::Trait::ApiMethods>
-* normalized booleans (Twitter likes 'true' and 'false', except when it
-doesn't) via L<NormalizeBooleans|Twitter::API::Trait::NormalizeBooleans>
-* automatic decoding of HTML entities via
-L<DecodeHtmlEntities|Twitter::API::Trait::DecodeHtmlEntities>
-* automatic retry on transient errors via
-L<RetryOnError|Twitter::API::Trait::RetryOnError>
-* "the whole enchilada" combines all the above traits via
-L<Enchilada|Twitter::API::Trait::Enchilada>
+* convenient methods for API endpoints with simplified argument handling via L<ApiMethods|Twitter::API::Trait::ApiMethods>
+* normalized booleans (Twitter likes 'true' and 'false', except when it doesn't) via L<NormalizeBooleans|Twitter::API::Trait::NormalizeBooleans>
+* automatic decoding of HTML entities via L<DecodeHtmlEntities|Twitter::API::Trait::DecodeHtmlEntities>
+* automatic retry on transient errors via L<RetryOnError|Twitter::API::Trait::RetryOnError>
+* "the whole enchilada" combines all the above traits via L<Enchilada|Twitter::API::Trait::Enchilada>
 * app-only (OAuth2) support via L<AppAuth|Twitter::API::Trait::AppAuth>
 
 Some featuers are provided by separate distributions to avoid additional
 dependencies most users won't want or need:
+
 =for :list
 * async support via subclass L<Twitter::API::AnyEvent>
-* inflate API call results to objects via
-L<Twitter::API::Trait::InflateObjects>
+* inflate API call results to objects via L<Twitter::API::Trait::InflateObjects>
 
 =cut
 

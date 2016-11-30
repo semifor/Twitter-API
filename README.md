@@ -69,34 +69,25 @@ version 0.0100
 Twitter::API provides an interface to the Twitter REST API for perl.
 
 Features:
-&#x3d;for :list
-\* full support for all Twitter REST API endpoints
-\* optionally, specify access tokens per API call - no need to construct a new
-client fo to use different user credentials
-\* error handling via an exception object that captures the full reqest/response
-context
-\* full support for OAuth handshake and xauth authentication
+
+- full support for all Twitter REST API endpoints
+- optionally, specify access tokens per API call - no need to construct a new client fo to use different user credentials \* error handling via an exception object that captures the full reqest/response context
+- full support for OAuth handshake and xauth authentication
 
 Additionl features are availble via optional traits:
-&#x3d;for :list
-\* convenient methods for API endpoints with simplified argument handling via
-[ApiMethods](https://metacpan.org/pod/Twitter::API::Trait::ApiMethods)
-\* normalized booleans (Twitter likes 'true' and 'false', except when it
-doesn't) via [NormalizeBooleans](https://metacpan.org/pod/Twitter::API::Trait::NormalizeBooleans)
-\* automatic decoding of HTML entities via
-[DecodeHtmlEntities](https://metacpan.org/pod/Twitter::API::Trait::DecodeHtmlEntities)
-\* automatic retry on transient errors via
-[RetryOnError](https://metacpan.org/pod/Twitter::API::Trait::RetryOnError)
-\* "the whole enchilada" combines all the above traits via
-[Enchilada](https://metacpan.org/pod/Twitter::API::Trait::Enchilada)
-\* app-only (OAuth2) support via [AppAuth](https://metacpan.org/pod/Twitter::API::Trait::AppAuth)
+
+- convenient methods for API endpoints with simplified argument handling via [ApiMethods](https://metacpan.org/pod/Twitter::API::Trait::ApiMethods)
+- normalized booleans (Twitter likes 'true' and 'false', except when it doesn't) via [NormalizeBooleans](https://metacpan.org/pod/Twitter::API::Trait::NormalizeBooleans)
+- automatic decoding of HTML entities via [DecodeHtmlEntities](https://metacpan.org/pod/Twitter::API::Trait::DecodeHtmlEntities)
+- automatic retry on transient errors via [RetryOnError](https://metacpan.org/pod/Twitter::API::Trait::RetryOnError)
+- "the whole enchilada" combines all the above traits via [Enchilada](https://metacpan.org/pod/Twitter::API::Trait::Enchilada)
+- app-only (OAuth2) support via [AppAuth](https://metacpan.org/pod/Twitter::API::Trait::AppAuth)
 
 Some featuers are provided by separate distributions to avoid additional
 dependencies most users won't want or need:
-&#x3d;for :list
-\* async support via subclass [Twitter::API::AnyEvent](https://metacpan.org/pod/Twitter::API::AnyEvent)
-\* inflate API call results to objects via
-[Twitter::API::Trait::InflateObjects](https://metacpan.org/pod/Twitter::API::Trait::InflateObjects)
+
+- async support via subclass [Twitter::API::AnyEvent](https://metacpan.org/pod/Twitter::API::AnyEvent)
+- inflate API call results to objects via [Twitter::API::Trait::InflateObjects](https://metacpan.org/pod/Twitter::API::Trait::InflateObjects)
 
 # ATTRIBUTES
 

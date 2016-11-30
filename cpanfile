@@ -21,4 +21,6 @@ requires 'URL::Encode';
 
 on test => sub {
     requires 'Test::More';
+    requires 'Test::Spec';
+    requires 'Test::Fatal';
 };
