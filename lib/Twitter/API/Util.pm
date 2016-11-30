@@ -3,10 +3,19 @@ package Twitter::API::Util;
 
 use 5.12.1;
 use warnings;
+use Scalar::Util ();
 use Time::Piece;
 use Sub::Exporter::Progressive -setup => {
-    exports => [ qw/timestamp_to_timepiece timestamp_to_epoch/ ],
+    exports => [ qw/
+        is_twitter_api_error
+        timestamp_to_timepiece
+        timestamp_to_epoch
+    /],
 };
+
+sub is_twitter_api_error {
+    Scalar::Util::blessed($_[0]) && $_[0]->isa('Twitter::API::Error');
+}
 
 # "Wed Jun 06 20:07:10 +0000 2012"
 my $format = '%a %b %d %T %z %Y';

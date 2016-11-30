@@ -419,14 +419,14 @@ __END__
 
     ### Error handling ###
 
-    use Scalar::Util 'blessed';
+    use Twitter::API::Util 'is_twitter_api_error';
     use Try::Tiny;
 
     try {
         my $r = $api->verify_credentials;
     }
     catch {
-        die $_ unless blessed $_ && $_->isa('Twitter::API::Error');
+        die $_ unless is_twitter_api_error($_);
 
         # The error object includes plenty of information
         say $_->http_request->as_string;
