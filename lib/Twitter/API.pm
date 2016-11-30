@@ -1,5 +1,5 @@
 package Twitter::API;
-$Twitter::API::VERSION = '0.0100';
+our $VERSION = '0.0100';
 use 5.12.1;
 use Moo;
 use Carp;
@@ -384,7 +384,7 @@ __END__
 
 =head1 SYNOPSIS
 
-Common usage:
+    ### Common usage ###
 
     use Twitter::API;
     my $api = Twitter::API->new_with_traits(
@@ -404,7 +404,8 @@ Common usage:
     my $remaning = $context->rate_limit_remaining;
     my $until    = $context->rate_limit_reset;
 
-No frills:
+
+    ### No frills ###
 
     my $api = Twitter::API->new(
         consumer_key    => $YOUR_CONSUMER_KEY,
@@ -416,7 +417,7 @@ No frills:
         -token_secret => $an_access_token_secret,
     });
 
-Error handling:
+    ### Error handling ###
 
     use Scalar::Util 'blessed';
     use Try::Tiny;
@@ -438,5 +439,119 @@ Error handling:
             say "Oops! Twitter thinks you're spam bot!";
         }
     };
+
+=head1 DESCRIPTION
+
+Twitter::API provides an interface to the Twitter REST API for perl.
+
+Features:
+=for :list
+* full support for all Twitter REST API endpoints
+* optionally, specify access tokens per API call - no need to construct a new
+client fo to use different user credentials
+* error handling via an exception object that captures the full reqest/response
+context
+* full support for OAuth handshake and xauth authentication
+
+Additionl features are availble via optional traits:
+=for :list
+* convenient methods for API endpoints with simplified argument handling via
+L<ApiMethods|Twitter::API::Trait::ApiMethods>
+* normalized booleans (Twitter likes 'true' and 'false', except when it
+doesn't) via L<NormalizeBooleans|Twitter::API::Trait::NormalizeBooleans>
+* automatic decoding of HTML entities via
+L<DecodeHtmlEntities|Twitter::API::Trait::DecodeHtmlEntities>
+* automatic retry on transient errors via
+L<RetryOnError|Twitter::API::Trait::RetryOnError>
+* "the whole enchilada" combines all the above traits via
+L<Enchilada|Twitter::API::Trait::Enchilada>
+* app-only (OAuth2) support via L<AppAuth|Twitter::API::Trait::AppAuth>
+
+Some featuers are provided by separate distributions to avoid additional
+dependencies most users won't want or need:
+=for :list
+* async support via subclass L<Twitter::API::AnyEvent>
+* inflate API call results to objects via
+L<Twitter::API::Trait::InflateObjects>
+
+=cut
+
+=attr consumer_key, consumer_secret
+
+Required. Every application has it's own application credentials.
+
+=attr access_token, access_token_secret
+
+Optional. If provided, every API call will be authenticated with these user
+credentials. See L<AppAuth|Twitter::API::Trait::AppAuth> for app-only (OAuth2)
+support, which does not require user credentials. You can also pass options
+C<-token> and C<-token_secret> to specify user credentials on each API call.
+
+=attr api_url
+
+Optional. Defaults to C<https://api.twitter.com>.
+
+=attr api_version
+
+Optional. Defaults to C<1.1>.
+
+=attr agent
+
+Optional. Used for both the User-Agent and X-Twitter-Client identifiers.
+Defaults to C<Twitter-API-$VERSION (Perl)>.
+
+=attr timeout
+
+Optional. Request timeout in seconds. Defaults to C<10>.
+
+=method get($url, [ \%args ])
+
+Issues an HTTP GET request to Twitter. If C<$url> is just a path part, e.g.,
+C<account/verify_credentials>, it will be expanded to a full URL by prepending
+the C<api_url>, C<api_version> and appending C<.json>. A full URL can also be
+specified, e.g. C<https://api.twitter.com/1.1/account/verify_credentials.json>.
+
+This should accommodate any new API endpoints Twitter adds without requiring an
+update to this module.
+
+=method put($url, [ \%args ])
+
+See C<get> above, for a discussion C<$url>. For file upload, pass an array
+reference as described in
+L<https://metacpan.org/pod/distribution/HTTP-Message/lib/HTTP/Request/Common.pm#POST-url-Header-Value-...-Content-content>.
+
+=method get_request_token([ \%args ])
+
+This is the first step in the OAuth handshake. The only argument expected is
+C<callback>, which defaults to C<oob> for PIN based verification. Web
+applications will pass a callback URL.
+
+Returns a hashref that includes C<oauth_token> and C<oauth_token_secret>.
+
+See L<https://dev.twitter.com/oauth/reference/post/oauth/request_token>.
+
+=method get_authentication_url(\%args)
+
+This is the second step in the OAuth handshake. The only required argument is C<oauth_token>. Use the value returned by C<get_request_token>. Optional arguments: C<force_login> and C<screen_name> to prefill Twitter's authentication form.
+
+See L<https://dev.twitter.com/oauth/reference/get/oauth/authenticate>.
+
+=method get_authorization_url(\%args)
+
+Identical to C<get_authentication_url>, but uses authorization flow, rather
+than authentication flow.
+
+See L<https://dev.twitter.com/oauth/reference/get/oauth/authorize>.
+
+=method get_access_token(\%ags)
+
+This is the third and final step in the OAuth handshake. Pass the request C<token>, request C<token_secret> obtained in the C<get_request_token> call, and either the PIN number if you used C<oob> for the callback value in C<get_request_token> or the C<verifier> parameter returned in the web callback, as C<verfier>.
+
+See L<https://dev.twitter.com/oauth/reference/post/oauth/access_token>.
+
+=method xauth(\%args)
+
+Requires per application approval from Twitter. Pass C<username> and
+C<password>.
 
 =cut
