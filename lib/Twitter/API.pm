@@ -1,6 +1,5 @@
 package Twitter::API;
-our $VERSION = '0.0100';
-
+$Twitter::API::VERSION = '0.0100';
 use 5.12.1;
 use Moo;
 use Carp;
