@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-use 5.12.1;
+use 5.14.1;
 use warnings;
 use utf8;
 use open qw/:std :utf8/;

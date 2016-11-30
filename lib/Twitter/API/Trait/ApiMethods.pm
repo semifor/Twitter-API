@@ -1,7 +1,7 @@
 package Twitter::API::Trait::ApiMethods;
 # ABSTRACT: Convenient API Methods
 
-use 5.12.1;
+use 5.14.1;
 use Carp;
 use Moo::Role;
 use MooX::Aliases;

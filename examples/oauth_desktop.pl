@@ -2,7 +2,7 @@
 
 # Twitter::API - OAuth desktop app example
 #
-use 5.12.1;
+use 5.14.1;
 use warnings;
 use Data::Dumper;
 use Twitter::API;

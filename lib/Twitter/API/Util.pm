@@ -1,7 +1,7 @@
 package Twitter::API::Util;
 # ABSTRACT: Exportable utility functions, e.g., Twitter timestamp parsing
 
-use 5.12.1;
+use 5.14.1;
 use warnings;
 use Scalar::Util ();
 use Time::Piece;
