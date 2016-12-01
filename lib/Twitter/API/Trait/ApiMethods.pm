@@ -27,23 +27,23 @@ sub retweets_of_me {
 alias retweeted_of_me => 'retweets_of_me';
 
 sub retweets {
-    shift->_with_pos_args([ 'id' ], get => 'statuses/retweets/:id', @_);
+    shift->_with_pos_args(id => get => 'statuses/retweets/:id', @_);
 }
 
 sub show_status {
-    shift->_with_pos_args([ 'id' ], get => 'statuses/show/:id', @_);
+    shift->_with_pos_args(id => get => 'statuses/show/:id', @_);
 }
 
 sub destroy_status {
-    shift->_with_pos_args([ 'id' ], post => 'statuses/destroy/:id', @_);
+    shift->_with_pos_args(id => post => 'statuses/destroy/:id', @_);
 }
 
 sub update {
-    shift->_with_pos_args([ qw/status/ ], post => 'statuses/update', @_);
+    shift->_with_pos_args(status => post => 'statuses/update', @_);
 }
 
 sub retweet {
-    shift->_with_pos_args([ 'id' ], post => 'statuses/retweet/:id', @_);
+    shift->_with_pos_args(id => post => 'statuses/retweet/:id', @_);
 }
 
 sub oembed {
@@ -51,15 +51,15 @@ sub oembed {
 }
 
 sub retweeters_ids {
-    shift->_with_pos_args([ 'id' ], get => 'statuses/retweeters/ids', @_);
+    shift->_with_pos_args(id => get => 'statuses/retweeters/ids', @_);
 }
 
 sub lookup_statuses {
-    shift->_with_pos_args([ 'id' ], get => 'statuses/lookup', @_);
+    shift->_with_pos_args(id => get => 'statuses/lookup', @_);
 }
 
 sub upload_media {
-    shift->_with_pos_args([ 'media' ],
+    shift->_with_pos_args(media =>
         post => 'https://upload.twitter.com/1.1/media/upload.json', @_);
 }
 alias upload => 'upload_media';
@@ -77,7 +77,7 @@ sub create_media_metadata {
 }
 
 sub search {
-    shift->_with_pos_args([ 'q' ], get => 'search/tweets', @_);
+    shift->_with_pos_args(q => get => 'search/tweets', @_);
 }
 
 sub direct_messages {
@@ -90,11 +90,11 @@ sub sent_direct_messages {
 alias direct_messages_sent => 'sent_direct_messages';
 
 sub show_direct_message {
-    shift->_with_pos_args([ 'id' ], get => 'direct_messages/show', @_);
+    shift->_with_pos_args(id => get => 'direct_messages/show', @_);
 }
 
 sub destroy_direct_message {
-    shift->_with_pos_args([ 'id' ], post => 'direct_messages/destroy', @_);
+    shift->_with_pos_args(id => post => 'direct_messages/destroy', @_);
 }
 
 sub new_direct_message {
@@ -117,7 +117,7 @@ sub friends {
 alias friends_list => 'friends';
 
 sub followers_ids {
-    shift->_with_pos_args([ ':ID' ], get => 'followers/ids', @_);
+    shift->_with_pos_args(':ID', get => 'followers/ids', @_);
 }
 
 sub lookup_friendships {
@@ -135,12 +135,12 @@ sub friendships_outgoing {
 alias outgoing_friendships => 'friendships_outgoing';
 
 sub create_friend {
-    shift->_with_pos_args([ ':ID' ], post => 'friendships/create', @_);
+    shift->_with_pos_args(':ID', post => 'friendships/create', @_);
 }
 alias $_ => 'create_friend' for qw/follow follow_new create_friendship/;
 
 sub destroy_friend {
-    shift->_with_pos_args([ ':ID' ], post => 'friendships/destroy', @_);
+    shift->_with_pos_args(':ID', post => 'friendships/destroy', @_);
 }
 alias $_ => 'destroy_friend' for qw/unfollow destroy_friendship/;
 
@@ -174,7 +174,7 @@ sub update_profile_background_image {
 }
 
 sub update_profile_image {
-    shift->_with_pos_args([ 'image' ], post => 'account/update_profile_image', @_);
+    shift->_with_pos_args(image => post => 'account/update_profile_image', @_);
 }
 
 sub blocking {
@@ -192,7 +192,7 @@ sub create_block {
 }
 
 sub destroy_block {
-    shift->_with_pos_args([ ':ID' ], post => 'blocks/destroy', @_);
+    shift->_with_pos_args(':ID', post => 'blocks/destroy', @_);
 }
 
 sub lookup_users {
@@ -200,11 +200,11 @@ sub lookup_users {
 }
 
 sub show_user {
-    shift->_with_pos_args([ ':ID' ], get => 'users/show', @_);
+    shift->_with_pos_args(':ID', get => 'users/show', @_);
 }
 
 sub users_search {
-    shift->_with_pos_args([ 'q' ], get => 'users/search', @_);
+    shift->_with_pos_args(q => get => 'users/search', @_);
 }
 alias $_ => 'users_search' for qw/find_people search_users/;
 
@@ -224,7 +224,7 @@ my $rename_category = sub {
 sub user_suggestions_for {
     my $self = shift;
 
-    $self->_with_pos_args([ 'slug' ], get => 'users/suggestions/:slug',
+    $self->_with_pos_args(slug => get => 'users/suggestions/:slug',
         $self->$rename_category(@_));
 }
 alias follow_suggestions => 'user_suggestions_for';
@@ -232,7 +232,7 @@ alias follow_suggestions => 'user_suggestions_for';
 sub user_suggestions {
     my $self = shift;
 
-    $self->_with_pos_args([ 'slug' ], get => 'users/suggestions/:slug/members',
+    $self->_with_pos_args(slug => get => 'users/suggestions/:slug/members',
         $self->$rename_category(@_));
 }
 
@@ -241,11 +241,11 @@ sub favorites {
 }
 
 sub destroy_favorite {
-    shift->_with_pos_args([ 'id' ], post => 'favorites/destroy', @_);
+    shift->_with_pos_args(id => post => 'favorites/destroy', @_);
 }
 
 sub create_favorite {
-    shift->_with_pos_args([ 'id' ], post => 'favorites/create', @_);
+    shift->_with_pos_args(id => post => 'favorites/create', @_);
 }
 
 sub get_lists {
@@ -310,7 +310,7 @@ sub update_list {
 }
 
 sub create_list {
-    shift->_with_pos_args([ 'name' ], post => 'lists/create', @_);
+    shift->_with_pos_args(name => post => 'lists/create', @_);
 }
 
 sub get_list {
@@ -337,21 +337,21 @@ sub saved_searches {
 }
 
 sub show_saved_search {
-    shift->_with_pos_args([ 'id' ], get => 'saved_searches/show/:id', @_);
+    shift->_with_pos_args(id => get => 'saved_searches/show/:id', @_);
 }
 
 sub create_saved_search {
-    shift->_with_pos_args([ 'query' ], post => 'saved_searches/create', @_);
+    shift->_with_pos_args(query => post => 'saved_searches/create', @_);
 }
 
 sub destroy_saved_search {
-    shift->_with_pos_args([ 'id' ], post => 'saved_searches/destroy/:id', @_);
+    shift->_with_pos_args(id => post => 'saved_searches/destroy/:id', @_);
 }
 alias delete_saved_search => 'destroy_saved_search';
 
 # NT incompatibility
 sub geo_id {
-    shift->_with_pos_args([ 'place_id' ], get => 'geo/id/:place_id', @_);
+    shift->_with_pos_args(place_id => get => 'geo/id/:place_id', @_);
 }
 
 sub reverse_geocode {
@@ -368,7 +368,7 @@ sub add_place {
 }
 
 sub trends_place {
-    shift->_with_pos_args([ 'id' ], get => 'trends/place', @_);
+    shift->_with_pos_args(id => get => 'trends/place', @_);
 }
 
 sub trends_available {
@@ -417,7 +417,7 @@ sub remove_profile_banner {
 }
 
 sub update_profile_banner {
-    shift->_with_pos_args([ 'banner' ], post => 'account/update_profile_banner', @_);
+    shift->_with_pos_args(banner => post => 'account/update_profile_banner', @_);
 }
 
 sub profile_banner {
@@ -435,27 +435,27 @@ sub muting {
 alias mutes_list => 'muting';
 
 sub create_mute {
-    shift->_with_pos_args([ 'id' ], post => 'mutes/users/create', @_);
+    shift->_with_pos_args(id => post => 'mutes/users/create', @_);
 }
 
 sub destroy_mute {
-    shift->_with_pos_args([ 'id' ], post => 'mutes/users/destroy', @_);
+    shift->_with_pos_args(id => post => 'mutes/users/destroy', @_);
 }
 
 sub collection_entries {
-    shift->_with_pos_args([ 'id' ], get => 'collections/entries', @_);
+    shift->_with_pos_args(id => get => 'collections/entries', @_);
 }
 
 sub collections {
-    shift->_with_pos_args([ ':ID' ], get => 'collections/list', @_);
+    shift->_with_pos_args(':ID', get => 'collections/list', @_);
 }
 
 sub create_collection {
-    shift->_with_pos_args([ 'name' ], post => 'collections/create', @_);
+    shift->_with_pos_args(name => post => 'collections/create', @_);
 }
 
 sub destroy_collection {
-    shift->_with_pos_args([ 'id' ], post => 'collections/destroy', @_);
+    shift->_with_pos_args(id => post => 'collections/destroy', @_);
 }
 
 sub add_collection_entry {
@@ -483,11 +483,11 @@ sub remove_collection_entry {
 }
 
 sub update_collection {
-    shift->_with_pos_args([ 'id' ], post => 'collections/update', @_);
+    shift->_with_pos_args(id => post => 'collections/update', @_);
 }
 
 sub unretweet {
-    shift->_with_pos_args([ 'id' ], post => 'statuses/unretweet/:id', @_);
+    shift->_with_pos_args(id => post => 'statuses/unretweet/:id', @_);
 }
 
 # if there is a positional arg, it's an :ID (screen_name or user_id)
@@ -499,6 +499,7 @@ sub _with_optional_id {
 
 sub _with_pos_args {
     my $pos_keys = splice @_, 1, 1;
+    $pos_keys = [ $pos_keys ] unless ref $pos_keys eq 'ARRAY';
 
     # We don't just assume the final arg is the (optional) args hashref,
     # because Twitter::API subclasses may pass extra args.
