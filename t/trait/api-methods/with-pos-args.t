@@ -28,7 +28,7 @@ describe _with_pos_args => sub {
 
     it 'croaks without args' => sub{
         like exception {
-            $api->_with_pos_args([':ID'], 'GET', 'path');
+            $api->_with_pos_args([':ID'], 'get', 'path');
         }, qr/missing required screen_name or user_id/;
     };
     it ':ID croaks with both screen_name or user_id' => sub {

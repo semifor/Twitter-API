@@ -7,4 +7,8 @@ perl:
   - "5.14"
 notifications:
   email: false
-  irc: "irc.perl.org#net-twitter"
+  irc:
+    channels:
+      - "irc.perl.org#net-twitter"
+    template:
+      - "%{result}: %{repository} (%{commit}) %{commit_subject}"
