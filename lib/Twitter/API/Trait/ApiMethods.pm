@@ -14,7 +14,7 @@ sub mentions {
 alias $_ => 'mentions' for qw/replies mentions_timeline/;
 
 sub user_timeline {
-    shift->_with_pos_args([ ':ID' ], get => 'statuses/user_timeline', @_);
+    shift->_with_optional_id(get => 'statuses/user_timeline', @_);
 }
 
 sub home_timeline {
@@ -55,7 +55,7 @@ sub retweeters_ids {
 }
 
 sub lookup_statuses {
-    shift->request(get => 'statuses/lookup', @_);
+    shift->_with_pos_args([ 'id' ], get => 'statuses/lookup', @_);
 }
 
 sub upload_media {
@@ -488,6 +488,13 @@ sub update_collection {
 
 sub unretweet {
     shift->_with_pos_args([ 'id' ], post => 'statuses/unretweet/:id', @_);
+}
+
+# if there is a positional arg, it's an :ID (screen_name or user_id)
+sub _with_optional_id {
+    splice @_, 1, 0, [];
+    push @{$_[1]}, ':ID' if @_ > 4 && ref $_[4] ne 'HASH';
+    goto $_[0]->can('_with_pos_args');
 }
 
 sub _with_pos_args {
