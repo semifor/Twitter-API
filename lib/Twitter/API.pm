@@ -257,6 +257,10 @@ sub inflate_response {
         if ( $res->content_type eq 'application/json' ) {
             $data = $self->from_json($res->content);
         }
+        elsif ( $res->content_length == 0 ) {
+            # E.g., 200 OK from media/metadata/create
+            $data = '';
+        }
         elsif ( ($c->get_option('accept') // '') eq 'application/x-www-form-urlencoded' ) {
 
             # Twitter sets Content-Type: text/html for /oauth/request_token and
@@ -279,7 +283,7 @@ sub inflate_response {
     };
 
     $c->set_result($data);
-    return if $data && $res->is_success;
+    return if defined($data) && $res->is_success;
 
     $self->process_error_response($c);
 }

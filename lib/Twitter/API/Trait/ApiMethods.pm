@@ -64,7 +64,8 @@ sub upload_media {
 }
 alias upload => 'upload_media';
 
-# undocumented
+# E.g.:
+# create_media_metadata({ media_id => $id, alt_text => { text => $text } })
 sub create_media_metadata {
     my ( $self, $to_json ) = @_;
 
