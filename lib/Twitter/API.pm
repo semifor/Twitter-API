@@ -152,7 +152,7 @@ sub preprocess_url {
     my $url = $c->url;
     my $args = $c->args;
     unless ( $url =~ m(^https?://) ) {
-        $url =~ s/:(\w+)/delete $$args{$1}/eg;
+        $url =~ s[:(\w+)][delete $$args{$1} // croak "missing arg $1"]eg;
         $c->set_url(join('/', $self->api_url, $self->api_version, $url)
             . '.json');
     }

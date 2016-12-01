@@ -56,7 +56,8 @@
             "Time::Piece" : "0",
             "Try::Tiny" : "0",
             "URL::Encode" : "0",
-            "namespace::clean" : "0"
+            "namespace::clean" : "0",
+            "perl" : "v5.14.1"
          }
       },
       "test" : {
@@ -80,6 +81,6 @@
       }
    },
    "version" : "0.0100",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
 }
 

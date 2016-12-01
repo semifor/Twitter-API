@@ -62,6 +62,19 @@ sub upload_media {
     shift->_with_pos_args([ 'media' ],
         post => 'https://upload.twitter.com/1.1/media/upload.json', @_);
 }
+alias upload => 'upload_media';
+
+# undocumented
+sub create_media_metadata {
+    my ( $self, $to_json ) = @_;
+
+    croak 'expected a single hashref argument'
+        unless @_ == 2 && ref $_[1] eq 'HASH';
+
+    $self->request(post => 'media/metadata/create', {
+        -to_json => $to_json,
+    });
+}
 
 sub search {
     shift->_with_pos_args([ 'q' ], get => 'search/tweets', @_);
@@ -478,28 +491,62 @@ sub unretweet {
 }
 
 sub _with_pos_args {
-    my $pos_list = splice @_, 1, 1;
+    my $pos_keys = splice @_, 1, 1;
+
+    # We don't just assume the final arg is the (optional) args hashref,
+    # because Twitter::API subclasses may pass extra args.
+    # Twitter::API::AnyEvent, e.g., passes a callback as the final arg.
+    my $pos_count = 0;
+    ++$pos_count while
+        $pos_count < @$pos_keys # we have a key for this arg in @$pos_keys
+        && @_ > $pos_count + 3  # and we still have arguments available
+        # and the next arg is not the args hash
+        && ref $_[$pos_count + 3] ne 'HASH';
 
     # Gather positional args
     my %pos_args;
-    for my $k ( @$pos_list ) {
-        # Found named args hash?
-        last if ref $_[3] && reftype $_[3] eq 'HASH';
+    @pos_args{splice @$pos_keys, 0, $pos_count} = splice @_, 3, $pos_count;
 
-        $pos_args{$k} = splice @_, 3, 1;
-    }
-
-    # transform inferred id type
-    if ( local $_ = delete $pos_args{':ID'} ) {
-        $pos_args{ /\D/ ? 'screen_name' : 'user_id' } = $_;
-    }
-
-    # removed existed named args hash if it exists
+    # removed existing named args hash if it exists
     my $named_args = ref $_[3] && reftype $_[3] eq 'HASH' ? splice @_, 3, 1 : {};
 
+    # transform :ID arg, if we have one, to screen_name or user_id
+    if ( local $_ = delete $pos_args{':ID'} ) {
+        $pos_args{/\D/ ? 'screen_name' : 'user_id'} = $_;
+    }
+
+    # Gather remaining required args into %pos_args
+    for my $key ( @$pos_keys ) {
+        if ( $key eq ':ID' ) {
+            my $other;
+            if ( exists $$named_args{user_id} ) {
+                $pos_args{user_id} = delete $$named_args{user_id};
+                $other = 'screen_name';
+            }
+            elsif ( exists $$named_args{screen_name} ) {
+                $pos_args{screen_name} = delete $$named_args{screen_name};
+                $other = 'user_id';
+            }
+            else {
+                croak 'missing required screen_name or user_id arg';
+            }
+            croak 'only one of screen_name or user_id allowed'
+                if exists $$named_args{$other};
+
+            next;
+        }
+        $pos_args{$key} = delete $$named_args{$key}
+            // croak "missing required '$key' arg";
+    }
+
+    # ensure we have no duplicate args
+    for ( keys %$named_args ) {
+        croak "'$_' specified in both positional and named args"
+            if exists $pos_args{$_};
+    }
+
     # combine named and positional args and insert into @_
-    $named_args = { %pos_args, %$named_args };
-    splice @_, 3, 0, $named_args;
+    splice @_, 3, 0, { %pos_args, %$named_args };
 
     # now, back to your regularly schedule program...
     goto $_[0]->can('request');
