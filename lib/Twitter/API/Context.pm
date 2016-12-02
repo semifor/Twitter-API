@@ -23,6 +23,7 @@ has options => (
 sub get_option { $_[0]->options->{$_[1]}         }
 sub has_option { exists $_[0]->options->{$_[1]}  }
 sub set_option { $_[0]->options->{$_[1]} = $_[2] }
+sub delete_option { delete $_[0]->options->{$_[1]} }
 
 # private method
 my $limit = sub {

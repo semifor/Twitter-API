@@ -126,8 +126,8 @@ sub request {
     $self->add_authorization($c);
     $self->finalize_request($c);
 
-    # Allow early exit for Twitter::API::AnyEvent
-    $c->set_http_response($self->send_request($c) // return);
+    # Allow early exit for things like Twitter::API::AnyEvent
+    $c->set_http_response($self->send_request($c) // return $c);
 
     $self->inflate_response($c);
     return wantarray ? ( $c->result, $c ) : $c->result;
@@ -474,7 +474,9 @@ Features:
 
 =for :list
 * full support for all Twitter REST API endpoints
-* optionally, specify access tokens per API call - no need to construct a new client fo to use different user credentials * error handling via an exception object that captures the full reqest/response context
+* not dependent on a new distribution for new endpoint support
+* optionally specify access tokens per call; no need to construct a new client to use different tokens
+* error handling via an exception object that captures the full reqest/response context
 * full support for OAuth handshake and xauth authentication
 
 Additionl features are availble via optional traits:
@@ -577,5 +579,12 @@ See L<https://dev.twitter.com/oauth/reference/post/oauth/access_token>.
 
 Requires per application approval from Twitter. Pass C<username> and
 C<password>.
+
+=head1 SEE ALSO
+
+=for :list
+* L<Net::Twitter> - Twitter::API's predecessor (also L<Net::Twitter::Lite>)
+* L<Mojo::WebService::Twitter> - Simple non-blocking Twitter API client
+* L<API::Twitter> - Another simple Twitter API client
 
 =cut
