@@ -58,8 +58,10 @@ sub lookup_statuses {
 }
 
 sub upload_media {
-    shift->_with_pos_args(media =>
-        post => 'https://upload.twitter.com/1.1/media/upload.json', @_);
+    my $self = shift;
+
+    $self->_with_pos_args(media =>
+        post => $self->upload_url_for('media/upload'), @_);
 }
 alias upload => 'upload_media';
 

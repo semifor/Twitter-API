@@ -8,7 +8,11 @@ use namespace::clean;
 
 # private methods
 
-my $oauth2_url_for = sub { join '/', $_[0]->api_url, 'oauth2', $_[1] };
+sub oauth2_url_for {
+    my $self = shift;
+
+    $self->_url_for('', $self->api_url, 'oauth2', @_);
+}
 
 my $add_consumer_auth_header = sub {
     my ( $self, $req ) = @_;
@@ -22,7 +26,7 @@ my $add_consumer_auth_header = sub {
 sub get_bearer_token {
     my $self = shift;
 
-    $self->request(post => $self->$oauth2_url_for('token'), {
+    $self->request(post => $self->oauth2_url_for('token'), {
         -add_consumer_auth_header => 1,
         grant_type => 'client_credentials',
     });
@@ -31,7 +35,7 @@ sub get_bearer_token {
 sub invalidate_token {
     my ( $self, $token ) = @_;
 
-    $self->request(post =>$self->$oauth2_url_for('invalidate_token'), {
+    $self->request(post =>$self->oauth2_url_for('invalidate_token'), {
         -add_consumer_auth_header => 1,
         access_token              => $token,
     });

@@ -5,7 +5,7 @@ use Test::Spec;
 use HTTP::Response;
 use Test::Fatal;
 
-use Twitter::API::Trait::ApiMethods;
+use Twitter::API;
 
 BEGIN {
     eval { require Net::Twitter };
@@ -24,18 +24,22 @@ my %skip = map +($_ => 1), (
     'upload_status',          # no longer documented
 );
 
-package Foo {
-    use Moo;
-    with 'Twitter::API::Trait::ApiMethods';
-
-    sub request {
+sub new_client {
+    my $client = Twitter::API->new_with_traits(
+        traits          => 'ApiMethods',
+        consumer_key    => 'key',
+        consumer_secret => 'secret',
+    );
+    $client->stubs(request => sub {
         my ( $self, $method, $path, $args ) = @_;
         die 'too many args' if @_ > 4;
         die 'too few args'  if @_ < 3;
         die 'final arg must be HASH' if @_ > 3 && ref $args ne 'HASH';
 
         return ( uc $method, $args );
-    }
+    });
+
+    return $client;
 }
 
 sub http_response_ok {
@@ -65,7 +69,7 @@ for my $nt_method ( @nt_methods ) {
     describe $name => sub {
         my $api;
         before each => sub {
-            $api = Foo->new;
+            $api = new_client;
         };
 
         it 'method exists' => sub {

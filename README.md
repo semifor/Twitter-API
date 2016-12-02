@@ -106,6 +106,10 @@ support, which does not require user credentials. You can also pass options
 
 Optional. Defaults to `https://api.twitter.com`.
 
+## upload\_url
+
+Optional. Defaults to `https://upload.twitter.com`.
+
 ## api\_version
 
 Optional. Defaults to `1.1`.

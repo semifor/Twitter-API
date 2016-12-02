@@ -40,6 +40,11 @@ has api_url => (
     default => sub { 'https://api.twitter.com' },
 );
 
+has upload_url => (
+    is      => 'ro',
+    default => sub { 'https://upload.twitter.com' },
+);
+
 has api_version => (
     is      => 'ro',
     default => sub { '1.1' },
@@ -150,11 +155,8 @@ sub preprocess_url {
 
     my $url = $c->url;
     my $args = $c->args;
-    unless ( $url =~ m(^https?://) ) {
-        $url =~ s[:(\w+)][delete $$args{$1} // croak "missing arg $1"]eg;
-        $c->set_url(join('/', $self->api_url, $self->api_version, $url)
-            . '.json');
-    }
+    $url =~ s[:(\w+)][delete $$args{$1} // croak "missing arg $1"]eg;
+    $c->set_url($self->api_url_for($url));
 }
 
 sub add_authorization {
@@ -317,13 +319,34 @@ sub process_error_response {
 # If any of the args are references, we'll assume it's a multipart request
 sub is_multipart { !!grep ref, values %{ $_[1] } }
 
-# OAuth handshake
+sub api_url_for {
+    my $self = shift;
+
+    $self->_url_for('.json', $self->api_url, $self->api_version, @_);
+}
+
+sub upload_url_for {
+    my $self = shift;
+
+    $self->_url_for('.json', $self->upload_url, $self->api_version, @_);
+}
 
 sub oauth_url_for {
-    my ( $self, $endpoint ) = @_;
+    my $self = shift;
 
-    join '/', $self->api_url, 'oauth', $endpoint;
+    $self->_url_for('', $self->api_url, 'oauth', @_);
 }
+
+sub _url_for {
+    my ( $self, $ext, @parts ) = @_;
+
+    # If we already have a fully qualified URL, just return it
+    return $_[-1] if $_[-1] =~ m(^https?://);
+
+    join('/', @parts) . $ext;
+}
+
+# OAuth handshake
 
 sub get_request_token {
     my ( $self, $args ) = @_;
@@ -487,6 +510,10 @@ C<-token> and C<-token_secret> to specify user credentials on each API call.
 =attr api_url
 
 Optional. Defaults to C<https://api.twitter.com>.
+
+=attr upload_url
+
+Optional. Defaults to C<https://upload.twitter.com>.
 
 =attr api_version
 
