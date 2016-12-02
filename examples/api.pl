@@ -17,7 +17,7 @@ my $client = Twitter::API->new_with_traits(
 my $r = $client->verify_credentials;
 say "$$r{screen_name} is authorized";
 
-my $mentions = $client->mentions({ user_id => $$r{id} });
+my $mentions = $client->mentions;
 for my $status ( @$mentions ) {
     say $$status{text};
 }
