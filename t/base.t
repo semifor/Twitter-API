@@ -47,26 +47,26 @@ describe 'construction' => sub {
 };
 
 describe 'request' => sub {
-    my $api;
+    my $client;
     before each => sub {
-        $api = Twitter::API->new(
+        $client = Twitter::API->new(
             consumer_key    => 'key',
             consumer_secret => 'secret',
         );
 
-        $api->stubs(send_request => \&http_response_ok);
+        $client->stubs(send_request => \&http_response_ok);
     };
 
     it 'requires an access_token' => sub {
         like(
-            exception { $api->request(get => 'fake/endpoint') },
+            exception { $client->request(get => 'fake/endpoint') },
             qr/token/,
         );
     };
 
     it 'accepts per request tokens' => sub {
         exception {
-            $api->get('fake/endpoint', {
+            $client->get('fake/endpoint', {
                 -token        => 'my-token',
                 -token_secret => 'my-secret',
             });
@@ -76,16 +76,16 @@ describe 'request' => sub {
 
     it "uses object's user credentials" => sub {
         exception {
-            $api->access_token('token');
-            $api->access_token_secret('token-secret');
-            $api->get('fake/endpoint');
+            $client->access_token('token');
+            $client->access_token_secret('token-secret');
+            $client->get('fake/endpoint');
         }, undef;
     };
 
     it 'prioritizes per-request user credentials' => sub {
-        $api->access_token('token');
-        $api->access_token_secret('token-secret');
-        my ($r, $c) = $api->get('fake/endpoint', {
+        $client->access_token('token');
+        $client->access_token_secret('token-secret');
+        my ($r, $c) = $client->get('fake/endpoint', {
             -token        => 'per-request',
             -token_secret => 'per-request-secret',
         });
@@ -97,12 +97,12 @@ describe 'request' => sub {
 describe 'get' => sub {
     my $req;
     before each => sub {
-        my $api = Twitter::API->new(
+        my $client = Twitter::API->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
         );
-        $api->stubs(send_request => \&http_response_ok);
-        my ($r, $c) = $api->get('fake/endpoint', {
+        $client->stubs(send_request => \&http_response_ok);
+        my ($r, $c) = $client->get('fake/endpoint', {
             -token        => 'token',
             -token_secret => 'access_token_secret',
             foo           => 'bar',
@@ -135,14 +135,14 @@ describe 'get' => sub {
 describe 'post' => sub {
     my $req;
     before each => sub {
-        my $api = Twitter::API->new(
+        my $client = Twitter::API->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
             access_token        => 'token',
             access_token_secret => 'secret',
         );
-        $api->stubs(send_request => \&http_response_ok);
-        my ($r, $c) = $api->post('fake/endpoint', {
+        $client->stubs(send_request => \&http_response_ok);
+        my ($r, $c) = $client->post('fake/endpoint', {
             foo => 'bar',
             baz => 'bop',
         });
@@ -164,14 +164,14 @@ describe 'post' => sub {
 describe 'post (file upload)' => sub {
     my $req;
     before each => sub {
-        my $api = Twitter::API->new(
+        my $client = Twitter::API->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
             access_token        => 'token',
             access_token_secret => 'secret',
         );
-        $api->stubs(send_request => \&http_response_ok);
-        my ($r, $c) = $api->post('fake/endpoint', {
+        $client->stubs(send_request => \&http_response_ok);
+        my ($r, $c) = $client->post('fake/endpoint', {
             foo  => 'bar',
             baz  => 'bop',
             file => [ undef, 'file', content => 'just some text' ],
@@ -198,16 +198,16 @@ describe 'post (file upload)' => sub {
 };
 
 describe 'post (json body)' => sub {
-    my ( $api, $req );
+    my ( $client, $req );
     before each => sub {
-        $api = Twitter::API->new(
+        $client = Twitter::API->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
             access_token        => 'token',
             access_token_secret => 'secret',
         );
-        $api->stubs(send_request => \&http_response_ok);
-        my ($r, $c) = $api->post('fake/endpoint', {
+        $client->stubs(send_request => \&http_response_ok);
+        my ($r, $c) = $client->post('fake/endpoint', {
             -to_json => { foo => 'bar', baz => 'bop' },
         });
         $req = $c->http_request;
@@ -218,7 +218,7 @@ describe 'post (json body)' => sub {
     };
     it 'has carrect content' => sub {
         my $json = $req->decoded_content;
-        my $data = $api->from_json($json);
+        my $data = $client->from_json($json);
         is_deeply $data, { foo => 'bar', baz => 'bop' };
     };
 };

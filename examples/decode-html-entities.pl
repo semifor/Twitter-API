@@ -7,7 +7,7 @@ use Test::More;
 
 use Twitter::API;
 
-my $api = Twitter::API->new_with_traits(
+my $client = Twitter::API->new_with_traits(
     traits => [ qw/ApiMethods DecodeHtmlEntities/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},
@@ -15,7 +15,7 @@ my $api = Twitter::API->new_with_traits(
     access_token_secret => $ENV{ACCESS_TOKEN_SECRET},
 );
 
-my $r = $api->show_status(801814387723935744);
+my $r = $client->show_status(801814387723935744);
 
 diag $$r{text};
 is $$r{text}, q{Test DecodeHtmlEntities trait. < & > ⚠️ 🏉 'single' "double"},

@@ -73,25 +73,25 @@ __END__
 =head1 SYNOPSIS
 
     use Twitter::API;
-    my $api = Twitter::API->new_with_traits(
+    my $client = Twitter::API->new_with_traits(
         traits => [ qw/ApiMethods AppAuth/ ]);
 
-    my $r = $api->get_bearer_token;
+    my $r = $client->get_bearer_token;
     # return value is hash ref:
     # { token_type => 'bearer', access_token => 'AA...' }
     my $token = $r->{access_token};
 
     # you can use the token explicitly with the -token argument:
-    my $user = $api->show_user('twitter_api', { -token => $token });
+    my $user = $client->show_user('twitter_api', { -token => $token });
 
     # or you can set the access_token attribute to use it implicitly
-    $api->access_token($token);
-    my $user = $api->show_user('twitterapi');
+    $client->access_token($token);
+    my $user = $client->show_user('twitterapi');
 
     # to revoke a token
-    $api->invalidate_token($token);
+    $client->invalidate_token($token);
 
     # if you revoke the token stored in the access_token attribute, clear it:
-    $api->clear_access_token;
+    $client->clear_access_token;
 
 =cut

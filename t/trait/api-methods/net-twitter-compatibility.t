@@ -67,13 +67,13 @@ for my $nt_method ( @nt_methods ) {
     my @required = @{ $nt_method->required };
 
     describe $name => sub {
-        my $api;
+        my $client;
         before each => sub {
-            $api = new_client;
+            $client = new_client;
         };
 
         it 'method exists' => sub {
-            ok $api->can($name);
+            ok $client->can($name);
         };
         it 'has correct HTTP method' => sub {
             # path-part arguments must be passed
@@ -82,7 +82,7 @@ for my $nt_method ( @nt_methods ) {
                 ( $nt_method->path =~ /:(\w+)/g ),
                 @required
             } = 'a' .. 'z';
-            my ( $http_method, undef ) = $api->$name(
+            my ( $http_method, undef ) = $client->$name(
                 keys %must_have_args ? \%must_have_args : ()
             );
             is $http_method, $nt_method->method;
@@ -91,14 +91,14 @@ for my $nt_method ( @nt_methods ) {
         it "handles ${ \(0+@required) }  positional args" => sub {
             my @args; @args[0 .. $#required] = 'a' .. 'z';
             my %expected; @expected{@required} = 'a' .. 'z';
-            my ( undef, $args ) = $api->$name(@args);
+            my ( undef, $args ) = $client->$name(@args);
             is_deeply $args, \%expected;
         } if @required > 0;
 
         it "handles mixed positional and named args" => sub {
             my %args; @args{@required[1..$#required]} = 'a' .. 'z';
             my %expected; @expected{@required} = ( 'foo', 'a' .. 'z' );
-            my ( undef, $args ) = $api->$name('foo', \%args);
+            my ( undef, $args ) = $client->$name('foo', \%args);
             is_deeply $args, \%expected;
         } if @required > 1;
     };

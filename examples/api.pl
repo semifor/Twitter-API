@@ -6,7 +6,7 @@ use open qw/:std :utf8/;
 
 use Twitter::API;
 
-my $api = Twitter::API->new_with_traits(
+my $client = Twitter::API->new_with_traits(
     traits => [ qw/ApiMethods/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},
@@ -14,10 +14,10 @@ my $api = Twitter::API->new_with_traits(
     access_token_secret => $ENV{ACCESS_TOKEN_SECRET},
 );
 
-my $r = $api->verify_credentials;
+my $r = $client->verify_credentials;
 say "$$r{screen_name} is authorized";
 
-my $mentions = $api->mentions({ user_id => $$r{id} });
+my $mentions = $client->mentions({ user_id => $$r{id} });
 for my $status ( @$mentions ) {
     say $$status{text};
 }

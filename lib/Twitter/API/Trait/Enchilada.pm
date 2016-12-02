@@ -24,13 +24,13 @@ __END__
 
     use Twitter::API;
 
-    my $api = Twitter::API->new_with_traits(
+    my $client = Twitter::API->new_with_traits(
         traits => 'Enchilada',
         %other_new_options
     );
 
     # which is just shorthand for:
-    my $api = Twitter::API->new_with_traits(
+    my $client = Twitter::API->new_with_traits(
         traits => [ qw/
             ApiMethods
             NormalizeBooleans

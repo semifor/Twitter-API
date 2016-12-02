@@ -413,7 +413,7 @@ __END__
     ### Common usage ###
 
     use Twitter::API;
-    my $api = Twitter::API->new_with_traits(
+    my $client = Twitter::API->new_with_traits(
         traits              => 'Enchilada',
         consumer_key        => $YOUR_CONSUMER_KEY,
         consumer_secret     => $YOUR_CONSUMER_SECRET,
@@ -421,24 +421,24 @@ __END__
         access_token_secret => $YOUR_ACCESS_TOKEN_SECRET,
     );
 
-    my $me   = $api->verify_credentials;
-    my $user = $api->show_user('twitter');
+    my $me   = $client->verify_credentials;
+    my $user = $client->show_user('twitter');
 
     # In list context, both the Twitter API result and a Twitter::API::Context
     # object are returned.
-    my ($r, $context) = $api->home_timeline({ count => 200, trim_user => 1 });
+    my ($r, $context) = $client->home_timeline({ count => 200, trim_user => 1 });
     my $remaning = $context->rate_limit_remaining;
     my $until    = $context->rate_limit_reset;
 
 
     ### No frills ###
 
-    my $api = Twitter::API->new(
+    my $client = Twitter::API->new(
         consumer_key    => $YOUR_CONSUMER_KEY,
         consumer_secret => $YOUR_CONSUMER_SECRET,
     );
 
-    my $r = $api->get('account/verify_credentials', {
+    my $r = $client->get('account/verify_credentials', {
         -token        => $an_access_token,
         -token_secret => $an_access_token_secret,
     });
@@ -449,7 +449,7 @@ __END__
     use Try::Tiny;
 
     try {
-        my $r = $api->verify_credentials;
+        my $r = $client->verify_credentials;
     }
     catch {
         die $_ unless is_twitter_api_error($_);
