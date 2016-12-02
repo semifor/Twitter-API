@@ -1,6 +1,6 @@
 package Twitter::API::Error;
 # ABSTRACT: Twitter API Error Object
-
+$Twitter::API::Error::VERSION = '0.0100'; # TRIAL
 use Moo;
 use Try::Tiny;
 use Devel::StackTrace;
@@ -126,3 +126,30 @@ sub is_permanent_error { shift->http_response_code < 500 }
 sub is_temporary_error { !shift->is_permanent_error }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Twitter::API::Error - Twitter API Error Object
+
+=head1 VERSION
+
+version 0.0100
+
+=head1 AUTHOR
+
+Marc Mims <marc@questright.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015-2016 by Marc Mims.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

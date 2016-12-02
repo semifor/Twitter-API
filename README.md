@@ -71,7 +71,9 @@ Twitter::API provides an interface to the Twitter REST API for perl.
 Features:
 
 - full support for all Twitter REST API endpoints
-- optionally, specify access tokens per API call - no need to construct a new client fo to use different user credentials \* error handling via an exception object that captures the full reqest/response context
+- not dependent on a new distribution for new endpoint support
+- optionally specify access tokens per call; no need to construct a new client to use different tokens
+- error handling via an exception object that captures the full reqest/response context
 - full support for OAuth handshake and xauth authentication
 
 Additionl features are availble via optional traits:
@@ -174,6 +176,12 @@ See [https://dev.twitter.com/oauth/reference/post/oauth/access\_token](https://d
 
 Requires per application approval from Twitter. Pass `username` and
 `password`.
+
+# SEE ALSO
+
+- [Net::Twitter](https://metacpan.org/pod/Net::Twitter) - Twitter::API's predecessor (also [Net::Twitter::Lite](https://metacpan.org/pod/Net::Twitter::Lite))
+- [Mojo::WebService::Twitter](https://metacpan.org/pod/Mojo::WebService::Twitter) - Simple non-blocking Twitter API client
+- [API::Twitter](https://metacpan.org/pod/API::Twitter) - Another simple Twitter API client
 
 # AUTHOR
 
