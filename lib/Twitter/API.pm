@@ -9,7 +9,6 @@ use HTTP::Request::Common qw/GET POST/;
 use Net::OAuth;
 use Digest::SHA;
 use Try::Tiny;
-use Scalar::Util qw/reftype/;
 use URI;
 use URL::Encode ();
 use Encode qw/encode_utf8/;
@@ -294,7 +293,7 @@ sub flatten_array_args {
     # transform arrays to comma delimited strings
     for my $k ( keys %$args ) {
         my $v = $$args{$k};
-        $$args{$k} = join ',' => @$v if ref $v && reftype $v eq 'ARRAY';
+        $$args{$k} = join ',' => @$v if ref $v eq 'ARRAY';
     }
 }
 
