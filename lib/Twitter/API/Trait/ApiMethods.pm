@@ -500,94 +500,48 @@ sub _with_optional_id {
 }
 
 sub _with_pos_args {
-    # @_ = (
-    #    $self
-    #    name of optional, positional argument or \@names if more than 1
-    #    http_method
-    #    endpoint
-    #    @values of positional arguments
-    #    hashref of other arguments or nothing
-    #    possibly other extra arguments
-    # )
-    # examples:
-    #   - single positional arg, no args hashref
-    #   ( $self, ':ID', 'get', 'statuses/user_timeline', 'semifor' )
-    #   becomes:
-    #   ( $self, 'get', 'statuses/user_timeline', {screen_name => 'semifor'} )
-    #
-    #   - multiple positional args, only 1 passed, has ags hashref
-    #   ( $self, ['id','text'], 'get', 'some/endpoint', 1234 {text => 'foo'} )
-    #   becomes:
-    #   ( $self, 'get', 'some/endpoint', { id => 1234, text => 'foo' } )
-    #
-    #   - 1 positional arg, no args hashref, some extra arg
-    #   ( $self, 'id', 'get', 'some/endpoint', 1234, $coderef
-    #   becomes:
-    #   ( $self, 'get', 'some/endpoint', { id => 1234 }, $coderef )
+    my $self        = shift;
+    my @pos_names   = shift;
+    my $http_method = shift;
+    my $path        = shift;
+    my %args;
 
-    my @pos_keys = splice @_, 1, 1;
-    @pos_keys = @{ $pos_keys[0] } if ref $pos_keys[0] eq 'ARRAY';
+    # names can be a single value or an arrayref
+    @pos_names = @{ $pos_names[0] } if ref $pos_names[0] eq 'ARRAY';
 
-    # We don't just assume the final arg is the (optional) args hashref,
-    # because Twitter::API subclasses may pass extra args.
-    # Twitter::API::AnyEvent, e.g., passes a callback as the final arg.
-    my $pos_count = 0;
-    ++$pos_count while
-        $pos_count < @pos_keys # we have a key for this arg in @pos_keys
-        && @_ > $pos_count + 3  # and we still have arguments available
-        # and the next arg is not the args hashref
-        && ref $_[$pos_count + 3] ne 'HASH';
-
-    # Gather positional args into a hash, removing values from @_
-    my %pos_args;
-    @pos_args{splice @pos_keys, 0, $pos_count} = splice @_, 3, $pos_count;
-
-    # removed args hashref if it exists
-    my %named_args;
-    %named_args = %{ splice @_, 3, 1 } if ref $_[3] eq 'HASH';
-
-    # transform :ID arg, if we have one, to screen_name or user_id
-    if ( my $id = delete $pos_args{':ID'} ) {
-        # if it's all digits, assume it's a numeric user_id
-        $pos_args{$id =~ /\D/ ? 'screen_name' : 'user_id'} = $id;
+    # gather positional arguments and name them
+    while ( @pos_names ) {
+        last if @_ == 0 || ref $_[0] eq 'HASH';
+        $args{shift @pos_names} = shift;
     }
 
-    # Gather remaining required args into %pos_args
-    for my $key ( @pos_keys ) {
-        if ( $key eq ':ID' ) {
-            my $other;
-            if ( exists $named_args{user_id} ) {
-                $pos_args{user_id} = delete $named_args{user_id};
-                $other = 'screen_name';
-            }
-            elsif ( exists $named_args{screen_name} ) {
-                $pos_args{screen_name} = delete $named_args{screen_name};
-                $other = 'user_id';
-            }
-            else {
-                croak 'missing required screen_name or user_id arg';
-            }
-            croak 'only one of screen_name or user_id allowed'
-                if exists $named_args{$other};
+    # get the optional, following args hashref and expand it
+    my %args_hash; %args_hash = %{ shift() } if ref $_[0] eq 'HASH';
+
+    # extract any required args if we still have names
+    while ( my $name = shift @pos_names ) {
+        if ( $name eq ':ID' ) {
+            $name = exists $args_hash{screen_namne} ? 'screen_name' : 'user_id';
+            croak 'missing required screen_name or user_id'
+                unless exists $args_hash{$name};
         }
-        else {
-            croak "missing required '$key' arg"
-                unless exists $named_args{$key};
-            $pos_args{$key} = delete $named_args{$key}
-        }
+        croak "missing required '$name' arg" unless exists $args_hash{$name};
+        $args{$name} = delete $args_hash{$name};
     }
 
-    # ensure we have no duplicate args
-    for ( keys %named_args ) {
-        croak "'$_' specified in both positional and named args"
-            if exists $pos_args{$_};
+    # name the :ID value (if any) based on its value
+    if ( my $id = delete $args{':ID'} ) {
+        $args{$id =~/\D/ ? 'screen_name' : 'user_id'} = $id;
     }
 
-    # combine named and positional args and insert into @_
-    splice @_, 3, 0, { %pos_args, %named_args };
+    # merge in the remaining optional values
+    for my $name ( keys %args_hash ) {
+        croak "'$name' specified in both positional and named args"
+            if exists $args{$name};
+        $args{$name} = $args_hash{$name};
+    }
 
-    # now, back to your regularly schedule program...
-    goto $_[0]->can('request');
+    $self->request($http_method, $path, \%args, @_);
 }
 
 1;

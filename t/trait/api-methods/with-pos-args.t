@@ -19,7 +19,6 @@ package Foo {
     }
 }
 
-
 describe _with_pos_args => sub {
     my $api;
     before each => sub {
@@ -87,6 +86,17 @@ describe _with_pos_args => sub {
             'baz', { bar => 'bop', and => 'more' }
         );
         is_deeply $args, { foo => 'baz', bar => 'bop', and => 'more' };
+    };
+
+    describe '_with_optional_id' => sub {
+        it 'handles optional :ID when it exists' => sub {
+            my $args = $api->_with_optional_id(get => 'path', 'just_me');
+            is_deeply $args, { screen_name => 'just_me' };
+        },
+        it 'handles optional :ID when it does not exist' => sub {
+            my $args = $api->_with_optional_id(get => 'path');
+            is_deeply $args, {};
+        },
     };
 };
 
