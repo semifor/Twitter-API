@@ -1,6 +1,7 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - documented trait ApiMethods
 
-0.0100  2016-12-02 13:32:27 PST
+0.0100  2016-12-02 13:32:27 PST (TRIAL RELEASE)
   - initial release
