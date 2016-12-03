@@ -1,6 +1,6 @@
 package Twitter::API::Trait::RetryOnError;
 # ABSTRACT: Automatically retry API calls
-$Twitter::API::Trait::RetryOnError::VERSION = '0.0100'; # TRIAL
+
 use Moo::Role;
 use Time::HiRes;
 use namespace::clean;
@@ -64,30 +64,3 @@ around send_request => sub {
 };
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Twitter::API::Trait::RetryOnError - Automatically retry API calls
-
-=head1 VERSION
-
-version 0.0100
-
-=head1 AUTHOR
-
-Marc Mims <marc@questright.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015-2016 by Marc Mims.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

@@ -1,6 +1,6 @@
 package Twitter::API::Trait::AppAuth;
 # ABSTRACT: App-only (OAuth2) Authentication
-$Twitter::API::Trait::AppAuth::VERSION = '0.0100'; # TRIAL
+
 use Moo::Role;
 use Carp;
 use HTTP::Request::Common qw/POST/;
@@ -70,16 +70,6 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
-=head1 NAME
-
-Twitter::API::Trait::AppAuth - App-only (OAuth2) Authentication
-
-=head1 VERSION
-
-version 0.0100
-
 =head1 SYNOPSIS
 
     use Twitter::API;
@@ -103,16 +93,5 @@ version 0.0100
 
     # if you revoke the token stored in the access_token attribute, clear it:
     $client->clear_access_token;
-
-=head1 AUTHOR
-
-Marc Mims <marc@questright.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015-2016 by Marc Mims.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

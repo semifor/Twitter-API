@@ -1,6 +1,6 @@
 package Twitter::API::Trait::Enchilada;
 # ABSTRACT: Sometimes you wan the whole enchilada
-$Twitter::API::Trait::Enchilada::VERSION = '0.0100'; # TRIAL
+
 use Moo::Role;
 use namespace::clean;
 
@@ -19,16 +19,6 @@ with map join('', $namespace, $_), qw/
 __END__
 
 =pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Twitter::API::Trait::Enchilada - Sometimes you wan the whole enchilada
-
-=head1 VERSION
-
-version 0.0100
 
 =head1 SYNOPSIS
 
@@ -55,16 +45,5 @@ version 0.0100
 This is just a shortcut for applying traits ApiMethods, NormalizeBooleans,
 RetryOnError, and DecodeHtmlEntities. Because sometimes you just want the whole
 enchilada.
-
-=head1 AUTHOR
-
-Marc Mims <marc@questright.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2015-2016 by Marc Mims.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut
