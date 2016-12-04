@@ -49,3 +49,40 @@ sub normalize_bools {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 SYNOPSIS
+
+    use Twitter::API;
+
+    my $client = Twitter::API->new_with_traits(
+        traits => [ qw/ApiMethods NormalizeBooleans/ ],
+        %other_new_options
+    );
+
+    my ( $r, $c ) = $client->home_timeline({ trim_user => 1 });
+
+    say $c->http_request->uri;
+
+    # output:
+    https://api.twitter.com/1.1/statuses/home_timeline.json?trim_user=true
+
+=head1 DESCRIPTION
+
+Twitter has a strange concept of boolean values. Usually, the API accepts C<t>,
+C<true>, or C<1> for true. Sometimes it accepts C<f>, C<false>, or C<0> for
+false. But then you have strange cases like the C<include_email> parameter
+accepted for authorized applications by the C<verify_credentials> endpoint. It
+only accepts C<true>. Worse, for some boolean values, passing C<f>, C<false>,
+or C<0> all work as if you passed C<true>. For those values, false means not
+including the parameter at all.
+
+So, this trait attempts to normalize booleans by transforming any perl truthy
+value to the Twitter API's preference, C<true>. It transform falsey values to
+C<false>. And then it removes false parameters that the API always treats as
+true.
+
+You're welcome.

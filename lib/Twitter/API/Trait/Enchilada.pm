@@ -1,5 +1,5 @@
 package Twitter::API::Trait::Enchilada;
-# ABSTRACT: Sometimes you wan the whole enchilada
+# ABSTRACT: Sometimes you want the whole enchilada
 
 use Moo::Role;
 use namespace::clean;
