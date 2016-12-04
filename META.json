@@ -4,7 +4,7 @@
       "Marc Mims <marc@questright.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,6 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
@@ -78,9 +77,10 @@
          "type" : "git",
          "url" : "https://github.com/semifor/Twitter-API.git",
          "web" : "https://github.com/semifor/Twitter-API"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "0.0100",
+   "version" : "0.0101",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
 }
 
