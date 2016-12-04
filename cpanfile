@@ -17,7 +17,7 @@ requires 'namespace::clean';
 requires 'Net::OAuth';
 requires 'Sub::Exporter::Progressive';
 requires 'Throwable';
-requires 'Time::Piece';
+requires 'Time::Local';
 requires 'Try::Tiny';
 requires 'URL::Encode';
 

@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - reworked Twitter::API::Utils - timestamp methods now return time (epoch
+    seconds), gmtime, and localtime, resectively
 
 0.0101  2016-12-03 20:13:21 PST (TRIAL RELEASE)
   - documented trait ApiMethods
