@@ -128,7 +128,7 @@ L<https://dev.twitter.com/rest/reference/get/friends/ids>
 =cut
 
 sub friends_ids {
-    shift->with_inferred_id(get => 'friends/ids', @_);
+    shift->_with_optional_id(get => 'friends/ids', @_);
 }
 alias following_ids => 'friends_ids';
 
@@ -272,7 +272,6 @@ L<https://dev.twitter.com/rest/reference/get/lists/memberships>
 =cut
 
 sub list_memberships {
-alias remove_list_member => 'list_memberships';
     shift->request(get => 'lists/memberships', @_);
 }
 
@@ -629,6 +628,7 @@ L<https://dev.twitter.com/rest/reference/get/trends/place>
 sub trends_place {
     shift->_with_pos_args(id => get => 'trends/place', @_);
 }
+alias trends_location => 'trends_place';
 
 =method user_suggestions([ $slug, ][ \%args ])
 
@@ -651,6 +651,7 @@ sub user_suggestions {
     $self->_with_pos_args(slug => get => 'users/suggestions/:slug/members',
         $self->$rename_category(@_));
 }
+alias follow_suggestions => 'user_suggestions';
 
 =method user_suggestions_for([ $slug, ][ \%args ])
 
@@ -666,7 +667,7 @@ sub user_suggestions_for {
     $self->_with_pos_args(slug => get => 'users/suggestions/:slug',
         $self->$rename_category(@_));
 }
-alias follow_suggestions => 'user_suggestions_for';
+alias follow_suggestions_for => 'user_suggestions_for';
 
 =method user_timeline([ $screen_name | $user_id, ][ \%args ])
 
@@ -728,14 +729,14 @@ sub add_place {
         post => 'geo/place', @_);
 }
 
-=method create_block([ \%args ])
+=method create_block([ $screen_name | $user_id, ][ \%args ])
 
 L<https://dev.twitter.com/rest/reference/post/blocks/create>
 
 =cut
 
 sub create_block {
-    shift->_with_optional_id(post => 'blocks/create', @_);
+    shift->_with_pos_args(':ID', post => 'blocks/create', @_);
 }
 
 =method create_collection([ $name, ][ \%args ])
@@ -854,6 +855,7 @@ L<https://dev.twitter.com/rest/reference/post/lists/members/destroy>
 sub delete_list_member {
     shift->request(post => 'lists/members/destroy', @_);
 }
+alias remove_list_member => 'delete_list_member';
 
 =method destroy_block([ $screen_name | $user_id, ][ \%args ])
 
@@ -1016,7 +1018,7 @@ L<https://dev.twitter.com/rest/reference/post/users/report_spam>
 =cut
 
 sub report_spam {
-    shift->_with_referred_id(post => 'users/report_spam', @_);
+    shift->_with_optional_id(post => 'users/report_spam', @_);
 }
 
 =method retweet([ $id, ][ \%args ])
@@ -1096,7 +1098,7 @@ L<https://dev.twitter.com/rest/reference/post/friendships/update>
 =cut
 
 sub update_friendship {
-    shift->_with_referred_id(post => 'friendships/update', @_);
+    shift->_with_optional_id(post => 'friendships/update', @_);
 }
 
 =method update_list([ \%args ])
@@ -1195,7 +1197,7 @@ sub _with_pos_args {
     # extract any required args if we still have names
     while ( my $name = shift @pos_names ) {
         if ( $name eq ':ID' ) {
-            $name = exists $args_hash{screen_namne} ? 'screen_name' : 'user_id';
+            $name = exists $args_hash{screen_name} ? 'screen_name' : 'user_id';
             croak 'missing required screen_name or user_id'
                 unless exists $args_hash{$name};
         }

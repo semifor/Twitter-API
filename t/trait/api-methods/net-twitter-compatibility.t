@@ -24,6 +24,28 @@ my %skip = map +($_ => 1), (
     'upload_status',          # no longer documented
 );
 
+# These methods are either modified with an "around" or defined incorrectly in
+# Net::Twitter, override what we expect for required parameters.
+my %override_required = (
+    show_user          => [ ':ID' ],
+    create_friend      => [ ':ID' ],
+    destroy_friend     => [ ':ID' ],
+    friends_ids        => [ ':ID' ],
+    followers_ids      => [ ':ID' ],
+    create_block       => [ ':ID' ],
+    destroy_block      => [ ':ID' ],
+    report_spam        => [ ':ID' ],
+    update_friendship  => [ ':ID' ],
+    new_direct_message => [ qw/text :ID/ ],
+);
+# aliases
+for ( \%override_required ) { # damned name is too long!
+    $_->{follow} = $_->{follow_new} = $_->{create_friendship}
+        = $_->{create_friend};
+    $_->{destroy_friendship} = $_->{unfollow} = $_->{destroy_friend};
+    $_->{following_ids} = $_->{friends_ids};
+}
+
 sub new_client {
     my $client = Twitter::API->new_with_traits(
         traits          => 'ApiMethods',
@@ -55,21 +77,27 @@ sub http_response_ok {
 
 my $nt = Net::Twitter->new(traits => [ qw/API::RESTv1_1/ ]);
 my @nt_methods =
+    # We'll test all methods through their aliases, too
+    map {
+        my $meta = $_;
+        my @names = ($_->name, @{ $_->aliases });
+        map [ $_, $meta ], @names;
+    }
     sort { $a->name cmp $b->name }
     grep !$_->deprecated,
     grep $_->isa('Net::Twitter::Meta::Method'),
+    map $_->original_method // $_, # may be wrapped
     $nt->meta->get_all_methods;
 
-for my $nt_method ( @nt_methods ) {
-    my $name = $nt_method->name;
-    next if $skip{$name};
-
-    my @required = @{ $nt_method->required };
+for my $pair ( @nt_methods ) {
+    my ( $name, $nt_method ) = @$pair;
+    next if $skip{$nt_method->name};
 
     describe $name => sub {
-        my $client;
+        my ( $client, @required );
         before each => sub {
             $client = new_client;
+            @required = @{ $override_required{$name} // $nt_method->required };
         };
 
         it 'method exists' => sub {
@@ -80,6 +108,7 @@ for my $nt_method ( @nt_methods ) {
             my %must_have_args;
             @must_have_args{
                 ( $nt_method->path =~ /:(\w+)/g ),
+                map $_ eq ':ID' ? 'screen_name' : $_,
                 @required
             } = 'a' .. 'z';
             my ( $http_method, undef ) = $client->$name(
@@ -90,14 +119,18 @@ for my $nt_method ( @nt_methods ) {
 
         it "handles ${ \(0+@required) }  positional args" => sub {
             my @args; @args[0 .. $#required] = 'a' .. 'z';
-            my %expected; @expected{@required} = 'a' .. 'z';
+            my %expected; @expected{
+                map $_ eq ':ID' ? 'screen_name' : '$_', @required
+            } = 'a' .. 'z';
             my ( undef, $args ) = $client->$name(@args);
             is_deeply $args, \%expected;
         } if @required > 0;
 
         it "handles mixed positional and named args" => sub {
             my %args; @args{@required[1..$#required]} = 'a' .. 'z';
-            my %expected; @expected{@required} = ( 'foo', 'a' .. 'z' );
+            my %expected; @expected{
+                map $_ eq ':ID' ? 'screen_name' : '$_', @required
+            } = ( 'foo', 'a' .. 'z' );
             my ( undef, $args ) = $client->$name('foo', \%args);
             is_deeply $args, \%expected;
         } if @required > 1;
