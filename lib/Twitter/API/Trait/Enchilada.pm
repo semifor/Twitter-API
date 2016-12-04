@@ -29,21 +29,16 @@ __END__
         %other_new_options
     );
 
-    # which is just shorthand for:
-    my $client = Twitter::API->new_with_traits(
-        traits => [ qw/
-            ApiMethods
-            NormalizeBooleans
-            RetryOnError
-            DecodeHtmlEntities
-        /],
-        %other_new_options
-    );
-
 =head1 DESCRIPTION
 
-This is just a shortcut for applying traits ApiMethods, NormalizeBooleans,
-RetryOnError, and DecodeHtmlEntities. Because sometimes you just want the whole
-enchilada.
+This is just a shortcut for applying commonly used traits. Because, sometimes, you just want the whole enchilada.
+
+This role simply bundles the following traits. See those modules for details.
+
+=for :list
+* L<ApiMethods|Twitter::API::Trait::ApiMethods>
+* L<NormalizeBooleans|Twitter::API::Trait::NormalizeBooleans>
+* L<RetryOnError|Twitter::API::Trait::RetryOnError>
+* L<DecodeHtmlEntites|Twitter::API::Trait::DecodeHtmlEntities>
 
 =cut

@@ -23,6 +23,16 @@ my $add_consumer_auth_header = sub {
 
 # public methods
 
+=method get_bearer_token
+
+Call the C<oauth2/token> endpoint to get a bearer token. The token is not
+stored in Twitter::API's state. If you want that, set the C<access_token>
+attribute with the returned token.
+
+See L<https://dev.twitter.com/oauth/reference/post/oauth2/token> for details.
+
+=cut
+
 sub get_bearer_token {
     my $self = shift;
 
@@ -31,6 +41,18 @@ sub get_bearer_token {
         grant_type => 'client_credentials',
     });
 }
+
+=method invalidate_token($token)
+
+Calls the C<oauth2/invalidate_token> endpoint to revoke a token. See
+L<https://dev.twitter.com/oauth/reference/post/oauth2/invalidate/token> for
+details.
+
+NOTE: This method currently does not work as advertised. It returns C<403
+Forbidden>. The author does not know, yet, if that's a bug in his code, a
+Twitter API error, or a bug in Twitter's documentation.
+
+=cut
 
 sub invalidate_token {
     my ( $self, $token ) = @_;
