@@ -4,6 +4,7 @@ package Twitter::API::Trait::AppAuth;
 use Moo::Role;
 use Carp;
 use HTTP::Request::Common qw/POST/;
+use URL::Encode qw/url_encode url_decode/;
 use namespace::clean;
 
 # private methods
@@ -36,10 +37,15 @@ See L<https://dev.twitter.com/oauth/reference/post/oauth2/token> for details.
 sub get_bearer_token {
     my $self = shift;
 
-    $self->request(post => $self->oauth2_url_for('token'), {
+    my $r = $self->request(post => $self->oauth2_url_for('token'), {
         -add_consumer_auth_header => 1,
         grant_type => 'client_credentials',
     });
+
+    # In their wisdom, Twitter sends us a URL encoded token. We need to decode
+    # it, so if/when we call invalidate_token, and properly URL encode our
+    # parameters, we don't end up with a double-encoded token.
+    return url_decode($$r{access_token});
 }
 
 =method invalidate_token($token)
@@ -47,10 +53,6 @@ sub get_bearer_token {
 Calls the C<oauth2/invalidate_token> endpoint to revoke a token. See
 L<https://dev.twitter.com/oauth/reference/post/oauth2/invalidate/token> for
 details.
-
-NOTE: This method currently does not work as advertised. It returns C<403
-Forbidden>. The author does not know, yet, if that's a bug in his code, a
-Twitter API error, or a bug in Twitter's documentation.
 
 =cut
 
@@ -74,7 +76,7 @@ around add_authorization => sub {
 
     my $token = $c->get_option('token') // $self->access_token // return;
 
-    $c->set_header(authorization => join ' ', Bearer => $token);
+    $c->set_header(authorization => join ' ', Bearer => url_encode($token));
 };
 
 around finalize_request => sub {
