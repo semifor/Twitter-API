@@ -52,7 +52,7 @@
             "Net::OAuth" : "0",
             "Sub::Exporter::Progressive" : "0",
             "Throwable" : "0",
-            "Time::Piece" : "0",
+            "Time::Local" : "0",
             "Try::Tiny" : "0",
             "URL::Encode" : "0",
             "namespace::clean" : "0",
@@ -80,7 +80,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "0.0101",
+   "version" : "0.0102",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
 }
 
