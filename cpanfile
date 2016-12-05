@@ -20,6 +20,7 @@ requires 'Throwable';
 requires 'Time::Local';
 requires 'Try::Tiny';
 requires 'URL::Encode';
+requires 'URI';
 
 on test => sub {
     requires 'Test::More';
