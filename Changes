@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0103  2016-12-06 07:43:10 PST (TRIAL RELEASE)
   - fixed: RetryOnError failed to load
   - upload_media accepts positional params media or media_data
 

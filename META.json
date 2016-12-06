@@ -41,19 +41,24 @@
             "Data::Visitor::Lite" : "0",
             "Devel::StackTrace" : "0",
             "Digest::SHA" : "0",
+            "Encode" : "0",
             "HTML::Entities" : "0",
             "HTTP::Request::Common" : "0",
             "HTTP::Thin" : "0",
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "Moo" : "0",
+            "Moo::Role" : "0",
             "MooX::Aliases" : "0",
             "MooX::Traits" : "0",
             "Net::OAuth" : "0",
+            "Scalar::Util" : "0",
             "Sub::Exporter::Progressive" : "0",
             "Throwable" : "0",
+            "Time::HiRes" : "0",
             "Time::Local" : "0",
             "Try::Tiny" : "0",
+            "URI" : "0",
             "URL::Encode" : "0",
             "namespace::clean" : "0",
             "perl" : "v5.14.1"
@@ -80,7 +85,11 @@
       },
       "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "0.0102",
+   "version" : "0.0103",
+   "x_contributors" : [
+      "Marc Mims <marc@moz.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
 }
 
