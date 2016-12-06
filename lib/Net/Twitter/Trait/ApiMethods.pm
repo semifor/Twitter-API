@@ -1,4 +1,4 @@
-package Twitter::API::Trait::ApiMethods;
+package Net::Twitter::Trait::ApiMethods;
 # ABSTRACT: Convenient API Methods
 
 use 5.14.1;
@@ -1281,7 +1281,7 @@ are equivalent:
     $client->add_collection_entry({ id => $id, tweet_id => $tweet_id });
 
 Many calls require a C<screen_name> or C<user_id>. Where noted, you may pass
-either ID as the first positional parameter. Twitter::API will inspect the
+either ID as the first positional parameter. Net::Twitter will inspect the
 value. If it contains only digits, it will be considered a C<user_id>.
 Otherwise, it will be considered a C<screen_name>. Best practice is to
 explicitly declare the ID type by passing it in the parameters hashref, because
@@ -1292,6 +1292,6 @@ making the inferred ID ambiguous. These calls are equivalent:
    $client->create_block({ screen_name => 'realDonaldTrump' });
 
 Since all of these methods simple resolve to a C<get> or C<post> call, see the
-L<Twitter::API> for details about return values and error handling.
+L<Net::Twitter> for details about return values and error handling.
 
 =cut

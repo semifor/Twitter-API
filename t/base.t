@@ -7,7 +7,7 @@ use Test::Fatal;
 use Test::Spec;
 use URL::Encode qw/url_params_mixed/;
 
-use Twitter::API;
+use Net::Twitter;
 
 sub http_response_ok {
     HTTP::Response->new(
@@ -24,21 +24,21 @@ describe 'construction' => sub {
 
     it 'requires consumer_key' => sub {
        like(
-            exception { Twitter::API->new },
+            exception { Net::Twitter->new },
             qr/Missing .* consumer_key/,
         );
     };
 
     it 'requires consumer_secret' => sub {
         like(
-            exception { Twitter::API->new(consumer_key => 'key') },
+            exception { Net::Twitter->new(consumer_key => 'key') },
             qr/Missing .* consumer_secret/,
         );
     };
 
     it 'instantiates a minimal object' => sub {
         exception {
-            Twitter::API->new(
+            Net::Twitter->new(
                 consumer_key    => 'key',
                 consumer_secret => 'secret',
             );
@@ -49,7 +49,7 @@ describe 'construction' => sub {
 describe 'request' => sub {
     my $client;
     before each => sub {
-        $client = Twitter::API->new(
+        $client = Net::Twitter->new(
             consumer_key    => 'key',
             consumer_secret => 'secret',
         );
@@ -97,7 +97,7 @@ describe 'request' => sub {
 describe 'get' => sub {
     my $req;
     before each => sub {
-        my $client = Twitter::API->new(
+        my $client = Net::Twitter->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
         );
@@ -135,7 +135,7 @@ describe 'get' => sub {
 describe 'post' => sub {
     my $req;
     before each => sub {
-        my $client = Twitter::API->new(
+        my $client = Net::Twitter->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
             access_token        => 'token',
@@ -164,7 +164,7 @@ describe 'post' => sub {
 describe 'post (file upload)' => sub {
     my $req;
     before each => sub {
-        my $client = Twitter::API->new(
+        my $client = Net::Twitter->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
             access_token        => 'token',
@@ -200,7 +200,7 @@ describe 'post (file upload)' => sub {
 describe 'post (json body)' => sub {
     my ( $client, $req );
     before each => sub {
-        $client = Twitter::API->new(
+        $client = Net::Twitter->new(
             consumer_key        => 'key',
             consumer_secret     => 'secret',
             access_token        => 'token',

@@ -1,4 +1,4 @@
-package Twitter::API::Util;
+package Net::Twitter::Util;
 # ABSTRACT: Utilities for working with the Twitter API
 
 use 5.14.1;
@@ -11,15 +11,15 @@ use namespace::clean;
 
 use Sub::Exporter::Progressive -setup => {
     exports => [ qw/
-        is_twitter_api_error
+        is_net_twitter_error
         timestamp_to_gmtime
         timestamp_to_localtime
         timestamp_to_time
     /],
 };
 
-sub is_twitter_api_error {
-    blessed($_[0]) && $_[0]->isa('Twitter::API::Error');
+sub is_net_twitter_error {
+    blessed($_[0]) && $_[0]->isa('Net::Twitter::Error');
 }
 
 my %month;
@@ -53,7 +53,7 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Twitter::API::Util ':all';
+    use Net::Twitter::Util ':all';
 
     # Given a timestamp in Twitter's text format:
     my $ts = $status->{created_at}; # "Wed Jun 06 20:07:10 +0000 2012"
@@ -67,8 +67,8 @@ __END__
     # Or a Perl gmtime:
     my $utc = timestamp_to_gmtime($status->{created_at});
 
-    # Check to see if an exception is a Twitter::API::Error
-    if ( is_twitter_api_error($@) ) {
+    # Check to see if an exception is a Net::Twitter::Error
+    if ( is_net_twitter_error($@) ) {
         warn "Twitter API error: " . $@->twitter_error_text;
     }
 
@@ -91,9 +91,9 @@ L<perlfunc/localtime-EXPR> for details.
 Returns a UNIX epoch time for a Twitter timestamp string. See L<perlfunc/time>
 for details.
 
-=method is_twitter_api_error
+=method is_net_twitter_error
 
-Returns true if the scalar passed to it is a L<Twitter::API::Error>. Otherwise,
+Returns true if the scalar passed to it is a L<Net::Twitter::Error>. Otherwise,
 it returns false.
 
 =cut

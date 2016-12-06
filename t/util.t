@@ -4,18 +4,18 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Twitter::API::Util qw/:all/;
+use Net::Twitter::Util qw/:all/;
 
 ## Timestamp methods
 
 sub ex_timestamp { 'Wed Jun 06 20:07:10 +0000 2012' }
 sub ex_time { 1339013230 }
 
-can_ok('Twitter::API::Util', $_) for qw/
+can_ok('Net::Twitter::Util', $_) for qw/
     timestamp_to_time
     timestamp_to_gmtime
     timestamp_to_localtime
-    is_twitter_api_error
+    is_net_twitter_error
 /;
 
 is timestamp_to_time(ex_timestamp), ex_time, 'example timestamp to time';
@@ -48,11 +48,11 @@ like(
     'croaks on invalid format'
 );
 
-## Twitter::API::Error
+## Net::Twitter::Error
 
-ok is_twitter_api_error(bless {}, 'Twitter::API::Error'), 'is api error';
-ok !is_twitter_api_error(bless {}, 'Foo'), 'other object is not api error';
-ok !is_twitter_api_error(1234), 'plain scalar is not api error';
-ok !is_twitter_api_error(), 'empty is not api error';
+ok is_net_twitter_error(bless {}, 'Net::Twitter::Error'), 'is api error';
+ok !is_net_twitter_error(bless {}, 'Foo'), 'other object is not api error';
+ok !is_net_twitter_error(1234), 'plain scalar is not api error';
+ok !is_net_twitter_error(), 'empty is not api error';
 
 done_testing;

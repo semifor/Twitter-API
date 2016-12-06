@@ -3,12 +3,12 @@ use 5.14.1;
 use warnings;
 use Test::Spec;
 
-use Twitter::API;
+use Net::Twitter;
 
 describe upload_media => sub {
     my $client;
     before each => sub {
-        $client = Twitter::API->new_with_traits(
+        $client = Net::Twitter->new_with_traits(
             traits              => 'ApiMethods',
             consumer_key        => 'key',
             consumer_secret     => 'secret',

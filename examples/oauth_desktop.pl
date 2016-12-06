@@ -1,15 +1,15 @@
 #!/usr/bin/env perl
 
-# Twitter::API - OAuth desktop app example
+# Net::Twitter - OAuth desktop app example
 #
 use 5.14.1;
 use warnings;
 use Data::Dumper;
-use Twitter::API;
+use Net::Twitter;
 
 # You can replace the consumer key/secret with your own.  These credentials are
 # for the Net::Twitter example app.
-my $client = Twitter::API->new_with_traits(
+my $client = Net::Twitter->new_with_traits(
     traits          => 'Enchilada',
     consumer_key    => 'v8t3JILkStylbgnxGLOQ',
     consumer_secret => '5r31rSMc0NPtBpHcK8MvnCLg2oAyFLx5eGOMkXM',

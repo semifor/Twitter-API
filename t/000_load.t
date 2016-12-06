@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    use_ok('Twitter::API');
+    use_ok('Net::Twitter');
 }
 
 done_testing;

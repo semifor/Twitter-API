@@ -1,5 +1,5 @@
-package Twitter::API;
-our $VERSION = '0.0103';
+package Net::Twitter;
+our $VERSION = '4.9900';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -12,12 +12,12 @@ use Try::Tiny;
 use URI;
 use URL::Encode ();
 use Encode qw/encode_utf8/;
-use Twitter::API::Context;
-use Twitter::API::Error;
+use Net::Twitter::Context;
+use Net::Twitter::Error;
 use namespace::clean;
 
 with 'MooX::Traits';
-sub _trait_namespace { 'Twitter::API::Trait' }
+sub _trait_namespace { 'Net::Twitter::Trait' }
 
 has [ qw/consumer_key consumer_secret/ ] => (
     is       => 'ro',
@@ -110,7 +110,7 @@ sub post { shift->request( post => @_ ) }
 sub request {
     my $self = shift;
 
-    my $c = Twitter::API::Context->new({
+    my $c = Net::Twitter::Context->new({
         http_method => uc shift,
         url         => shift,
         args        => shift || {},
@@ -125,7 +125,7 @@ sub request {
     $self->add_authorization($c);
     $self->finalize_request($c);
 
-    # Allow early exit for things like Twitter::API::AnyEvent
+    # Allow early exit for things like Net::Twitter::AnyEvent
     $c->set_http_response($self->send_request($c) // return $c);
 
     $self->inflate_response($c);
@@ -316,7 +316,7 @@ sub encode_args_string {
 sub uri_escape { URL::Encode::url_encode_utf8($_[1]) }
 
 sub process_error_response {
-    Twitter::API::Error->throw({ context => $_[1] });
+    Net::Twitter::Error->throw({ context => $_[1] });
 }
 
 sub api_url_for {
@@ -412,8 +412,8 @@ __END__
 
     ### Common usage ###
 
-    use Twitter::API;
-    my $client = Twitter::API->new_with_traits(
+    use Net::Twitter;
+    my $client = Net::Twitter->new_with_traits(
         traits              => 'Enchilada',
         consumer_key        => $YOUR_CONSUMER_KEY,
         consumer_secret     => $YOUR_CONSUMER_SECRET,
@@ -424,7 +424,7 @@ __END__
     my $me   = $client->verify_credentials;
     my $user = $client->show_user('twitter');
 
-    # In list context, both the Twitter API result and a Twitter::API::Context
+    # In list context, both the Twitter API result and a Net::Twitter::Context
     # object are returned.
     my ($r, $context) = $client->home_timeline({ count => 200, trim_user => 1 });
     my $remaning = $context->rate_limit_remaining;
@@ -433,7 +433,7 @@ __END__
 
     ### No frills ###
 
-    my $client = Twitter::API->new(
+    my $client = Net::Twitter->new(
         consumer_key    => $YOUR_CONSUMER_KEY,
         consumer_secret => $YOUR_CONSUMER_SECRET,
     );
@@ -445,7 +445,7 @@ __END__
 
     ### Error handling ###
 
-    use Twitter::API::Util 'is_twitter_api_error';
+    use Net::Twitter::Util 'is_twitter_api_error';
     use Try::Tiny;
 
     try {
@@ -468,7 +468,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Twitter::API provides an interface to the Twitter REST API for perl.
+Net::Twitter provides an interface to the Twitter REST API for perl.
 
 Features:
 
@@ -482,19 +482,19 @@ Features:
 Additionl features are availble via optional traits:
 
 =for :list
-* convenient methods for API endpoints with simplified argument handling via L<ApiMethods|Twitter::API::Trait::ApiMethods>
-* normalized booleans (Twitter likes 'true' and 'false', except when it doesn't) via L<NormalizeBooleans|Twitter::API::Trait::NormalizeBooleans>
-* automatic decoding of HTML entities via L<DecodeHtmlEntities|Twitter::API::Trait::DecodeHtmlEntities>
-* automatic retry on transient errors via L<RetryOnError|Twitter::API::Trait::RetryOnError>
-* "the whole enchilada" combines all the above traits via L<Enchilada|Twitter::API::Trait::Enchilada>
-* app-only (OAuth2) support via L<AppAuth|Twitter::API::Trait::AppAuth>
+* convenient methods for API endpoints with simplified argument handling via L<ApiMethods|Net::Twitter::Trait::ApiMethods>
+* normalized booleans (Twitter likes 'true' and 'false', except when it doesn't) via L<NormalizeBooleans|Net::Twitter::Trait::NormalizeBooleans>
+* automatic decoding of HTML entities via L<DecodeHtmlEntities|Net::Twitter::Trait::DecodeHtmlEntities>
+* automatic retry on transient errors via L<RetryOnError|Net::Twitter::Trait::RetryOnError>
+* "the whole enchilada" combines all the above traits via L<Enchilada|Net::Twitter::Trait::Enchilada>
+* app-only (OAuth2) support via L<AppAuth|Net::Twitter::Trait::AppAuth>
 
 Some featuers are provided by separate distributions to avoid additional
 dependencies most users won't want or need:
 
 =for :list
-* async support via subclass L<Twitter::API::AnyEvent>
-* inflate API call results to objects via L<Twitter::API::Trait::InflateObjects>
+* async support via subclass L<Net::Twitter::AnyEvent>
+* inflate API call results to objects via L<Net::Twitter::Trait::InflateObjects>
 
 =cut
 
@@ -505,7 +505,7 @@ Required. Every application has it's own application credentials.
 =attr access_token, access_token_secret
 
 Optional. If provided, every API call will be authenticated with these user
-credentials. See L<AppAuth|Twitter::API::Trait::AppAuth> for app-only (OAuth2)
+credentials. See L<AppAuth|Net::Twitter::Trait::AppAuth> for app-only (OAuth2)
 support, which does not require user credentials. You can also pass options
 C<-token> and C<-token_secret> to specify user credentials on each API call.
 
@@ -583,7 +583,6 @@ C<password>.
 =head1 SEE ALSO
 
 =for :list
-* L<Net::Twitter> - Twitter::API's predecessor (also L<Net::Twitter::Lite>)
 * L<Mojo::WebService::Twitter> - Simple non-blocking Twitter API client
 * L<API::Twitter> - Another simple Twitter API client
 

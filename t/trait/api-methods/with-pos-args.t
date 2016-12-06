@@ -7,7 +7,7 @@ use Test::Spec;
 package Foo {
     use Moo;
     use Carp;
-    with 'Twitter::API::Trait::ApiMethods';
+    with 'Net::Twitter::Trait::ApiMethods';
 
     sub request {
         my ( $self, $http_method, $url, $args ) = @_;

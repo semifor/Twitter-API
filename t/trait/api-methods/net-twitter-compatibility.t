@@ -5,7 +5,11 @@ use Test::Spec;
 use HTTP::Response;
 use Test::Fatal;
 
-use Twitter::API;
+# Since renaming Twitter::API to Net::Twitter, this test will have to be
+# reworked
+BEGIN { plan skip_all => 'Twitter::API renamed to Net::Twitter' }
+
+use Net::Twitter;
 
 BEGIN {
     eval { require Net::Twitter };
@@ -47,7 +51,7 @@ for ( \%override_required ) { # damned name is too long!
 }
 
 sub new_client {
-    my $client = Twitter::API->new_with_traits(
+    my $client = Net::Twitter->new_with_traits(
         traits          => 'ApiMethods',
         consumer_key    => 'key',
         consumer_secret => 'secret',

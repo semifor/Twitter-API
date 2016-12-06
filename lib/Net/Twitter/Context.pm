@@ -1,4 +1,4 @@
-package Twitter::API::Context;
+package Net::Twitter::Context;
 # ABSTRACT: Encapsulated state for a request/response
 
 use Moo;
@@ -68,7 +68,7 @@ value in list context. The context includes the L<HTTP::Request> and
 L<HTTP::Response> objects, a reference to the API return data, and accessor for
 rate limit information.
 
-A reference to the context is also included in a L<Twitter::API::Error>
+A reference to the context is also included in a L<Net::Twitter::Error>
 exception.
 
 =method http_request

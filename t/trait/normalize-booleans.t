@@ -6,7 +6,7 @@ use Test::More;
 
 package Foo {
     use Moo;
-    with 'Twitter::API::Trait::NormalizeBooleans';
+    with 'Net::Twitter::Trait::NormalizeBooleans';
 
     # required
     sub preprocess_args {}

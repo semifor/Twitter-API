@@ -1,4 +1,4 @@
-package Twitter::API::Trait::NormalizeBooleans;
+package Net::Twitter::Trait::NormalizeBooleans;
 # ABSTRACT: Normalize Booleans
 
 use 5.14.1;
@@ -56,9 +56,9 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Twitter::API;
+    use Net::Twitter;
 
-    my $client = Twitter::API->new_with_traits(
+    my $client = Net::Twitter->new_with_traits(
         traits => [ qw/ApiMethods NormalizeBooleans/ ],
         %other_new_options
     );

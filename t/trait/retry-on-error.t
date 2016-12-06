@@ -5,7 +5,7 @@ use HTTP::Response;
 use Test::Fatal;
 use Test::Spec;
 
-use Twitter::API;
+use Net::Twitter;
 
 sub new_client {
     my $response = shift;
@@ -18,7 +18,7 @@ sub new_client {
         HTTP::Response->new($code, $reason);
     });
 
-    return Twitter::API->new_with_traits(
+    return Net::Twitter->new_with_traits(
         traits              => 'RetryOnError',
         consumer_key        => 'key',
         consumer_secret     => 'secret',

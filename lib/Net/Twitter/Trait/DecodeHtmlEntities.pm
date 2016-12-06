@@ -1,4 +1,4 @@
-package Twitter::API::Trait::DecodeHtmlEntities;
+package Net::Twitter::Trait::DecodeHtmlEntities;
 # ABSTRACT: Decode HTML entities in strings
 
 use Moo::Role;
@@ -33,10 +33,10 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Twitter::API;
+    use Net::Twitter;
     use open qw/:std :utf8/;
 
-    my $client = Twitter::API->new_with_traits(
+    my $client = Net::Twitter->new_with_traits(
         traits => [ qw/ApiMethods DecodeHtmlEntites/ ],
         %other_options
     );
@@ -57,7 +57,7 @@ in API responses to a web page without HTML encoding it. But you HTML encode
 all of your output right? And Twitter's lack of trust has you double encoding
 entities.
 
-So, include this trait and Twitter::API will decode HTML entities in all of the
+So, include this trait and Net::Twitter will decode HTML entities in all of the
 text returned by the API.
 
 You're welcome.

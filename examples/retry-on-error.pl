@@ -4,9 +4,9 @@ use warnings;
 use utf8;
 use open qw/:std :utf8/;
 
-use Twitter::API;
+use Net::Twitter;
 
-my $client = Twitter::API->new_with_traits(
+my $client = Net::Twitter->new_with_traits(
     traits => [ qw/ApiMethods RetryOnError/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},

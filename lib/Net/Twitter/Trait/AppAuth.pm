@@ -1,4 +1,4 @@
-package Twitter::API::Trait::AppAuth;
+package Net::Twitter::Trait::AppAuth;
 # ABSTRACT: App-only (OAuth2) Authentication
 
 use Moo::Role;
@@ -27,7 +27,7 @@ my $add_consumer_auth_header = sub {
 =method get_bearer_token
 
 Call the C<oauth2/token> endpoint to get a bearer token. The token is not
-stored in Twitter::API's state. If you want that, set the C<access_token>
+stored in Net::Twitter's state. If you want that, set the C<access_token>
 attribute with the returned token.
 
 See L<https://dev.twitter.com/oauth/reference/post/oauth2/token> for details.
@@ -96,8 +96,8 @@ __END__
 
 =head1 SYNOPSIS
 
-    use Twitter::API;
-    my $client = Twitter::API->new_with_traits(
+    use Net::Twitter;
+    my $client = Net::Twitter->new_with_traits(
         traits => [ qw/ApiMethods AppAuth/ ]);
 
     my $r = $client->get_bearer_token;

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
-use Twitter::API;
+use Net::Twitter;
 
-my $client = Twitter::API->new_with_traits(
+my $client = Net::Twitter->new_with_traits(
     traits          => 'AppAuth',
     consumer_key    => 'key',
     consumer_secret => 'secret',

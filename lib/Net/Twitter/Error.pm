@@ -1,4 +1,4 @@
-package Twitter::API::Error;
+package Net::Twitter::Error;
 # ABSTRACT: Twitter API exception
 
 use Moo;
@@ -63,7 +63,7 @@ sub _build_stack_trace {
     my $this_sub = (caller 0)[3];
     Devel::StackTrace->new(frame_filter => sub {
         my $caller = shift->{caller};
-        my $skip = $caller->[0] =~ /^(?:Twitter::API|Throwable|Role::Tiny)\b/
+        my $skip = $caller->[0] =~ /^(?:Net::Twitter|Throwable|Role::Tiny)\b/
             || $caller->[3] eq $this_sub;
         ($seen ||= $skip) && !$skip || 0;
     });
@@ -201,7 +201,7 @@ sub is_permanent_error { shift->http_response_code < 500 }
 
 Returns true or HTTP status codes of 500 or greater. Often, these errors
 indicate a transient condition. Retrying the API call right away may result in
-success. See the L<RetryOnError|Twitter::API::Trait::RetryOnError> for
+success. See the L<RetryOnError|Net::Twitter::Trait::RetryOnError> for
 automatically retrying temporary errors.
 
 =cut
@@ -217,10 +217,10 @@ __END__
 =head1 SYNOPSIS
 
     use Try::Tiny;
-    use Twitter::API;
-    use Twitter::API::Util 'is_twitter_api_error';
+    use Net::Twitter;
+    use Net::Twitter::Util 'is_twitter_api_error';
 
-    my $client = Twitter::API->new(%options);
+    my $client = Net::Twitter->new(%options);
 
     try {
         my $r = $client->get('account/verify_credentials');
@@ -233,7 +233,7 @@ __END__
 
 =head1 DESCRIPTION
 
-Twitter::API dies, throwing a Twitter::API::Error exception when it receives an
+Net::Twitter dies, throwing a Net::Twitter::Error exception when it receives an
 error. The error object contains information about the error so your code can
 decide how to respond to various error conditions.
 

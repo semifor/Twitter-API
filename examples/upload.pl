@@ -2,9 +2,9 @@
 use 5.14.1;
 use warnings;
 
-use Twitter::API;
+use Net::Twitter;
 
-my $client = Twitter::API->new_with_traits(
+my $client = Net::Twitter->new_with_traits(
     traits => [ qw/ApiMethods/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},

@@ -5,9 +5,9 @@ use utf8;
 use open qw/:std :utf8/;
 use Test::More;
 
-use Twitter::API;
+use Net::Twitter;
 
-my $client = Twitter::API->new_with_traits(
+my $client = Net::Twitter->new_with_traits(
     traits => [ qw/ApiMethods DecodeHtmlEntities/ ],
     consumer_key        => $ENV{CONSUMER_KEY},
     consumer_secret     => $ENV{CONSUMER_SECRET},
