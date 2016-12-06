@@ -148,6 +148,10 @@ sub preprocess_args {
     if ( $c->http_method eq 'GET' ) {
         $self->flatten_array_args($c->args);
     }
+
+    # If any of the args are arrayrefs, we'll infer it's multipart/form-data
+    $c->set_option(multipart_form_data => 1) if
+        $c->http_method eq 'POST' && !!grep ref, values %{ $c->args };
 }
 
 sub preprocess_url {
@@ -177,7 +181,7 @@ sub add_authorization {
         signature_method => 'HMAC-SHA1',
         timestamp        => time,
         nonce            => Digest::SHA::sha1_base64({} . time . $$ . rand),
-        extra_params     => $self->is_multipart($args) ? {} : $args,
+        extra_params     => $c->get_option('multipart_form_data') ? {} : $args,
     );
 
     $req->sign;
@@ -194,7 +198,7 @@ sub finalize_request {
     my $method = $c->http_method;
     $c->set_http_request(
         $method eq 'POST' ? (
-            $self->is_multipart($c->args) ? $self->finalize_multipart_post($c)
+            $c->get_option('multipart_form_data') ? $self->finalize_multipart_post($c)
             : $c->has_option('to_json')   ? $self->finalize_json_post($c)
             : $self->finalize_post($c)
         )
@@ -315,9 +319,6 @@ sub uri_escape { URL::Encode::url_encode_utf8($_[1]) }
 sub process_error_response {
     Twitter::API::Error->throw({ context => $_[1] });
 }
-
-# If any of the args are references, we'll assume it's a multipart request
-sub is_multipart { !!grep ref, values %{ $_[1] } }
 
 sub api_url_for {
     my $self = shift;

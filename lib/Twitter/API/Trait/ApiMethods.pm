@@ -1162,8 +1162,26 @@ L<https://dev.twitter.com/rest/reference/post/media/upload>
 sub upload_media {
     my $self = shift;
 
-    $self->_with_pos_args(media =>
-        post => $self->upload_url_for('media/upload'), @_);
+    # Used to require media. Now requires media *or* media_data.
+    # Handle either as a positional parameter, like we do with
+    # screen_name or user_id on other methods.
+    if ( @_ && ref $_[0] ne 'HASH' ) {
+        my $media = shift;
+        my $key = ref $media ? 'media' : 'media_data';
+        my $args = @_ && ref $_[0] eq 'HASH' ? pop : {};
+        $args->{$key} = $media;
+        unshift @_, $args;
+    }
+
+    my $args = shift;
+    $args->{-multipart_form_data} = 1;
+
+    # We normally only flatten arrays for GET requests, because we assume
+    # arrayrefs in POST requests represent file uploads.
+    if ( my $owners = delete $args->{additional_owners} ) {
+        $args->{additional_owners} = join ',' => @$owners;
+    }
+    $self->request(post => $self->upload_url_for('media/upload'), $args, @_);
 }
 alias upload => 'upload_media';
 
