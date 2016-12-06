@@ -5,7 +5,7 @@ requires 'Class::Load';
 requires 'Data::Visitor::Lite';
 requires 'Devel::StackTrace';
 requires 'Digest::SHA';
-erquires 'Encode';
+requires 'Encode';
 requires 'HTML::Entities';
 requires 'HTTP::Request::Common';
 requires 'HTTP::Thin';
