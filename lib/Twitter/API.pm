@@ -91,7 +91,6 @@ has user_agent => (
     },
     handles => {
         send_request   => 'request',
-        simple_request => 'request',
     },
 );
 
@@ -262,7 +261,7 @@ sub inflate_response {
         if ( $res->content_type eq 'application/json' ) {
             $data = $self->from_json($res->content);
         }
-        elsif ( $res->content_length == 0 ) {
+        elsif ( ( $res->content_length // 0 ) == 0 ) {
             # E.g., 200 OK from media/metadata/create
             $data = '';
         }

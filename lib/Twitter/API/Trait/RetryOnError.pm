@@ -99,6 +99,12 @@ around send_request => sub {
     $res;
 };
 
+1;
+
+__END__
+
+=pod
+
 =head1 SYNOPSIS
 
     use Twitter::API;
@@ -124,4 +130,4 @@ number of retries has been reached.
 For non-blocking applications, set a suitable C<retry_delay_code> callback.
 This attribute can also be used to provided retry logging.
 
-1;
+=cut
