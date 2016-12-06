@@ -120,7 +120,7 @@ sub request {
         extra_args  => \@_,
     });
 
-    $self->extract_synthetic_args($c);
+    $self->extract_options($c);
     $self->preprocess_args($c);
     $self->preprocess_url($c);
     $self->add_authorization($c);
@@ -133,7 +133,7 @@ sub request {
     return wantarray ? ( $c->result, $c ) : $c->result;
 }
 
-sub extract_synthetic_args {
+sub extract_options {
     my ( $self, $c ) = @_;
 
     my $args = $c->args;
