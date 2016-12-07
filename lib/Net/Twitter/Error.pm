@@ -218,7 +218,7 @@ __END__
 
     use Try::Tiny;
     use Net::Twitter;
-    use Net::Twitter::Util 'is_twitter_api_error';
+    use Net::Twitter::Util 'is_net_twitter_error';
 
     my $client = Net::Twitter->new(%options);
 
@@ -226,7 +226,7 @@ __END__
         my $r = $client->get('account/verify_credentials');
     }
     catch {
-        die $_ unless _is_twitter_api_error;
+        die $_ unless is_net_twitter_error;
 
         warn "Twitter says: ", $_->twitter_error_text;
     };

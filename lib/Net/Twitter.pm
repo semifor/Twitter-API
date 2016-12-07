@@ -445,14 +445,14 @@ __END__
 
     ### Error handling ###
 
-    use Net::Twitter::Util 'is_twitter_api_error';
+    use Net::Twitter::Util 'is_net_twitter_error';
     use Try::Tiny;
 
     try {
         my $r = $client->verify_credentials;
     }
     catch {
-        die $_ unless is_twitter_api_error($_);
+        die $_ unless is_net_twitter_error($_);
 
         # The error object includes plenty of information
         say $_->http_request->as_string;
