@@ -3,4 +3,4 @@ local/
 tmp/
 cpanfile.snapshot
 *.swp
-Twitter-API-*
+Net-Twitter-*
