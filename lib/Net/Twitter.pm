@@ -1,4 +1,6 @@
 package Net::Twitter;
+# ABSTRACT: A Twitter REST API library for Perl
+
 our $VERSION = '4.9900';
 use 5.14.1;
 use Moo;
@@ -399,8 +401,6 @@ sub xauth {
         },
     });
 }
-
-# ABSTRACT: A Twitter REST API library for Perl
 
 1;
 
