@@ -1,6 +1,8 @@
 Revision history for Net::Twitter
 
 {{$NEXT}}
+
+4.9900  2016-12-06 20:21:28 PST (TRIAL RELEASE)
   - renamed to Net::Twitter
 
 0.0103  2016-12-06 07:43:10 PST (TRIAL RELEASE)
