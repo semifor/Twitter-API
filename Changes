@@ -1,6 +1,10 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - added Net::Twitter/::Lite migration support
+  - renamed methods that exist in Net::Twitter with different sematics,
+    primarily OAuth management methods
+  - more documentation and tests
 
 0.0103  2016-12-06 07:43:10 PST (TRIAL RELEASE)
   - fixed: RetryOnError failed to load

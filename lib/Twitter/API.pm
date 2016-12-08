@@ -1,4 +1,6 @@
 package Twitter::API;
+# ABSTRACT: A Twitter REST API library for Perl
+
 our $VERSION = '0.0103';
 use 5.14.1;
 use Moo;
@@ -16,7 +18,7 @@ use Twitter::API::Context;
 use Twitter::API::Error;
 use namespace::clean;
 
-with 'MooX::Traits';
+with qw/MooX::Traits Twitter::API::Transition/;
 sub _trait_namespace { 'Twitter::API::Trait' }
 
 has [ qw/consumer_key consumer_secret/ ] => (
@@ -67,8 +69,6 @@ has default_headers => (
     default => sub {
         my $agent = shift->agent;
         {
-            accept                   => 'application/json',
-            content_type             => 'application/json;charset=utf8',
             user_agent               => $agent,
             x_twitter_client         => $agent,
             x_twitter_client_version => $VERSION,
@@ -115,7 +115,11 @@ sub request {
         url         => shift,
         args        => shift || {},
         # shallow copy so we don't spoil the defaults
-        headers     => { %{ $self->default_headers } },
+        headers     => {
+            %{ $self->default_headers },
+            accept       => 'application/json',
+            content_type => 'application/json;charset=utf8',
+        },
         extra_args  => \@_,
     });
 
@@ -348,8 +352,9 @@ sub _url_for {
 
 # OAuth handshake
 
-sub get_request_token {
-    my ( $self, $args ) = @_;
+sub oauth_request_token {
+    my $self = shift;
+    my $args = @_ == 1 && ref $_[0] ? shift : { @_ };
 
     $args->{callback} //= 'oob';
     return $self->request(post => $self->oauth_url_for('request_token'), {
@@ -359,35 +364,32 @@ sub get_request_token {
     });
 }
 
-my $auth_url = sub {
-    my ( $self, $endpoint, $args ) = @_;
+sub _auth_url {
+    my ( $self, $endpoint ) = splice @_, 0, 2;
+    my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
 
     my $uri = URI->new($self->oauth_url_for($endpoint));
-    $uri->query_form($args);
+    $uri->query_form(%args);
     return $uri;
 };
 
-sub get_authentication_url { shift->$auth_url(authenticate => @_) }
-sub get_authorization_url  { shift->$auth_url(authorize    => @_) }
+sub oauth_authentication_url { shift->_auth_url(authenticate => @_) }
+sub oauth_authorization_url  { shift->_auth_url(authorize    => @_) }
 
-sub get_access_token {
-    my ( $self, $args ) = @_;
+sub oauth_access_token {
+    my $self = shift;
+    my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
 
     $self->request(post => $self->oauth_url_for('access_token'), {
         -accept     => 'application/x-www-form-urlencoded',
         -oauth_type => 'access token',
-        -oauth_args => $args,
+        -oauth_args => \%args,
     });
 }
 
 sub xauth {
-    my ( $self, $args ) = @_;
-
-    my $username = delete $args->{username} // croak 'username required';
-    my $password = delete $args->{password} // croak 'password required';
-    if ( my $unexpected = join ', ' => keys %$args ) {
-        croak "unexpected arguments: $unexpected";
-    }
+    my ( $self, $username, $password ) = splice @_, 0, 3;
+    my %extra_args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
 
     $self->request(post => $self->oauth_url_for('access_token'), {
         -accept     => 'application/x-www-form-urlencoded',
@@ -396,11 +398,10 @@ sub xauth {
             x_auth_mode     => 'client_auth',
             x_auth_password => $password,
             x_auth_username => $username,
+            %extra_args,
         },
     });
 }
-
-# ABSTRACT: A Twitter REST API library for Perl
 
 1;
 
@@ -496,7 +497,33 @@ dependencies most users won't want or need:
 * async support via subclass L<Twitter::API::AnyEvent>
 * inflate API call results to objects via L<Twitter::API::Trait::InflateObjects>
 
-=cut
+=head1 OVERVIEW
+
+=head2 Migration from Net::Twitter and Net::Twitter::Lite
+
+Transitional support is included to assist users migrating from L<Net::Twitter>
+and L<Net::Twitter::Lite>. It will be removed from a future release (or at
+least not included by default). See L<Twitter::API::Transition> for details
+about migrating your existing Net::Twitter/::Lite applications.
+
+=head2 Normal usage
+
+Normally, you will construct a Twitter::API client with some traits, primarily
+B<ApiMethods>. It provides methods for each known Twitter API endpoint.
+Documentation is provided for each of those methods in
+L<ApiMethods|Twitter::API::Trait::ApiMethods>.
+
+See the list of traits in the L</DESCRIPTION> and refer to the documentation
+for each.
+
+=head2 Minimalist usage
+
+Without any traits, Twitter::API provides access to API endpoints with the
+L<get> and L<post> methods described below, as well as methods for managing
+OAuth authentication. API results are simply perl data structures decoded from
+the JSON responses. Refer to the L<Twitter API
+Documentation|https://dev.twitter.com/rest/public> for available endpoints,
+parameters, and responses.
 
 =attr consumer_key, consumer_secret
 
@@ -556,7 +583,7 @@ Returns a hashref that includes C<oauth_token> and C<oauth_token_secret>.
 
 See L<https://dev.twitter.com/oauth/reference/post/oauth/request_token>.
 
-=method get_authentication_url(\%args)
+=method oauth_authentication_url(\%args)
 
 This is the second step in the OAuth handshake. The only required argument is C<oauth_token>. Use the value returned by C<get_request_token>. Optional arguments: C<force_login> and C<screen_name> to prefill Twitter's authentication form.
 
@@ -564,7 +591,7 @@ See L<https://dev.twitter.com/oauth/reference/get/oauth/authenticate>.
 
 =method get_authorization_url(\%args)
 
-Identical to C<get_authentication_url>, but uses authorization flow, rather
+Identical to C<oauth_authentication_url>, but uses authorization flow, rather
 than authentication flow.
 
 See L<https://dev.twitter.com/oauth/reference/get/oauth/authorize>.

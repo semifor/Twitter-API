@@ -27,7 +27,8 @@ requires 'URI';
 requires 'URL::Encode';
 
 on test => sub {
+    requires 'Test::Fatal';
     requires 'Test::More';
     requires 'Test::Spec';
-    requires 'Test::Fatal';
+    requires 'Test::Warnings';
 };

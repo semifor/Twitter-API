@@ -3,9 +3,13 @@ package Twitter::API::Trait::AppAuth;
 
 use Moo::Role;
 use Carp;
-use HTTP::Request::Common qw/POST/;
 use URL::Encode qw/url_encode url_decode/;
 use namespace::clean;
+
+requires qw/
+    _url_for access_token add_authorization api_url consumer_key
+    consumer_secret finalize_request request request_access_token
+/;
 
 # private methods
 
@@ -24,7 +28,7 @@ my $add_consumer_auth_header = sub {
 
 # public methods
 
-=method get_bearer_token
+=method oauth2_token
 
 Call the C<oauth2/token> endpoint to get a bearer token. The token is not
 stored in Twitter::API's state. If you want that, set the C<access_token>
@@ -34,10 +38,10 @@ See L<https://dev.twitter.com/oauth/reference/post/oauth2/token> for details.
 
 =cut
 
-sub get_bearer_token {
+sub oauth2_token {
     my $self = shift;
 
-    my $r = $self->request(post => $self->oauth2_url_for('token'), {
+    my ( $r, $c ) = $self->request(post => $self->oauth2_url_for('token'), {
         -add_consumer_auth_header => 1,
         grant_type => 'client_credentials',
     });
@@ -45,7 +49,8 @@ sub get_bearer_token {
     # In their wisdom, Twitter sends us a URL encoded token. We need to decode
     # it, so if/when we call invalidate_token, and properly URL encode our
     # parameters, we don't end up with a double-encoded token.
-    return url_decode($$r{access_token});
+    my $token = url_decode $$r{access_token};
+    return wantarray ? ( $token, $c ) : $token;
 }
 
 =method invalidate_token($token)
@@ -59,10 +64,13 @@ details.
 sub invalidate_token {
     my ( $self, $token ) = @_;
 
-    $self->request(post =>$self->oauth2_url_for('invalidate_token'), {
-        -add_consumer_auth_header => 1,
-        access_token              => $token,
+    my ( $r, $c ) = $self->request(
+        post =>$self->oauth2_url_for('invalidate_token'), {
+            -add_consumer_auth_header => 1,
+            access_token              => $token,
     });
+    my $token_returned = url_decode $$r{access_token};
+    return wantarray ? ( $token_returned, $c ) : $token_returned;
 }
 
 # request chain modifiers
@@ -100,7 +108,7 @@ __END__
     my $client = Twitter::API->new_with_traits(
         traits => [ qw/ApiMethods AppAuth/ ]);
 
-    my $r = $client->get_bearer_token;
+    my $r = $client->oauth2_token;
     # return value is hash ref:
     # { token_type => 'bearer', access_token => 'AA...' }
     my $token = $r->{access_token};
