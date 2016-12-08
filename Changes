@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0104  2016-12-08 15:10:34 PST (TRIAL RELEASE)
   - added Net::Twitter/::Lite migration support
   - renamed methods that exist in Net::Twitter with different sematics,
     primarily OAuth management methods
