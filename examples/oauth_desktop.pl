@@ -16,10 +16,10 @@ my $client = Twitter::API->new_with_traits(
 );
 
 # 1. First, we get a request token and secret:
-my $request = $client->get_request_token;
+my $request = $client->oauth_request_token;
 
 # 2. We use the request token to generate an authorization URL:
-my $auth_url = $client->get_authorization_url({
+my $auth_url = $client->oauth_authorization_url({
     oauth_token => $request->{oauth_token},
 });
 
@@ -34,7 +34,7 @@ chomp $pin;
 say '';
 
 # 5. Exchange the request token for an access token
-my $access = $client->get_access_token({
+my $access = $client->oauth_access_token({
     token        => $request->{oauth_token},
     token_secret => $request->{oauth_token_secret},
     verifier     => $pin,

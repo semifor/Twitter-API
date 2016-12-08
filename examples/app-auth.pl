@@ -12,8 +12,8 @@ my $client = Twitter::API->new_with_traits(
     consumer_secret => $ENV{CONSUMER_SECRET},
 );
 
-my $token = $client->get_bearer_token;
-$client->access_token($$token{access_token});
+my $token = $client->oauth2_token;
+$client->access_token($token);
 my $r = $client->user_timeline(twitterapi => { count => 10 });
 
 for my $status ( @$r ) {

@@ -1,10 +1,11 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - updated examples for changes semantics in 0.0104
 
 0.0104  2016-12-08 15:10:34 PST (TRIAL RELEASE)
   - added Net::Twitter/::Lite migration support
-  - renamed methods that exist in Net::Twitter with different sematics,
+  - renamed methods that exist in Net::Twitter with different semantics,
     primarily OAuth management methods
   - more documentation and tests
 
@@ -16,7 +17,7 @@ Revision history for Twitter::API
   - fix invalidate_token
   - more documentation
   - reworked Twitter::API::Utils - timestamp methods now return time (epoch
-    seconds), gmtime, and localtime, resectively
+    seconds), gmtime, and localtime, respectively
 
 0.0101  2016-12-03 20:13:21 PST (TRIAL RELEASE)
   - documented trait ApiMethods
