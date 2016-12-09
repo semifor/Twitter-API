@@ -11,8 +11,14 @@ use Twitter::API;
 # for the Net::Twitter example app.
 my $client = Twitter::API->new_with_traits(
     traits          => 'Enchilada',
-    consumer_key    => 'v8t3JILkStylbgnxGLOQ',
-    consumer_secret => '5r31rSMc0NPtBpHcK8MvnCLg2oAyFLx5eGOMkXM',
+    # Net::Twitter example app credentials
+    map(tr/A-Za-z/N-ZA-Mn-za-m/r, qw/
+        pbafhzre_xrl i8g3WVYxFglyotakTYBD
+        pbafhzre_frperg 5e31eFZp0ACgOcUpX8ZiaPYt2bNlSYk5rTBZxKZ
+    /),
+    # To use your own:
+    # consumer_key    => 'your-app-key',
+    # consumer_secret => 'your-app-secret',
 );
 
 # 1. First, we get a request token and secret:

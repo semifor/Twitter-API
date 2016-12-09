@@ -354,13 +354,14 @@ sub _url_for {
 
 sub oauth_request_token {
     my $self = shift;
-    my $args = @_ == 1 && ref $_[0] ? shift : { @_ };
+    my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
 
-    $args->{callback} //= 'oob';
+    # stringify the callback parameter so we can accept a URI object
+    $args{callback} = exists $args{callback} ? "$args{callback}" : 'oob';
     return $self->request(post => $self->oauth_url_for('request_token'), {
         -accept     => 'application/x-www-form-urlencoded',
         -oauth_type => 'request token',
-        -oauth_args => $args,
+        -oauth_args => \%args,
     });
 }
 
