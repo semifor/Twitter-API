@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '0.0104';
+our $VERSION = '0.0105';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -470,12 +470,14 @@ __END__
 
 Twitter::API provides an interface to the Twitter REST API for perl.
 
+This in an alpha release. The interface may change. Feedback welcome.
+
 Features:
 
 =for :list
 * full support for all Twitter REST API endpoints
 * not dependent on a new distribution for new endpoint support
-* optionally specify access tokens per call; no need to construct a new client to use different tokens
+* optionally specify access tokens per API call
 * error handling via an exception object that captures the full reqest/response context
 * full support for OAuth handshake and xauth authentication
 
