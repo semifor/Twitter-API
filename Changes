@@ -3,6 +3,7 @@ Revision history for Twitter::API
 {{$NEXT}}
   - updated examples for changes semantics in 0.0104
   - added example/oauth_webapp.psgi
+  - dependecy diet: replaced Net::OAuth with WWW::OAuth
 
 0.0104  2016-12-08 15:10:34 PST (TRIAL RELEASE)
   - added Net::Twitter/::Lite migration support

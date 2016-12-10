@@ -16,7 +16,6 @@ requires 'Moo::Role';
 requires 'MooX::Aliases';
 requires 'MooX::Traits';
 requires 'namespace::clean';
-requires 'Net::OAuth';
 requires 'Scalar::Util';
 requires 'Sub::Exporter::Progressive';
 requires 'Throwable';
@@ -25,6 +24,7 @@ requires 'Time::Local';
 requires 'Try::Tiny';
 requires 'URI';
 requires 'URL::Encode';
+requires 'WWW::OAuth' => '0.006';
 
 on test => sub {
     requires 'Test::Fatal';

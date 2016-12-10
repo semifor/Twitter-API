@@ -6,16 +6,16 @@ use 5.14.1;
 use Moo;
 use Carp;
 use Class::Load qw/load_class/;
-use JSON::MaybeXS ();
-use HTTP::Request::Common qw/GET POST/;
-use Net::OAuth;
 use Digest::SHA;
-use Try::Tiny;
-use URI;
-use URL::Encode ();
 use Encode qw/encode_utf8/;
+use HTTP::Request::Common qw/GET POST/;
+use JSON::MaybeXS ();
+use Try::Tiny;
 use Twitter::API::Context;
 use Twitter::API::Error;
+use URI;
+use URL::Encode ();
+use WWW::OAuth;
 use namespace::clean;
 
 with qw/MooX::Traits Twitter::API::Transition/;
@@ -126,8 +126,8 @@ sub request {
     $self->extract_options($c);
     $self->preprocess_args($c);
     $self->preprocess_url($c);
+    $self->prepare_request($c);
     $self->add_authorization($c);
-    $self->finalize_request($c);
 
     # Allow early exit for things like Twitter::API::AnyEvent
     $c->set_http_response($self->send_request($c) // return $c);
@@ -166,32 +166,7 @@ sub preprocess_url {
     $c->set_url($self->api_url_for($url));
 }
 
-sub add_authorization {
-    my ( $self, $c ) = @_;
-
-    my $oauth_type = $c->get_option('oauth_type') // 'protected resource';
-    my $oauth_args = $c->get_option('oauth_args') // {
-        token        => $c->get_option('token') // $self->access_token,
-        token_secret => $c->get_option('token_secret') // $self->access_token_secret,
-    };
-    my $args = $c->args;
-    my $req = Net::OAuth->request($oauth_type)->new(%$oauth_args,
-        protocol_version => Net::OAuth::PROTOCOL_VERSION_1_0A,
-        consumer_key     => $self->consumer_key,
-        consumer_secret  => $self->consumer_secret,
-        request_url      => $c->url,
-        request_method   => $c->http_method,
-        signature_method => 'HMAC-SHA1',
-        timestamp        => time,
-        nonce            => Digest::SHA::sha1_base64({} . time . $$ . rand),
-        extra_params     => $c->get_option('multipart_form_data') ? {} : $args,
-    );
-
-    $req->sign;
-    $c->set_header(authorization => $req->to_authorization_header);
-}
-
-sub finalize_request {
+sub prepare_request {
     my ( $self, $c ) = @_;
 
     # possible override Accept header
@@ -201,16 +176,16 @@ sub finalize_request {
     my $method = $c->http_method;
     $c->set_http_request(
         $method eq 'POST' ? (
-            $c->get_option('multipart_form_data') ? $self->finalize_multipart_post($c)
-            : $c->has_option('to_json')   ? $self->finalize_json_post($c)
-            : $self->finalize_post($c)
+            $c->get_option('multipart_form_data') ? $self->prepare_multipart_post($c)
+            : $c->has_option('to_json')   ? $self->prepare_json_post($c)
+            : $self->prepare_post($c)
         )
-        : $method eq 'GET' ? $self->finalize_get($c)
+        : $method eq 'GET' ? $self->prepare_get($c)
         : croak "unexpected HTTP method: $_"
     );
 }
 
-sub finalize_multipart_post {
+sub prepare_multipart_post {
     my ( $self, $c ) = @_;
 
     $c->set_header(content_type => 'multipart/form-data;charset=utf-8');
@@ -221,7 +196,7 @@ sub finalize_multipart_post {
         ];
 }
 
-sub finalize_json_post {
+sub prepare_json_post {
     my ( $self, $c ) = @_;
 
     POST $c->url,
@@ -229,7 +204,7 @@ sub finalize_json_post {
         Content => $self->to_json($c->get_option('to_json'));
 }
 
-sub finalize_post {
+sub prepare_post {
     my ( $self, $c ) = @_;
 
     $c->set_header(
@@ -239,7 +214,7 @@ sub finalize_post {
         Content => $self->encode_args_string($c->args);
 }
 
-sub finalize_get {
+sub prepare_get {
     my ( $self, $c ) = @_;
 
     my $uri = URI->new($c->url);
@@ -248,6 +223,30 @@ sub finalize_get {
     }
 
     GET $uri, %{ $c->headers };
+}
+
+sub add_authorization {
+    my ( $self, $c ) = @_;
+
+    my $req = $c->http_request;
+
+    my %oauth_args = (
+        client_id     => $self->consumer_key,
+        client_secret => $self->consumer_secret,
+    );
+
+    my $extra_args = $c->get_option('oauth_args');
+    unless ( $extra_args ) {
+        $oauth_args{token} = $c->get_option('token')
+            // $self->access_token
+            // croak 'requires an oauth token';
+        $oauth_args{token_secret} = $c->get_option('token_secret')
+            // $self->access_token_secret
+            // croak 'requires an oauth token secret';
+    }
+
+    my $oauth = WWW::OAuth->new(%oauth_args);
+    $oauth->authenticate($req, $extra_args || {});
 }
 
 around send_request => sub {
@@ -356,11 +355,9 @@ sub oauth_request_token {
     my $self = shift;
     my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
 
-    # stringify the callback parameter so we can accept a URI object
-    $args{callback} = exists $args{callback} ? "$args{callback}" : 'oob';
+    $args{oauth_callback} = delete $args{callback} // 'oob';
     return $self->request(post => $self->oauth_url_for('request_token'), {
         -accept     => 'application/x-www-form-urlencoded',
-        -oauth_type => 'request token',
         -oauth_args => \%args,
     });
 }
@@ -381,10 +378,13 @@ sub oauth_access_token {
     my $self = shift;
     my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
 
+    # We'll take 'em with or without the oauth_ prefix :)
+    my %oauth_args;
+    @oauth_args{map s/^(?!oauth_)/oauth_/r, keys %args} = values %args;
+
     $self->request(post => $self->oauth_url_for('access_token'), {
         -accept     => 'application/x-www-form-urlencoded',
-        -oauth_type => 'access token',
-        -oauth_args => \%args,
+        -oauth_args => \%oauth_args,
     });
 }
 
@@ -394,13 +394,11 @@ sub xauth {
 
     $self->request(post => $self->oauth_url_for('access_token'), {
         -accept     => 'application/x-www-form-urlencoded',
-        -oauth_type => 'XauthAccessToken',
-        -oauth_args => {
-            x_auth_mode     => 'client_auth',
-            x_auth_password => $password,
-            x_auth_username => $username,
-            %extra_args,
-        },
+        -oauth_args => {},
+        x_auth_mode     => 'client_auth',
+        x_auth_password => $password,
+        x_auth_username => $username,
+        %extra_args,
     });
 }
 

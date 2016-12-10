@@ -8,7 +8,7 @@ use namespace::clean;
 
 requires qw/
     _url_for access_token add_authorization api_url consumer_key
-    consumer_secret finalize_request request request_access_token
+    consumer_secret request request_access_token
 /;
 
 # private methods
@@ -76,24 +76,17 @@ sub invalidate_token {
 # request chain modifiers
 
 around add_authorization => sub {
-    my $orig = shift;
+    shift; # we're overriding the base, so we won't call it
     my ( $self, $c ) = @_;
 
-    # We do this in finalize_request after we have an HTTP::Request
-    return if $c->get_option('add_consumer_auth_header');
-
-    my $token = $c->get_option('token') // $self->access_token // return;
-
-    $c->set_header(authorization => join ' ', Bearer => url_encode($token));
-};
-
-around finalize_request => sub {
-    my ( $next, $self, $c ) = @_;
-
-    $self->$next($c);
-    return unless $c->get_option('add_consumer_auth_header');
-
-    $self->$add_consumer_auth_header($c->http_request);
+    my $req = $c->http_request;
+    if ( $c->get_option('add_consumer_auth_header') ) {
+        $self->$add_consumer_auth_header($req);
+    }
+    else {
+        my $token = $c->get_option('token') // $self->access_token // return;
+        $req->header(authorization => join ' ', Bearer => url_encode($token));
+    }
 };
 
 1;

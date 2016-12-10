@@ -120,12 +120,12 @@ describe 'get' => sub {
     };
     it 'creates valid authorization header' => sub {
         like $req->header('authorization'), qr/
-            OAuth\ oauth_consumer_key="key",
-            oauth_nonce="[^"]+",
-            oauth_signature="[^"]+",
-            oauth_signature_method="HMAC-SHA1",
-            oauth_timestamp="\d+",
-            oauth_token="token",
+            OAuth\ oauth_consumer_key="key",\s*
+            oauth_nonce="[^"]+",\s*
+            oauth_signature="[^"]+",\s*
+            oauth_signature_method="HMAC-SHA1",\s*
+            oauth_timestamp="\d+",\s*
+            oauth_token="token",\s*
             oauth_version="1\.0"
         /x;
     };
