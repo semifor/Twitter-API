@@ -230,23 +230,25 @@ sub add_authorization {
 
     my $req = $c->http_request;
 
-    my %oauth_args = (
-        client_id     => $self->consumer_key,
-        client_secret => $self->consumer_secret,
-    );
+    my $oauth_args = $c->get_option('oauth_args');
 
-    my $extra_args = $c->get_option('oauth_args');
-    unless ( $extra_args ) {
-        $oauth_args{token} = $c->get_option('token')
+    # If we don't have oauth_args, it's a protected request; we need a
+    # token/secret.
+    unless ( $oauth_args ) {
+        $oauth_args->{token} = $c->get_option('token')
             // $self->access_token
             // croak 'requires an oauth token';
-        $oauth_args{token_secret} = $c->get_option('token_secret')
+        $oauth_args->{token_secret} = $c->get_option('token_secret')
             // $self->access_token_secret
             // croak 'requires an oauth token secret';
     }
 
-    my $oauth = WWW::OAuth->new(%oauth_args);
-    $oauth->authenticate($req, $extra_args || {});
+    my $oauth = WWW::OAuth->new(
+        client_id     => $self->consumer_key,
+        client_secret => $self->consumer_secret,
+        %$oauth_args,
+    );
+    $oauth->authenticate($req);
 }
 
 around send_request => sub {
@@ -355,10 +357,12 @@ sub oauth_request_token {
     my $self = shift;
     my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
 
-    $args{oauth_callback} = delete $args{callback} // 'oob';
+    my %oauth_args;
+    $oauth_args{oauth_callback} = delete $args{callback} // 'oob';
     return $self->request(post => $self->oauth_url_for('request_token'), {
         -accept     => 'application/x-www-form-urlencoded',
-        -oauth_args => \%args,
+        -oauth_args => \%oauth_args,
+        %args, # i.e. ( x_auth_access_type => 'read' )
     });
 }
 
