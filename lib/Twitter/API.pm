@@ -416,6 +416,14 @@ __END__
 
 =pod
 
+=begin :buttons
+
+=for html
+<a href="http://github.com/badges/stability-badges"><img src="http://badges.github.io/stability-badges/dist/experimental.svg" alt="experimental" /></a>
+<a href="http://travis-ci.org/semifor/Twitter-API"><img src="https://secure.travis-ci.org/semifor/Twitter-API.svg" alt="Build Status" /></a>
+
+=end :buttons
+
 =head1 SYNOPSIS
 
     ### Common usage ###
@@ -619,8 +627,10 @@ C<password>.
 =head1 SEE ALSO
 
 =for :list
+* L<API::Twitter> - Twitter.com API Client
+* L<AnyEvent::Twitter::Stream> - Receive Twitter streaming API in an event loop
+* L<AnyEvent::Twitter> - A thin wrapper for Twitter API using OAuth
+* L<Mojo::WebService::Twitter> - Simple Twitter API client
 * L<Net::Twitter> - Twitter::API's predecessor (also L<Net::Twitter::Lite>)
-* L<Mojo::WebService::Twitter> - Simple non-blocking Twitter API client
-* L<API::Twitter> - Another simple Twitter API client
 
 =cut
