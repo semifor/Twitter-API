@@ -1,6 +1,7 @@
 Twitter-API
 ===========
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges) [![Build Status](https://travis-ci.org/semifor/Twitter-API.svg?branch=master)](https://travis-ci.org/semifor/Twitter-API) [![CPAN version](https://badge.fury.io/pl/Twitter-API.svg)](https://badge.fury.io/pl/Twitter-API)
+
 This is a rewrite of [Net::Twitter][1] and [Net::Twitter::Lite][2]. If it works out, I'll deprecate those modules in favor of this one.
 
 I have several goals for the rewrite:

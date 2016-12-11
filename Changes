@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - moved and renamed API endpoint helper methods into
+    Twitter::API::Role::RequestArgs for other implementers
 
 0.0106  2016-12-10 17:31:25 PST
   - improved tests and fixes for oauth management methods

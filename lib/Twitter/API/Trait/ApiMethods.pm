@@ -7,6 +7,10 @@ use Moo::Role;
 use MooX::Aliases;
 use namespace::clean;
 
+requires 'request';
+
+with 'Twitter::API::Role::RequestArgs';
+
 =method account_settings([ \%args ])
 
 L<https://dev.twitter.com/rest/reference/get/account/settings>
@@ -50,7 +54,7 @@ L<https://dev.twitter.com/rest/reference/get/collections/entries>
 =cut
 
 sub collection_entries {
-    shift->_with_pos_args(id => get => 'collections/entries', @_);
+    shift->request_with_pos_args(id => get => 'collections/entries', @_);
 }
 
 =method collections([ $screen_name | $user_id, ][ \%args ])
@@ -60,7 +64,7 @@ L<https://dev.twitter.com/rest/reference/get/collections/list>
 =cut
 
 sub collections {
-    shift->_with_pos_args(':ID', get => 'collections/list', @_);
+    shift->request_with_pos_args(':ID', get => 'collections/list', @_);
 }
 
 =method direct_messages([ \%args ])
@@ -103,7 +107,7 @@ L<https://dev.twitter.com/rest/reference/get/followers/ids>
 =cut
 
 sub followers_ids {
-    shift->_with_pos_args(':ID', get => 'followers/ids', @_);
+    shift->request_with_pos_args(':ID', get => 'followers/ids', @_);
 }
 
 =method friends([ \%args ])
@@ -128,7 +132,7 @@ L<https://dev.twitter.com/rest/reference/get/friends/ids>
 =cut
 
 sub friends_ids {
-    shift->_with_optional_id(get => 'friends/ids', @_);
+    shift->request_with_id(get => 'friends/ids', @_);
 }
 alias following_ids => 'friends_ids';
 
@@ -166,7 +170,7 @@ L<https://dev.twitter.com/rest/reference/get/geo/id/:place_id>
 
 # NT incompatibility
 sub geo_id {
-    shift->_with_pos_args(place_id => get => 'geo/id/:place_id', @_);
+    shift->request_with_pos_args(place_id => get => 'geo/id/:place_id', @_);
 }
 
 =method geo_search([ \%args ])
@@ -335,7 +339,7 @@ L<https://dev.twitter.com/rest/reference/get/statuses/lookup>
 =cut
 
 sub lookup_statuses {
-    shift->_with_pos_args(id => get => 'statuses/lookup', @_);
+    shift->request_with_pos_args(id => get => 'statuses/lookup', @_);
 }
 
 =method lookup_users([ \%args ])
@@ -437,7 +441,7 @@ L<https://dev.twitter.com/rest/reference/get/statuses/retweeters/ids>
 =cut
 
 sub retweeters_ids {
-    shift->_with_pos_args(id => get => 'statuses/retweeters/ids', @_);
+    shift->request_with_pos_args(id => get => 'statuses/retweeters/ids', @_);
 }
 
 =method retweets([ $id, ][ \%args ])
@@ -447,7 +451,7 @@ L<https://dev.twitter.com/rest/reference/get/statuses/retweets/:id>
 =cut
 
 sub retweets {
-    shift->_with_pos_args(id => get => 'statuses/retweets/:id', @_);
+    shift->request_with_pos_args(id => get => 'statuses/retweets/:id', @_);
 }
 
 =method retweets_of_me([ \%args ])
@@ -470,7 +474,7 @@ L<https://dev.twitter.com/rest/reference/get/geo/reverse_geocode>
 =cut
 
 sub reverse_geocode {
-    shift->_with_pos_args([ qw/lat long/ ], get => 'geo/reverse_geocode', @_);
+    shift->request_with_pos_args([ qw/lat long/ ], get => 'geo/reverse_geocode', @_);
 }
 
 =method saved_searches([ \%args ])
@@ -490,7 +494,7 @@ L<https://dev.twitter.com/rest/reference/get/search/tweets>
 =cut
 
 sub search {
-    shift->_with_pos_args(q => get => 'search/tweets', @_);
+    shift->request_with_pos_args(q => get => 'search/tweets', @_);
 }
 
 =method sent_direct_messages([ \%args ])
@@ -513,7 +517,7 @@ L<https://dev.twitter.com/rest/reference/get/direct_messages/show>
 =cut
 
 sub show_direct_message {
-    shift->_with_pos_args(id => get => 'direct_messages/show', @_);
+    shift->request_with_pos_args(id => get => 'direct_messages/show', @_);
 }
 
 =method show_friendship([ \%args ])
@@ -562,7 +566,7 @@ L<https://dev.twitter.com/rest/reference/get/saved_searches/show/:id>
 =cut
 
 sub show_saved_search {
-    shift->_with_pos_args(id => get => 'saved_searches/show/:id', @_);
+    shift->request_with_pos_args(id => get => 'saved_searches/show/:id', @_);
 }
 
 =method show_status([ $id, ][ \%args ])
@@ -572,7 +576,7 @@ L<https://dev.twitter.com/rest/reference/get/statuses/show/:id>
 =cut
 
 sub show_status {
-    shift->_with_pos_args(id => get => 'statuses/show/:id', @_);
+    shift->request_with_pos_args(id => get => 'statuses/show/:id', @_);
 }
 
 =method show_user([ $screen_name | $user_id, ][ \%args ])
@@ -582,7 +586,7 @@ L<https://dev.twitter.com/rest/reference/get/users/show>
 =cut
 
 sub show_user {
-    shift->_with_pos_args(':ID', get => 'users/show', @_);
+    shift->request_with_pos_args(':ID', get => 'users/show', @_);
 }
 
 =method suggestion_categories([ \%args ])
@@ -626,7 +630,7 @@ L<https://dev.twitter.com/rest/reference/get/trends/place>
 =cut
 
 sub trends_place {
-    shift->_with_pos_args(id => get => 'trends/place', @_);
+    shift->request_with_pos_args(id => get => 'trends/place', @_);
 }
 alias trends_location => 'trends_place';
 
@@ -648,7 +652,7 @@ my $rename_category = sub {
 sub user_suggestions {
     my $self = shift;
 
-    $self->_with_pos_args(slug => get => 'users/suggestions/:slug/members',
+    $self->request_with_pos_args(slug => get => 'users/suggestions/:slug/members',
         $self->$rename_category(@_));
 }
 alias follow_suggestions => 'user_suggestions';
@@ -664,7 +668,7 @@ L<https://dev.twitter.com/rest/reference/get/users/suggestions/:slug>
 sub user_suggestions_for {
     my $self = shift;
 
-    $self->_with_pos_args(slug => get => 'users/suggestions/:slug',
+    $self->request_with_pos_args(slug => get => 'users/suggestions/:slug',
         $self->$rename_category(@_));
 }
 alias follow_suggestions_for => 'user_suggestions_for';
@@ -676,7 +680,7 @@ L<https://dev.twitter.com/rest/reference/get/statuses/user_timeline>
 =cut
 
 sub user_timeline {
-    shift->_with_optional_id(get => 'statuses/user_timeline', @_);
+    shift->request_with_id(get => 'statuses/user_timeline', @_);
 }
 
 =method users_search([ $q, ][ \%args ])
@@ -688,7 +692,7 @@ L<https://dev.twitter.com/rest/reference/get/users/search>
 =cut
 
 sub users_search {
-    shift->_with_pos_args(q => get => 'users/search', @_);
+    shift->request_with_pos_args(q => get => 'users/search', @_);
 }
 alias $_ => 'users_search' for qw/find_people search_users/;
 
@@ -709,7 +713,7 @@ L<https://dev.twitter.com/rest/reference/post/collections/entries/add>
 =cut
 
 sub add_collection_entry {
-    shift->_with_pos_args([ qw/id tweet_id /],
+    shift->request_with_pos_args([ qw/id tweet_id /],
         post => 'collections/entries/add', @_);
 }
 
@@ -725,7 +729,7 @@ sub add_list_member {
 
 # deprecated: https://dev.twitter.com/rest/reference/post/geo/place
 sub add_place {
-    shift->_with_pos_args([ qw/name contained_within token lat long/ ],
+    shift->request_with_pos_args([ qw/name contained_within token lat long/ ],
         post => 'geo/place', @_);
 }
 
@@ -736,7 +740,7 @@ L<https://dev.twitter.com/rest/reference/post/blocks/create>
 =cut
 
 sub create_block {
-    shift->_with_pos_args(':ID', post => 'blocks/create', @_);
+    shift->request_with_pos_args(':ID', post => 'blocks/create', @_);
 }
 
 =method create_collection([ $name, ][ \%args ])
@@ -746,7 +750,7 @@ L<https://dev.twitter.com/rest/reference/post/collections/create>
 =cut
 
 sub create_collection {
-    shift->_with_pos_args(name => post => 'collections/create', @_);
+    shift->request_with_pos_args(name => post => 'collections/create', @_);
 }
 
 =method create_favorite([ $id, ][ \%args ])
@@ -756,7 +760,7 @@ L<https://dev.twitter.com/rest/reference/post/favorites/create>
 =cut
 
 sub create_favorite {
-    shift->_with_pos_args(id => post => 'favorites/create', @_);
+    shift->request_with_pos_args(id => post => 'favorites/create', @_);
 }
 
 =method create_friend([ $screen_name | $user_id, ][ \%args ])
@@ -768,7 +772,7 @@ L<https://dev.twitter.com/rest/reference/post/friendships/create>
 =cut
 
 sub create_friend {
-    shift->_with_pos_args(':ID', post => 'friendships/create', @_);
+    shift->request_with_pos_args(':ID', post => 'friendships/create', @_);
 }
 alias $_ => 'create_friend' for qw/follow follow_new create_friendship/;
 
@@ -779,7 +783,7 @@ L<https://dev.twitter.com/rest/reference/post/lists/create>
 =cut
 
 sub create_list {
-    shift->_with_pos_args(name => post => 'lists/create', @_);
+    shift->request_with_pos_args(name => post => 'lists/create', @_);
 }
 
 =method create_media_metadata([ \%args ])
@@ -808,7 +812,7 @@ L<https://dev.twitter.com/rest/reference/post/mutes/users/create>
 =cut
 
 sub create_mute {
-    shift->_with_pos_args(id => post => 'mutes/users/create', @_);
+    shift->request_with_pos_args(id => post => 'mutes/users/create', @_);
 }
 
 =method create_saved_search([ $query, ][ \%args ])
@@ -818,7 +822,7 @@ L<https://dev.twitter.com/rest/reference/post/saved_searches/create>
 =cut
 
 sub create_saved_search {
-    shift->_with_pos_args(query => post => 'saved_searches/create', @_);
+    shift->request_with_pos_args(query => post => 'saved_searches/create', @_);
 }
 
 =method curate_collection([ \%args ])
@@ -864,7 +868,7 @@ L<https://dev.twitter.com/rest/reference/post/blocks/destroy>
 =cut
 
 sub destroy_block {
-    shift->_with_pos_args(':ID', post => 'blocks/destroy', @_);
+    shift->request_with_pos_args(':ID', post => 'blocks/destroy', @_);
 }
 
 =method destroy_collection([ $id, ][ \%args ])
@@ -874,7 +878,7 @@ L<https://dev.twitter.com/rest/reference/post/collections/destroy>
 =cut
 
 sub destroy_collection {
-    shift->_with_pos_args(id => post => 'collections/destroy', @_);
+    shift->request_with_pos_args(id => post => 'collections/destroy', @_);
 }
 
 =method destroy_direct_message([ $id, ][ \%args ])
@@ -884,7 +888,7 @@ L<https://dev.twitter.com/rest/reference/post/direct_messages/destroy>
 =cut
 
 sub destroy_direct_message {
-    shift->_with_pos_args(id => post => 'direct_messages/destroy', @_);
+    shift->request_with_pos_args(id => post => 'direct_messages/destroy', @_);
 }
 
 =method destroy_favorite([ $id, ][ \%args ])
@@ -894,7 +898,7 @@ L<https://dev.twitter.com/rest/reference/post/favorites/destroy>
 =cut
 
 sub destroy_favorite {
-    shift->_with_pos_args(id => post => 'favorites/destroy', @_);
+    shift->request_with_pos_args(id => post => 'favorites/destroy', @_);
 }
 
 =method destroy_friend([ $screen_name | $user_id, ][ \%args ])
@@ -906,7 +910,7 @@ L<https://dev.twitter.com/rest/reference/post/friendships/destroy>
 =cut
 
 sub destroy_friend {
-    shift->_with_pos_args(':ID', post => 'friendships/destroy', @_);
+    shift->request_with_pos_args(':ID', post => 'friendships/destroy', @_);
 }
 alias $_ => 'destroy_friend' for qw/unfollow destroy_friendship/;
 
@@ -917,7 +921,7 @@ L<https://dev.twitter.com/rest/reference/post/mutes/users/destroy>
 =cut
 
 sub destroy_mute {
-    shift->_with_pos_args(id => post => 'mutes/users/destroy', @_);
+    shift->request_with_pos_args(id => post => 'mutes/users/destroy', @_);
 }
 
 =method destroy_saved_search([ $id, ][ \%args ])
@@ -929,7 +933,7 @@ L<https://dev.twitter.com/rest/reference/post/saved_searches/destroy/:id>
 =cut
 
 sub destroy_saved_search {
-    shift->_with_pos_args(id => post => 'saved_searches/destroy/:id', @_);
+    shift->request_with_pos_args(id => post => 'saved_searches/destroy/:id', @_);
 }
 alias delete_saved_search => 'destroy_saved_search';
 
@@ -940,7 +944,7 @@ L<https://dev.twitter.com/rest/reference/post/statuses/destroy/:id>
 =cut
 
 sub destroy_status {
-    shift->_with_pos_args(id => post => 'statuses/destroy/:id', @_);
+    shift->request_with_pos_args(id => post => 'statuses/destroy/:id', @_);
 }
 
 =method members_create_all([ \%args ])
@@ -976,7 +980,7 @@ L<https://dev.twitter.com/rest/reference/post/collections/entries/move>
 =cut
 
 sub move_collection_entry {
-    shift->_with_pos_args([ qw/id tweet_id relative_to /],
+    shift->request_with_pos_args([ qw/id tweet_id relative_to /],
         post => 'collections/entries/move', @_);
 }
 
@@ -987,7 +991,7 @@ L<https://dev.twitter.com/rest/reference/post/direct_messages/new>
 =cut
 
 sub new_direct_message {
-    shift->_with_pos_args([ qw/text :ID/ ], post => 'direct_messages/new', @_);
+    shift->request_with_pos_args([ qw/text :ID/ ], post => 'direct_messages/new', @_);
 }
 
 =method remove_collection_entry([ $id, [ $tweet_id, ]][ \%args ])
@@ -997,7 +1001,7 @@ L<https://dev.twitter.com/rest/reference/post/collections/entries/remove>
 =cut
 
 sub remove_collection_entry {
-    shift->_with_pos_args([ qw/id tweet_id/ ],
+    shift->request_with_pos_args([ qw/id tweet_id/ ],
         post => 'collections/entries/remove', @_);
 }
 
@@ -1018,7 +1022,7 @@ L<https://dev.twitter.com/rest/reference/post/users/report_spam>
 =cut
 
 sub report_spam {
-    shift->_with_optional_id(post => 'users/report_spam', @_);
+    shift->request_with_id(post => 'users/report_spam', @_);
 }
 
 =method retweet([ $id, ][ \%args ])
@@ -1028,7 +1032,7 @@ L<https://dev.twitter.com/rest/reference/post/statuses/retweet/:id>
 =cut
 
 sub retweet {
-    shift->_with_pos_args(id => post => 'statuses/retweet/:id', @_);
+    shift->request_with_pos_args(id => post => 'statuses/retweet/:id', @_);
 }
 
 =method subscribe_list([ \%args ])
@@ -1048,7 +1052,7 @@ L<https://dev.twitter.com/rest/reference/post/statuses/unretweet/:id>
 =cut
 
 sub unretweet {
-    shift->_with_pos_args(id => post => 'statuses/unretweet/:id', @_);
+    shift->request_with_pos_args(id => post => 'statuses/unretweet/:id', @_);
 }
 
 =method unsubscribe_list([ \%args ])
@@ -1068,7 +1072,7 @@ L<https://dev.twitter.com/rest/reference/post/statuses/update>
 =cut
 
 sub update {
-    shift->_with_pos_args(status => post => 'statuses/update', @_);
+    shift->request_with_pos_args(status => post => 'statuses/update', @_);
 }
 
 =method update_account_settings([ \%args ])
@@ -1088,7 +1092,7 @@ L<https://dev.twitter.com/rest/reference/post/collections/update>
 =cut
 
 sub update_collection {
-    shift->_with_pos_args(id => post => 'collections/update', @_);
+    shift->request_with_pos_args(id => post => 'collections/update', @_);
 }
 
 =method update_friendship([ \%args ])
@@ -1098,7 +1102,7 @@ L<https://dev.twitter.com/rest/reference/post/friendships/update>
 =cut
 
 sub update_friendship {
-    shift->_with_optional_id(post => 'friendships/update', @_);
+    shift->request_with_id(post => 'friendships/update', @_);
 }
 
 =method update_list([ \%args ])
@@ -1138,7 +1142,7 @@ L<https://dev.twitter.com/rest/reference/post/account/update_profile_banner>
 =cut
 
 sub update_profile_banner {
-    shift->_with_pos_args(banner => post => 'account/update_profile_banner', @_);
+    shift->request_with_pos_args(banner => post => 'account/update_profile_banner', @_);
 }
 
 =method update_profile_image([ $image, ][ \%args ])
@@ -1148,7 +1152,7 @@ L<https://dev.twitter.com/rest/reference/post/account/update_profile_image>
 =cut
 
 sub update_profile_image {
-    shift->_with_pos_args(image => post => 'account/update_profile_image', @_);
+    shift->request_with_pos_args(image => post => 'account/update_profile_image', @_);
 }
 
 =method upload_media([ $media, ][ \%args ])
@@ -1184,59 +1188,6 @@ sub upload_media {
     $self->request(post => $self->upload_url_for('media/upload'), $args, @_);
 }
 alias upload => 'upload_media';
-
-
-# if there is a positional arg, it's an :ID (screen_name or user_id)
-sub _with_optional_id {
-    splice @_, 1, 0, [];
-    push @{$_[1]}, ':ID' if @_ > 4 && ref $_[4] ne 'HASH';
-    goto $_[0]->can('_with_pos_args');
-}
-
-sub _with_pos_args {
-    my $self        = shift;
-    my @pos_names   = shift;
-    my $http_method = shift;
-    my $path        = shift;
-    my %args;
-
-    # names can be a single value or an arrayref
-    @pos_names = @{ $pos_names[0] } if ref $pos_names[0] eq 'ARRAY';
-
-    # gather positional arguments and name them
-    while ( @pos_names ) {
-        last if @_ == 0 || ref $_[0] eq 'HASH';
-        $args{shift @pos_names} = shift;
-    }
-
-    # get the optional, following args hashref and expand it
-    my %args_hash; %args_hash = %{ shift() } if ref $_[0] eq 'HASH';
-
-    # extract any required args if we still have names
-    while ( my $name = shift @pos_names ) {
-        if ( $name eq ':ID' ) {
-            $name = exists $args_hash{screen_name} ? 'screen_name' : 'user_id';
-            croak 'missing required screen_name or user_id'
-                unless exists $args_hash{$name};
-        }
-        croak "missing required '$name' arg" unless exists $args_hash{$name};
-        $args{$name} = delete $args_hash{$name};
-    }
-
-    # name the :ID value (if any) based on its value
-    if ( my $id = delete $args{':ID'} ) {
-        $args{$id =~/\D/ ? 'screen_name' : 'user_id'} = $id;
-    }
-
-    # merge in the remaining optional values
-    for my $name ( keys %args_hash ) {
-        croak "'$name' specified in both positional and named args"
-            if exists $args{$name};
-        $args{$name} = $args_hash{$name};
-    }
-
-    $self->request($http_method, $path, \%args, @_);
-}
 
 1;
 
