@@ -18,7 +18,7 @@ use URL::Encode ();
 use WWW::OAuth;
 use namespace::clean;
 
-with qw/MooX::Traits Twitter::API::Transition/;
+with qw/MooX::Traits Twitter::API::Migration/;
 sub _trait_namespace { 'Twitter::API::Trait' }
 
 has [ qw/consumer_key consumer_secret/ ] => (
@@ -252,8 +252,7 @@ sub add_authorization {
             // croak 'requires an oauth token secret';
     }
 
-    my $oauth = WWW::OAuth->new(%cred);
-    $oauth->authenticate($req, \%oauth);
+    WWW::OAuth->new(%cred)->authenticate($req, \%oauth);
 }
 
 around send_request => sub {
@@ -511,9 +510,9 @@ dependencies most users won't want or need:
 
 =head2 Migration from Net::Twitter and Net::Twitter::Lite
 
-Transitional support is included to assist users migrating from L<Net::Twitter>
+Migration support is included to assist users migrating from L<Net::Twitter>
 and L<Net::Twitter::Lite>. It will be removed from a future release (or at
-least not included by default). See L<Twitter::API::Transition> for details
+least not included by default). See L<Twitter::API::Migration> for details
 about migrating your existing Net::Twitter/::Lite applications.
 
 =head2 Normal usage
@@ -529,9 +528,9 @@ for each.
 =head2 Minimalist usage
 
 Without any traits, Twitter::API provides access to API endpoints with the
-L<get> and L<post> methods described below, as well as methods for managing
-OAuth authentication. API results are simply perl data structures decoded from
-the JSON responses. Refer to the L<Twitter API
+L<get|get-url-args> and L<post|post-url-args> methods described below, as well
+as methods for managing OAuth authentication. API results are simply perl data
+structures decoded from the JSON responses. Refer to the L<Twitter API
 Documentation|https://dev.twitter.com/rest/public> for available endpoints,
 parameters, and responses.
 

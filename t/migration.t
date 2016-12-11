@@ -16,7 +16,7 @@ sub new_client {
     );
 }
 
-context 'Net::Twitter transition' => sub {
+context 'Net::Twitter migration' => sub {
     my $client;
     before each => sub {
         $client = new_client;
@@ -45,7 +45,7 @@ context 'Net::Twitter transition' => sub {
                     oauth_token_secret       => 'token-secret',
                     oauth_callback_confirmed => 'true',
                 })->exactly(1);
-                local $ENV{TWITTER_API_NO_TRANSITION_WARNINGS} = 1;
+                local $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1;
                 $uri = $client->$method(callback => 'foo/bar');
             };
 
@@ -79,7 +79,7 @@ context 'Net::Twitter transition' => sub {
     / )
     {
         describe $method => sub {
-            it 'has transition warning' => sub {
+            it 'has migration warning' => sub {
                 my $client = new_client;
                 $client->stubs('request');
                 like(
@@ -105,7 +105,7 @@ context 'Net::Twitter transition' => sub {
             });
             $client->request_token('request-token');
             $client->request_token_secret('request-token-secret');
-            local $ENV{TWITTER_API_NO_TRANSITION_WARNINGS} = 1;
+            local $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1;
             @result = $client->request_access_token(
                 verifier => 'callback-verifier');
         };
@@ -145,21 +145,21 @@ context 'Net::Twitter transition' => sub {
         };
 
         it 'returns a context object' => sub {
-            local $ENV{TWITTER_API_NO_TRANSITION_WARNINGS} = 1;
+            local $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1;
             my $r = $client->get('some/endpoint');
             ok( blessed $r && $r->isa('Twitter::API::Context'));
         };
-        it 'has transition warning' => sub {
+        it 'has migration warning' => sub {
             like( warning { $client->get('some/endpoint') },
                 qr/wrap_result is enabled/);
         };
     };
     describe ua => sub {
-        it 'has trasitional warning' => sub {
+        it 'has migration warning' => sub {
             like warning { $client->ua }, qr/will be removed/;
         };
         it 'returns an HTTP::Thin' => sub {
-            local $ENV{TWITTER_API_NO_TRANSITION_WARNINGS} = 1;
+            local $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1;
             my $ua = $client->ua;
             ok blessed $ua && $ua->isa('HTTP::Thin');
         };
@@ -195,7 +195,7 @@ context 'with AppAuth' => sub {
             ok !$client->has_access_token;
         };
         it 'sets access_token' => sub {
-            local $ENV{TWITTER_API_NO_TRANSITION_WARNINGS} = 1;
+            local $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1;
             $client->request_access_token;
             is $client->access_token, $url_decoded_token;
         };

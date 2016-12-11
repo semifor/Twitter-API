@@ -1,5 +1,5 @@
-package Twitter::API::Transition;
-# ABSTRACT: Transitional support Net::Twitter/::Lite users
+package Twitter::API::Migration;
+# ABSTRACT: Migration support Net::Twitter/::Lite users
 
 use 5.14.1;
 use Carp;
@@ -34,11 +34,11 @@ around request => sub {
     # Early exit? Actually just a context object; return it.
     return $r unless defined $c;
 
-    # Net::Twitter/::Lite transitional support
+    # Net::Twitter/::Lite migraton support
     if ( $self->wrap_result ) {
-        unless ( $ENV{TWITTER_API_NO_TRANSITION_WARNINGS} ) {
+        unless ( $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} ) {
             carp 'wrap_result is enabled. It will be removed in a future '
-                .'version. See Twitter::API::Transition';
+                .'version. See Twitter::API::Migration';
         }
         return $c;
     }
@@ -46,7 +46,7 @@ around request => sub {
     return wantarray ? ( $c->result, $c ) : $c->result;
 };
 
-# Net::Twitter transitional support; sets access_token attribute
+# Net::Twitter migration support; sets access_token attribute
 around request_access_token => sub {
     my ( $next, $self ) = @_;
 
@@ -110,9 +110,9 @@ for my $method ( qw/
     around $method => sub {
         my ( $next, $self ) = splice @_, 0, 2;
 
-        unless ( $ENV{TWITTER_API_NO_TRANSITION_WARNINGS} ) {
+        unless ( $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} ) {
             carp $method.' will be removed in a future release. '
-                .'Please see Twitter::API::Transition';
+                .'Please see Twitter::API::Migration';
         }
         $self->$next(@_);
     };
@@ -198,12 +198,12 @@ Or for the smallest change to your code:
     $r->result; i            # same as before
     $r->rate_limit_remaning; # same as before
 
-However, there is transitional support for B<WrapResult>. Call the constructor
+However, there is migration support for B<WrapResult>. Call the constructor
 with option C<<wrap_result => 1>> and Twitter::API will return the context
 object, only, for API calls. This should give you the same behavior you had
 with B<WrapResult> while you modify your code. Twitter::API will warn when this
 option is used. You may disale warnings with
-C<$ENV{TWITTER_API_NO_TRANSITION_WARNINGS} = 1>.
+C<$ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1>.
 
 If you are using any other Net::Twitter traits, please contact the author of
 Twitter::API.  Additional traits may be added to Twitter::API or released as
@@ -253,11 +253,11 @@ the 3-legged OAuth handshake. That was a poor design decision. Twitter::API
 returns request and access tokens to the caller. It is the caller's
 responsibility to store are cache them appropriately. Hovever, tansitional
 support is provided, with client instance storage, so your code can run,
-unmodified until you've made the transition.
+unmodified while you make the transition.
 
-The following methods exist only for Net::Twitter transition and will be
+The following methods exist only for migration from Net::Twitter and will be
 removed in a future release. A warning is issued on each call to these methods.
-To disable the warnings, set C<$ENV{TWITTER_API_NO_TRANSITION_WARNINGS} = 1>.
+To disable the warnings, set C<$ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1>.
 
 =for list:
 * B<get_authentication_url> - replace with B<oauth_authentication_url> or B<oauth_request_token> and B<oauth_authentication_url>
@@ -276,7 +276,7 @@ with B<oauth2_token> calls. Method B<oauth2_token> does not set the
 C<access_token> attribute. Method C<request_access_token> is provided for
 tranitional support, only. It warns like the OAuth mehods discussed above, and
 it sets the C<access_token> attribute so existing code should work as expected
-during transition. It will be removed in a future release.
+during migration. It will be removed in a future release.
 
 =head1 Migrating from Net::Twitter::Lite
 
@@ -294,7 +294,7 @@ To:
     );
 
 If you're using the option B<wrap_result>, see the discussion above about the
-Net::Twitter WrapResult trait. There is transitional support for
-B<wrap_result>. It will be removed in a future release.
+Net::Twitter WrapResult trait. There is migration support for B<wrap_result>.
+It will be removed in a future release.
 
 =cut
