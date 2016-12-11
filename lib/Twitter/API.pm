@@ -230,25 +230,30 @@ sub add_authorization {
 
     my $req = $c->http_request;
 
-    my $oauth_args = $c->get_option('oauth_args');
+    my %cred = (
+        client_id     => $self->consumer_key,
+        client_secret => $self->consumer_secret,
+    );
 
-    # If we don't have oauth_args, it's a protected request; we need a
-    # token/secret.
-    unless ( $oauth_args ) {
-        $oauth_args->{token} = $c->get_option('token')
+    my %oauth;
+    # only the token management methods set 'oauth_args'
+    if ( my $opt = $c->get_option('oauth_args') ) {
+        %oauth = %$opt;
+        $cred{token}        = delete $oauth{oauth_token};
+        $cred{token_secret} = delete $oauth{oauth_token_secret};
+    }
+    else {
+        # protected request; requires tokens
+        $cred{token} = $c->get_option('token')
             // $self->access_token
             // croak 'requires an oauth token';
-        $oauth_args->{token_secret} = $c->get_option('token_secret')
+        $cred{token_secret} = $c->get_option('token_secret')
             // $self->access_token_secret
             // croak 'requires an oauth token secret';
     }
 
-    my $oauth = WWW::OAuth->new(
-        client_id     => $self->consumer_key,
-        client_secret => $self->consumer_secret,
-        %$oauth_args,
-    );
-    $oauth->authenticate($req);
+    my $oauth = WWW::OAuth->new(%cred);
+    $oauth->authenticate($req, \%oauth);
 }
 
 around send_request => sub {

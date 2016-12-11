@@ -68,6 +68,20 @@ describe oauth => sub {
             });
         };
 
+        it 'has valid authorization header' => sub {
+            my ( $r, $c ) = $client->oauth_request_token;
+            like $c->http_request->header('authorization'), qr/
+                OAuth\s+
+                oauth_callback="oob",\s+
+                oauth_consumer_key="key",\s+
+                oauth_nonce="[^"]+",\s+
+                oauth_signature="[^"]+",\s+
+                oauth_signature_method="HMAC-SHA1",\s+
+                oauth_timestamp="\d+",\s+
+                oauth_version="1.0"
+            /x;
+        };
+
         it 'returns a hashref with oauth_token/secret' => sub {
             my $r = $client->oauth_request_token;
             is_deeply $r, {
@@ -94,6 +108,24 @@ describe oauth => sub {
             });
         };
 
+        it 'has a valid autorization header' => sub {
+            my ( $r, $c ) = $client->oauth_access_token(
+                token        => 'request-token',
+                token_secret => 'request-token-secret',
+                verifier     => 'verifier',
+            );
+            like $c->http_request->header('authorization'), qr/
+                OAuth\s+
+                oauth_consumer_key="key",\s+
+                oauth_nonce="[^"]+",\s+
+                oauth_signature="[^"]+",\s+
+                oauth_signature_method="HMAC-SHA1",\s+
+                oauth_timestamp="\d+",\s+
+                oauth_token="request-token",\s+
+                oauth_verifier="verifier",\s+
+                oauth_version="1.0"
+            /x;
+        };
         it 'returns  a hashref with oauth_token/secret' => sub {
             my $r = $client->oauth_access_token(
                 token        => 'request-token',
@@ -106,6 +138,25 @@ describe oauth => sub {
             like $$r{oauth_token_secret}, qr/^2EEfA6BG3l/;
         };
         describe xauth => sub {
+            it 'has a valid authorization header' => sub {
+                my ( $r, $c ) = $client->xauth('alice', 'rabbit');
+                like $c->http_request->header('authorization'), qr/
+                    OAuth\s+
+                    oauth_consumer_key="key",\s+
+                    oauth_nonce="[^"]+",\s+
+                    oauth_signature="[^"]+",\s+
+                    oauth_signature_method="HMAC-SHA1",\s+
+                    oauth_timestamp="\d+",\s+
+                    oauth_version="1.0"
+                /x;
+            };
+            it 'has required args' => sub {
+                my ( $r, $c ) = $client->xauth('alice', 'rabbit');
+                my $args = URL::Encode::url_params_mixed(
+                    $c->http_request->content);
+                is_deeply [ sort keys %$args ],
+                    [ qw/x_auth_mode x_auth_password x_auth_username/ ];
+            };
             it 'returns a hashref with oauth_token/secret' => sub {
                 my $r = $client->xauth('foo@bar.baz', 'SeCrEt');
                 is_deeply [ sort keys %$r ],
