@@ -2,6 +2,11 @@ Revision history for Twitter::API
 
 {{$NEXT}}
 
+0.0106  2016-12-10 17:31:25 PST
+  - improved tests and fixes for oauth management methods
+  - renamed s/Transition/Migration
+  - fixed some POD links
+
 0.0105  2016-12-09 22:16:05 PST
   - alpha release
   - updated examples for changes semantics in 0.0104
