@@ -419,8 +419,8 @@ __END__
 =begin :buttons
 
 =for html
-<a href="http://github.com/badges/stability-badges"><img src="http://badges.github.io/stability-badges/dist/experimental.svg" alt="experimental" /></a>
-<a href="http://travis-ci.org/semifor/Twitter-API"><img src="https://secure.travis-ci.org/semifor/Twitter-API.svg" alt="Build Status" /></a>
+<img src="https://img.shields.io/badge/stability-experimental-orange.svg" alt="experimental" />
+<a href="https://travis-ci.org/semifor/Twitter-API"><img src="https://travis-ci.org/semifor/Twitter-API.svg?branch=master" alt="Build Status" /></a>
 
 =end :buttons
 

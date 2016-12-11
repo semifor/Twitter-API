@@ -92,7 +92,7 @@ Examples:
         [ ':ID', 'status' ], get => 'some/endpoint',
         'alice', 'down the rabbit hole'
     );
-    # is also transformed to:
+    # is transformed to:
     $self->request(get => 'some/endpoint', {
         sreen_name => 'alice',
         status     => 'down the rabbit hole',
