@@ -10,7 +10,8 @@ use URL::Encode qw/url_decode/;
 use Twitter::API;
 
 sub new_client {
-    Twitter::API->new(
+    Twitter::API->new_with_traits(
+        traits          => 'Migration',
         consumer_key    => 'key',
         consumer_secret => 'secret',
     );
@@ -25,7 +26,7 @@ context 'Net::Twitter migration' => sub {
     it 'dies with traits' => sub {
         like exception {
             Twitter::API->new(
-                traits          => [ qw/WrapResult/ ],
+                traits          => [ qw/Migration WrapResult/ ],
                 consumer_key    => 'key',
                 consumer_secret => 'secret',
             );
@@ -129,7 +130,8 @@ context 'Net::Twitter migration' => sub {
     };
     describe wrap_result => sub {
         before each => sub {
-            $client = Twitter::API->new(
+            $client = Twitter::API->new_with_traits(
+                traits              => 'Migration',
                 wrap_result         => 1,
                 consumer_key        => 'key',
                 consumer_secret     => 'secret',
@@ -174,7 +176,7 @@ context 'with AppAuth' => sub {
     my $client;
     before each => sub {
         $client = Twitter::API->new_with_traits(
-            traits          => 'AppAuth',
+            traits          => [ qw/Migration AppAuth/ ],
             consumer_key    => 'key',
             consumer_secret => 'secret',
         );

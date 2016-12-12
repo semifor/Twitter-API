@@ -74,14 +74,14 @@ __END__
 
 Twitter has a strange concept of boolean values. Usually, the API accepts C<t>,
 C<true>, or C<1> for true. Sometimes it accepts C<f>, C<false>, or C<0> for
-false. But then you have strange cases like the C<include_email> parameter
-accepted for authorized applications by the C<verify_credentials> endpoint. It
-only accepts C<true>. Worse, for some boolean values, passing C<f>, C<false>,
-or C<0> all work as if you passed C<true>. For those values, false means not
+false. But then you have strange cases like the C<include_email> parameter used
+for authorized applications by the C<verify_credentials> endpoint. It only
+accepts C<true>. Worse, for some boolean values, passing C<f>, C<false>, or
+C<0> all work as if you passed C<true>. For those values, false means not
 including the parameter at all.
 
 So, this trait attempts to normalize booleans by transforming any perl truthy
-value to the Twitter API's preference, C<true>. It transform falsey values to
+value to the Twitter API's preference, C<true>. It transforms falsey values to
 C<false>. And then it removes false parameters that the API always treats as
 true.
 

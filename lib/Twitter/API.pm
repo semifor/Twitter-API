@@ -18,7 +18,7 @@ use URL::Encode ();
 use WWW::OAuth;
 use namespace::clean;
 
-with qw/MooX::Traits Twitter::API::Migration/;
+with qw/MooX::Traits/;
 sub _trait_namespace { 'Twitter::API::Trait' }
 
 has [ qw/consumer_key consumer_secret/ ] => (
@@ -103,6 +103,15 @@ has json_parser => (
         to_json   => 'encode',
     },
 );
+
+around BUILDARGS => sub {
+    my ( $next, $class ) = splice @_, 0, 2;
+
+    my $args = $class->$next(@_);
+    croak 'use new_with_traits' if exists $args->{traits};
+
+    return $args;
+};
 
 sub get  { shift->request( get => @_ ) }
 sub post { shift->request( post => @_ ) }
@@ -500,11 +509,16 @@ Features:
 Additionl features are availble via optional traits:
 
 =for :list
-* convenient methods for API endpoints with simplified argument handling via L<ApiMethods|Twitter::API::Trait::ApiMethods>
-* normalized booleans (Twitter likes 'true' and 'false', except when it doesn't) via L<NormalizeBooleans|Twitter::API::Trait::NormalizeBooleans>
-* automatic decoding of HTML entities via L<DecodeHtmlEntities|Twitter::API::Trait::DecodeHtmlEntities>
-* automatic retry on transient errors via L<RetryOnError|Twitter::API::Trait::RetryOnError>
-* "the whole enchilada" combines all the above traits via L<Enchilada|Twitter::API::Trait::Enchilada>
+* convenient methods for API endpoints with simplified argument handling via
+  L<ApiMethods|Twitter::API::Trait::ApiMethods>
+* normalized booleans (Twitter likes 'true' and 'false', except when it
+  doesn't) via L<NormalizeBooleans|Twitter::API::Trait::NormalizeBooleans>
+* automatic decoding of HTML entities via
+  L<DecodeHtmlEntities|Twitter::API::Trait::DecodeHtmlEntities>
+* automatic retry on transient errors via
+  L<RetryOnError|Twitter::API::Trait::RetryOnError>
+* "the whole enchilada" combines all the above traits via
+  L<Enchilada|Twitter::API::Trait::Enchilada>
 * app-only (OAuth2) support via L<AppAuth|Twitter::API::Trait::AppAuth>
 
 Some featuers are provided by separate distributions to avoid additional
@@ -519,9 +533,9 @@ dependencies most users won't want or need:
 =head2 Migration from Net::Twitter and Net::Twitter::Lite
 
 Migration support is included to assist users migrating from L<Net::Twitter>
-and L<Net::Twitter::Lite>. It will be removed from a future release (or at
-least not included by default). See L<Twitter::API::Migration> for details
-about migrating your existing Net::Twitter/::Lite applications.
+and L<Net::Twitter::Lite>. It will be removed from a future release. See
+L<Migration|Twitter::API::Trait::Migration> for details about migrating your
+existing Net::Twitter/::Lite applications.
 
 =head2 Normal usage
 

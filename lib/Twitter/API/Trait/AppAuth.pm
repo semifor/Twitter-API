@@ -8,7 +8,7 @@ use namespace::clean;
 
 requires qw/
     _url_for access_token add_authorization api_url consumer_key
-    consumer_secret request request_access_token
+    consumer_secret request
 /;
 
 # private methods

@@ -1,6 +1,7 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - make Migration trait optional
 
 0.0107  2016-12-11 06:37:10 PST
   - moved and renamed API endpoint helper methods into

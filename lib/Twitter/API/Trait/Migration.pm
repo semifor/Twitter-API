@@ -1,4 +1,4 @@
-package Twitter::API::Migration;
+package Twitter::API::Trait::Migration;
 # ABSTRACT: Migration support Net::Twitter/::Lite users
 
 use 5.14.1;
@@ -17,15 +17,6 @@ has wrap_result => (
     default => sub { 0 },
 );
 
-around BUILDARGS => sub {
-    my ( $next, $class ) = splice @_, 0, 2;
-
-    my $args = $class->$next(@_);
-    croak 'use new_with_traits' if exists $args->{traits};
-
-    return $args;
-};
-
 around request => sub {
     my ( $next, $self ) = splice @_, 0, 2;
 
@@ -38,25 +29,12 @@ around request => sub {
     if ( $self->wrap_result ) {
         unless ( $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} ) {
             carp 'wrap_result is enabled. It will be removed in a future '
-                .'version. See Twitter::API::Migration';
+                .'version. See Twitter::API::Trait::Migration';
         }
         return $c;
     }
 
     return wantarray ? ( $c->result, $c ) : $c->result;
-};
-
-# Net::Twitter migration support; sets access_token attribute
-around request_access_token => sub {
-    my ( $next, $self ) = @_;
-
-    # request_access_token is defined in both Net::Twitter's OAuth and AppAuth
-    # traits. We need to know which one to call, here.
-    if ( $self->does('Twitter::API::Trait::AppAuth') ) {
-        return $self->access_token($self->oauth2_token(@_));
-    }
-
-    $self->$next(@_);
 };
 
 sub ua { shift->user_agent(@_) }
@@ -82,6 +60,12 @@ sub get_authorization_url  { shift->_get_auth_url(authorize    => @_) }
 
 sub request_access_token {
     my ( $self, %params ) = @_;
+
+    # request_access_token is defined in both Net::Twitter's OAuth and AppAuth
+    # traits. We need to know which one to call, here.
+    if ( $self->does('Twitter::API::Trait::AppAuth') ) {
+        return $self->access_token($self->oauth2_token(@_));
+    }
 
     my ( $r, $c ) = $self->oauth_access_token({
         token        => $self->request_token,
@@ -112,7 +96,7 @@ for my $method ( qw/
 
         unless ( $ENV{TWITTER_API_NO_MIGRATION_WARNINGS} ) {
             carp $method.' will be removed in a future release. '
-                .'Please see Twitter::API::Migration';
+                .'Please see Twitter::API::Trait::Migration';
         }
         $self->$next(@_);
     };
@@ -126,13 +110,17 @@ __END__
 
 =head1 DESCRIPTION
 
-Twitter::API is a rewrite of L<Net::Twitter>. It's leaner, lighter, faster—fewer dependencies, less baggage.
+Twitter::API is a rewrite of L<Net::Twitter>. It's leaner, lighter, and
+faster—fewer dependencies, less baggage. This trait helps Net::Twitter and
+Net::Twitter::Lite users migrate to Twitter::API by providing Net::Twitter
+compatible behavior where possible and warning politely where code should be
+changed.
 
 =head1 Migrating from Net::Twitter
 
 Twitter::API requires a minimum perl version of 5.14.1. Make sure you have that.
 
-If you're using Net::Twitter in a very standard way, the switch is easy.
+Just change your constructor call:
 
 	my $client = Net::Twitter->new(
 		traits => [ qw/API::RESTv1_1 OAuth RetryOnError/ ],
@@ -145,7 +133,7 @@ If you're using Net::Twitter in a very standard way, the switch is easy.
 Becomes:
 
 	my $client = Twitter::API->new_with_traits(
-		traits => [ qw/ApiMethods RetryOnError/ ],
+		traits => [ qw/Migration ApiMethods RetryOnError/ ],
 		consumer_key        => $key,
 		consumer_secret     => $secret,
 		access_token        => $token,
@@ -153,14 +141,18 @@ Becomes:
 	);
 
 Differences:
+
 =for :list
 * replace C<new> with C<new_with_traits>
 * replace trait C<API::RESTv1_1> with C<ApiMethods>
-* drop trait C<OAuth>, Twitter::API's core includeds it
+* drop trait C<OAuth>, Twitter::API's core includes it
+* add the Migration trait so Twitter::API will handle oauth key management in a
+  Net::Twitter compatible way and warn
 
 =head2 Traits
 
 Twitter::API supports the following traits:
+
 =for :list
 * L<ApiMethods|Twitter::API::Trait::ApiMethods>
 * L<AppAuth|Twitter::API::Trait::AppAuth>
@@ -224,8 +216,8 @@ DecodeHtmlEntities.
 
 =head2 Other constructor options
 
-=for :list
-* B<ssl> - Drop it; it is no longer necessary. By default, all connections use SSL.
+Drop option C<<ssl => 1>>. It is no longer necessary. By default, all
+connections use SSL.
 
 If you are setting B<useragent_lass> and/or B<useragent_args> to customize the
 user agent, just construct your own pass it to new with C<<user_agent =>
@@ -259,17 +251,17 @@ The following methods exist only for migration from Net::Twitter and will be
 removed in a future release. A warning is issued on each call to these methods.
 To disable the warnings, set C<$ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1>.
 
-=for list:
-* B<get_authentication_url> - replace with B<oauth_authentication_url> or B<oauth_request_token> and B<oauth_authentication_url>
-* B<get_autorization_url> - replace with B<oauth_authorization_url> or B<oauth_request_token> and B<oauth_authorization_url>
-* B<get_access_token> - replace with B<oauth_access_token>
-
-Documentation for those methods:
-=for list:
-* L<Twitter::API/oauth_request_token>
-* L<Twitter::API/oauth_authentication_url>
-* L<Twitter::API/oauth_authorization_url>
-* L<Twitter::API/oath_access_token>
+=for :list
+* B<get_authentication_url>
+replace with L<oauth_authentication_url|Twitter::API/oauth_athentication_url>
+  or L<oauth_request_token|Twitter::API/oauth_request_token> and
+  L<oauth_authentication_url|Twitter::API/oauth_athentication_url>
+* B<get_autorization_url>
+replace with L<oauth_authorization_url|Twitter::API/oauth_authorization_url> or
+  L<oauth_request_token|Twitter::API/oauth_request_token> and
+  L<oauth_authorization_url|Twitter::API/oauth_authorization_url>
+* B<get_access_token>
+replace with L<oauth_access_token|Twitter::API/oauth_access_token>
 
 If you are using the B<AppAuth> trait, replace B<request_access_token> calls
 with B<oauth2_token> calls. Method B<oauth2_token> does not set the
@@ -289,7 +281,7 @@ Net::Twitter::Lite does not use traits. Change your contructor call from:
 To:
 
     my $client = Twitter::API->new_with_traits(
-        traits => [ qw/ApiMethods/ ],
+        traits => [ qw/Migration ApiMethods/ ],
         %args,
     );
 
