@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0108  2016-12-12 10:53:34 PST
   - make Migration trait optional
   - use WWW::Form::UrlEncoded::PP in tests to avoid a fall back warning
 
