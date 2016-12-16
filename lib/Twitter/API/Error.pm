@@ -3,12 +3,11 @@ package Twitter::API::Error;
 
 use Moo;
 use Try::Tiny;
-use Devel::StackTrace;
 use namespace::clean;
 
 use overload '""' => sub { shift->error };
 
-with 'Throwable';
+with qw/Throwable StackTrace::Auto/;
 
 =method http_request
 
@@ -48,26 +47,12 @@ Delegates to C<<stack_trace->next_frame>>. See L<Devel::StackTrace> for details.
 
 =cut
 
-has stack_trace => (
-    is       => 'ro',
-    init_arg => undef,
-    builder  => '_build_stack_trace',
+has '+stack_trace' => (
     handles => {
         stack_frame      => 'frame',
         next_stack_frame => 'next_frame',
     },
 );
-
-sub _build_stack_trace {
-    my $seen;
-    my $this_sub = (caller 0)[3];
-    Devel::StackTrace->new(frame_filter => sub {
-        my $caller = shift->{caller};
-        my $skip = $caller->[0] =~ /^(?:Twitter::API|Throwable|Role::Tiny)\b/
-            || $caller->[3] eq $this_sub;
-        ($seen ||= $skip) && !$skip || 0;
-    });
-}
 
 =method error
 
@@ -226,7 +211,7 @@ __END__
         my $r = $client->get('account/verify_credentials');
     }
     catch {
-        die $_ unless _is_twitter_api_error;
+        die $_ unless is_twitter_api_error;
 
         warn "Twitter says: ", $_->twitter_error_text;
     };
