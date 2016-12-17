@@ -191,7 +191,7 @@ Or for the smallest change to your code:
     $r->rate_limit_remaning; # same as before
 
 However, there is migration support for B<WrapResult>. Call the constructor
-with option C<<wrap_result => 1>> and Twitter::API will return the context
+with option C<< wrap_result => 1 >> and Twitter::API will return the context
 object, only, for API calls. This should give you the same behavior you had
 with B<WrapResult> while you modify your code. Twitter::API will warn when this
 option is used. You may disale warnings with
@@ -201,7 +201,7 @@ If you are using any other Net::Twitter traits, please contact the author of
 Twitter::API.  Additional traits may be added to Twitter::API or released as
 separate distributions.
 
-If you are using C<<decode_html_entities => 1>> in Net::Twitter, drop that
+If you are using C<< decode_html_entities => 1 >> in Net::Twitter, drop that
 option and add trait B<DecodeHtmlEntities>. Traits B<AppAuth> and
 B<RetryOnError> provide the same functionality in Twitter::API as their
 Net::Twitter counterparts. So, no changes required, there, if you're using
@@ -216,16 +216,16 @@ DecodeHtmlEntities.
 
 =head2 Other constructor options
 
-Drop option C<<ssl => 1>>. It is no longer necessary. By default, all
+Drop option C<< ssl => 1 >>. It is no longer necessary. By default, all
 connections use SSL.
 
 If you are setting B<useragent_lass> and/or B<useragent_args> to customize the
-user agent, just construct your own pass it to new with C<<user_agent =>
-$custom_user_agent>>.
+user agent, just construct your own pass it to new with C<< user_agent =>
+$custom_user_agent >>.
 
 If you are using B<ua> to set a custom user agent, the attribute name has
-changed to B<usre_agent>. So, pass it to new with C<<user_agent =>
-$custom_user_agent>>.
+changed to B<usre_agent>. So, pass it to new with C<< user_agent =>
+$custom_user_agent >>.
 
 By default, Twitter::API uses L<HTTP::Thin> as its user agent. You should be
 able to you any user agent you like, as long as it has a B<request> method that
@@ -233,10 +233,10 @@ takes an L<HTTP::Request> and returns an L<HTTP::Response>.
 
 If you used B<clientname>, B<clientver>, B<clienturl>, or B<useragent>, see
 L<Twitter::API/agent> and L<Twitter::API/default_headers>. If all you're after
-is a custome User-Agent header, just pass C<<agent => $user_agent_string>>. It
-will be used for both User-Agent header and the X-Twitter-Client header on
+is a custome User-Agent header, just pass C<< agent => $user_agent_string >>.
+It will be used for both User-Agent header and the X-Twitter-Client header on
 requests. If you want to include your own application version and url, pass
-C<<default_headers => \%my_request_headers>>.
+C<< default_headers => \%my_request_headers >>.
 
 =head2 OAuth changes
 

@@ -40,11 +40,11 @@ Returns a L<Devel::StackTrace> object encapsulating the call stack so you can di
 
 =method stack_frame
 
-Delegates to C<<stack_trace->frame>>. See L<Devel::StackTrace> for details.
+Delegates to C<< stack_trace->frame >>. See L<Devel::StackTrace> for details.
 
 =method next_stack_fram
 
-Delegates to C<<stack_trace->next_frame>>. See L<Devel::StackTrace> for details.
+Delegates to C<< stack_trace->next_frame >>. See L<Devel::StackTrace> for details.
 
 =cut
 
@@ -179,7 +179,7 @@ sub is_token_error {
 
 =method http_response_code
 
-Delegates to C<<http_response->code>>. Returns the HTTP status code of the
+Delegates to C<< http_response->code >>. Returns the HTTP status code of the
 response.
 
 =cut
