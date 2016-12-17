@@ -28,9 +28,17 @@ describe 'Twitter::API::Error' => sub {
     };
 
     describe is_token_error => sub {
-        for my $code ( 32, 64, 88, 89, 215, 226, 326 ) {
+        for my $code ( 32, 64, 88, 89, 99, 135, 136, 215, 226, 326 ) {
             it "recognizes $code as a token error" => sub {
                 ok construct_error(400, $code)->is_token_error;
+            };
+        }
+    };
+
+    describe is_token_error => sub {
+        for my $code ( 34, 50, 63, 144 ) {
+            it "does not recognize $code as a token error" => sub {
+                ok !construct_error(400, $code)->is_token_error;
             };
         }
     };

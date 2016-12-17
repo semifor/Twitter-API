@@ -2,7 +2,6 @@ package Twitter::API::Error;
 # ABSTRACT: Twitter API exception
 
 use Moo;
-use List::Util qw/any/;
 use Try::Tiny;
 use namespace::clean;
 
@@ -145,10 +144,13 @@ no longer exists.
 is_token_error returns true for the following Twitter API errors:
 
 =for :list
-* 32:  could not authenticate you
-* 64:  this account is suspended
-* 88:  rate limit exceeded for this token
-* 89:  invalid or expired tokens
+* 32: Could not authenticate you
+* 64: Your account is suspended and is not permitted to access this feature
+* 88: Rate limit exceeded
+* 89: Invalid or expired token
+* 99: Unable to verify your credentials.
+* 135: Could not authenticate you
+* 136: You have been blocked from viewing this user's profile.
 * 215: Bad authentication data
 * 226: This request looks like it might be automated. To protect our users from
   spam and other malicious activity, we can’t complete this action right now.
@@ -170,11 +172,11 @@ for more information.
 
 =cut
 
-use constant TOKEN_ERRORS => ( 32, 64, 88, 89, 215, 226, 326 );
+use constant TOKEN_ERRORS => (32, 64, 88, 89, 99, 135, 136, 215, 226, 326);
+my %token_errors = map +($_ => undef), TOKEN_ERRORS;
 
 sub is_token_error {
-    my $code = shift->twitter_error_code;
-    return any { $code == $_ } TOKEN_ERRORS;
+    exists $token_errors{shift->twitter_error_code};
 }
 
 =method http_response_code
