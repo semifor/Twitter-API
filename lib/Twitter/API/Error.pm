@@ -2,6 +2,7 @@ package Twitter::API::Error;
 # ABSTRACT: Twitter API exception
 
 use Moo;
+use List::Util qw/any/;
 use Try::Tiny;
 use namespace::clean;
 
@@ -120,12 +121,14 @@ L<https://dev.twitter.com/overview/api/response-codes> for details.
 sub twitter_error_code {
     my $self = shift;
 
-    return $self->twitter_error
-        && exists $self->twitter_error->{errors}
-        && exists $self->twitter_error->{errors}[0]
-        && exists $self->twitter_error->{errors}[0]{code}
-        && $self->twitter_error->{errors}[0]{code}
-        || 0;
+    for ( $self->twitter_error ) {
+        return ref $_ eq 'HASH'
+            && exists $_->{errors}
+            && exists $_->{errors}[0]
+            && exists $_->{errors}[0]{code}
+            && $_->{errors}[0]{code}
+            || 0;
+    }
 }
 
 =method is_token_error
@@ -139,28 +142,39 @@ suspended or access to the application revoked by the user. Other error codes
 indicate a problem with the resource requested. For example, the target account
 no longer exists.
 
+is_token_error returns true for the following Twitter API errors:
+
+=for :list
+* 32:  could not authenticate you
+* 64:  this account is suspended
+* 88:  rate limit exceeded for this token
+* 89:  invalid or expired tokens
+* 215: Bad authentication data
+* 226: This request looks like it might be automated. To protect our users from
+  spam and other malicious activity, we can’t complete this action right now.
+* 326: To protect our users from spam…
+
+For error 215, Twitter's API documentation says, "Typically sent with 1.1
+responses with HTTP code 400. The method requires authentication but it was not
+presented or was wholly invalid." In practice, though, this error seems to be
+spurious, and often succeeds if retried, even with the same tokens.
+
+The Twitter API documentation describes error code 226, but in practice, they
+use code 326 instead, so we check for both. This error code means the account
+the tokens belong to has been locked for spam like activity and can't be used
+by the API until the user takes action to unlock their account.
+
+See Twitter's L<Error Codes &
+Responses|https://dev.twitter.com/overview/api/response-codes> documentation
+for more information.
+
 =cut
 
-# Some twitter errors result from issues with the target of a call. Others,
-# from an issue with the tokens used to make the call. In the latter case, we
-# should just retry with fresh tokens. Return true for the latter type.
-sub is_token_error {
-    my $self = shift;
+use constant TOKEN_ERRORS => ( 32, 64, 88, 89, 215, 226, 326 );
 
-    # 32:  could not authenticate you
-    # 64:  this account is suspended
-    # 88:  rate limit exceeded for this token
-    # 89:  invalid or expired tokens
-    #
-    # Twitter documents error 226 as spam/bot-like behavior,
-    # but they actually send 326! So, we'll look for both.
-    # 226: this account locked for bot-like behavior
-    # 326: To protect our users from spam...
-    my $code = $self->twitter_error_code;
-    for ( 32, 64, 88, 89, 226, 326 ) {
-        return 1 if $_ == $code;
-    }
-    return 0;
+sub is_token_error {
+    my $code = shift->twitter_error_code;
+    return any { $code == $_ } TOKEN_ERRORS;
 }
 
 =method http_response_code
