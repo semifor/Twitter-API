@@ -39,7 +39,6 @@
             "Carp" : "0",
             "Class::Load" : "0",
             "Data::Visitor::Lite" : "0",
-            "Devel::StackTrace" : "0",
             "Digest::SHA" : "0",
             "Encode" : "0",
             "HTML::Entities" : "0",
@@ -52,6 +51,7 @@
             "MooX::Aliases" : "0",
             "MooX::Traits" : "0",
             "Scalar::Util" : "0",
+            "StackTrace::Auto" : "0",
             "Sub::Exporter::Progressive" : "0",
             "Throwable" : "0",
             "Time::HiRes" : "0",
@@ -86,7 +86,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "0.0108",
+   "version" : "0.0109",
    "x_contributors" : [
       "Marc Mims <marc@moz.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

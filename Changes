@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0109  2016-12-17 07:29:53 PST
   - Added Twitter API error code 215 to is_token_error
 
 0.0108  2016-12-12 10:53:34 PST
