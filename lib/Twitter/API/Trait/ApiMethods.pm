@@ -805,15 +805,18 @@ sub create_media_metadata {
     });
 }
 
-=method create_mute([ $id, ][ \%args ])
+=method create_mute([ $screen_name | $user_id, ][ \%args ])
 
 L<https://dev.twitter.com/rest/reference/post/mutes/users/create>
+
+Alias: mute
 
 =cut
 
 sub create_mute {
-    shift->request_with_pos_args(id => post => 'mutes/users/create', @_);
+    shift->request_with_pos_args(':ID' => post => 'mutes/users/create', @_);
 }
+alias mute => 'create_mute';
 
 =method create_saved_search([ $query, ][ \%args ])
 
@@ -914,15 +917,18 @@ sub destroy_friend {
 }
 alias $_ => 'destroy_friend' for qw/unfollow destroy_friendship/;
 
-=method destroy_mute([ $id, ][ \%args ])
+=method destroy_mute([ $screen_name | $user_id, ][ \%args ])
 
 L<https://dev.twitter.com/rest/reference/post/mutes/users/destroy>
+
+Alias: unmute
 
 =cut
 
 sub destroy_mute {
-    shift->request_with_pos_args(id => post => 'mutes/users/destroy', @_);
+    shift->request_with_pos_args(':ID' => post => 'mutes/users/destroy', @_);
 }
+alias unmute => 'destroy_mute';
 
 =method destroy_saved_search([ $id, ][ \%args ])
 

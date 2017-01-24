@@ -37,6 +37,8 @@ my %override_required = (
     report_spam        => [ ':ID' ],
     update_friendship  => [ ':ID' ],
     new_direct_message => [ qw/text :ID/ ],
+    create_mute        => [ ':ID' ],
+    destroy_mute       => [ ':ID' ],
 );
 # aliases
 for ( \%override_required ) { # damned name is too long!
