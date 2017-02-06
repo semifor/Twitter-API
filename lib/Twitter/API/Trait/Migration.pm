@@ -111,7 +111,7 @@ __END__
 =head1 DESCRIPTION
 
 Twitter::API is a rewrite of L<Net::Twitter>. It's leaner, lighter, and
-faster—fewer dependencies, less baggage. This trait helps Net::Twitter and
+has faster—fewer dependencies, and less baggage. This trait helps Net::Twitter and
 Net::Twitter::Lite users migrate to Twitter::API by providing Net::Twitter
 compatible behavior where possible and warning politely where code should be
 changed.
@@ -228,12 +228,12 @@ changed to B<usre_agent>. So, pass it to new with C<< user_agent =>
 $custom_user_agent >>.
 
 By default, Twitter::API uses L<HTTP::Thin> as its user agent. You should be
-able to you any user agent you like, as long as it has a B<request> method that
+able to use any user agent you like, as long as it has a B<request> method that
 takes an L<HTTP::Request> and returns an L<HTTP::Response>.
 
 If you used B<clientname>, B<clientver>, B<clienturl>, or B<useragent>, see
 L<Twitter::API/agent> and L<Twitter::API/default_headers>. If all you're after
-is a custome User-Agent header, just pass C<< agent => $user_agent_string >>.
+is a custom User-Agent header, just pass C<< agent => $user_agent_string >>.
 It will be used for both User-Agent header and the X-Twitter-Client header on
 requests. If you want to include your own application version and url, pass
 C<< default_headers => \%my_request_headers >>.
@@ -243,8 +243,8 @@ C<< default_headers => \%my_request_headers >>.
 Net::Twitter saved request and access tokens in the client instance as part of
 the 3-legged OAuth handshake. That was a poor design decision. Twitter::API
 returns request and access tokens to the caller. It is the caller's
-responsibility to store are cache them appropriately. Hovever, tansitional
-support is provided, with client instance storage, so your code can run,
+responsibility to store and cache them appropriately. Hovever, transitional
+support is provided, with client instance storage, so your code can run
 unmodified while you make the transition.
 
 The following methods exist only for migration from Net::Twitter and will be
@@ -266,7 +266,7 @@ replace with L<oauth_access_token|Twitter::API/oauth_access_token>
 If you are using the B<AppAuth> trait, replace B<request_access_token> calls
 with B<oauth2_token> calls. Method B<oauth2_token> does not set the
 C<access_token> attribute. Method C<request_access_token> is provided for
-tranitional support, only. It warns like the OAuth mehods discussed above, and
+transitional support, only. It warns like the OAuth methods discussed above, and
 it sets the C<access_token> attribute so existing code should work as expected
 during migration. It will be removed in a future release.
 
