@@ -10,6 +10,7 @@ use Digest::SHA;
 use Encode qw/encode_utf8/;
 use HTTP::Request::Common qw/GET POST/;
 use JSON::MaybeXS ();
+use Ref::Util qw/is_arrayref is_ref/;
 use Try::Tiny;
 use Twitter::API::Context;
 use Twitter::API::Error;
@@ -163,7 +164,7 @@ sub preprocess_args {
 
     # If any of the args are arrayrefs, we'll infer it's multipart/form-data
     $c->set_option(multipart_form_data => 1) if
-        $c->http_method eq 'POST' && !!grep ref, values %{ $c->args };
+        $c->http_method eq 'POST' && !!grep is_ref($_), values %{ $c->args };
 }
 
 sub preprocess_url {
@@ -201,7 +202,7 @@ sub prepare_multipart_post {
     POST $c->url,
         %{ $c->headers },
         Content => [
-            map { ref $_ ? $_ : encode_utf8 $_ } %{ $c->args },
+            map { is_ref($_) ? $_ : encode_utf8 $_ } %{ $c->args },
         ];
 }
 
@@ -316,7 +317,7 @@ sub flatten_array_args {
     # transform arrays to comma delimited strings
     for my $k ( keys %$args ) {
         my $v = $$args{$k};
-        $$args{$k} = join ',' => @$v if ref $v eq 'ARRAY';
+        $$args{$k} = join ',' => @$v if is_arrayref($v);
     }
 }
 
@@ -368,7 +369,7 @@ sub _url_for {
 
 sub oauth_request_token {
     my $self = shift;
-    my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
+    my %args = @_ == 1 && is_ref($_[0]) ? %{ $_[0] } : @_;
 
     my %oauth_args;
     $oauth_args{oauth_callback} = delete $args{callback} // 'oob';
@@ -381,7 +382,7 @@ sub oauth_request_token {
 
 sub _auth_url {
     my ( $self, $endpoint ) = splice @_, 0, 2;
-    my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
+    my %args = @_ == 1 && is_ref($_[0]) ? %{ $_[0] } : @_;
 
     my $uri = URI->new($self->oauth_url_for($endpoint));
     $uri->query_form(%args);
@@ -393,7 +394,7 @@ sub oauth_authorization_url  { shift->_auth_url(authorize    => @_) }
 
 sub oauth_access_token {
     my $self = shift;
-    my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
+    my %args = @_ == 1 && is_ref($_[0]) ? %{ $_[0] } : @_;
 
     # We'll take 'em with or without the oauth_ prefix :)
     my %oauth_args;
@@ -407,7 +408,7 @@ sub oauth_access_token {
 
 sub xauth {
     my ( $self, $username, $password ) = splice @_, 0, 3;
-    my %extra_args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
+    my %extra_args = @_ == 1 && is_ref($_[0]) ? %{ $_[0] } : @_;
 
     $self->request(post => $self->oauth_url_for('access_token'), {
         -accept     => 'application/x-www-form-urlencoded',

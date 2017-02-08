@@ -2,6 +2,7 @@
 use 5.14.1;
 use warnings;
 use HTTP::Response;
+use Ref::Util qw/is_ref/;
 use Test::Fatal;
 use Test::Spec;
 
@@ -12,7 +13,7 @@ sub new_client {
 
     my $user_agent = mock();
     $user_agent->stubs(request => sub {
-        my ( $code, $reason ) = ref $$response[0]
+        my ( $code, $reason ) = is_ref($$response[0])
             ? @{ shift @$response // [ 999 => 'off the end' ] }
             : @{ $response };
         HTTP::Response->new($code, $reason);

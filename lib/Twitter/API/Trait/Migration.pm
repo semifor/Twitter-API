@@ -4,6 +4,7 @@ package Twitter::API::Trait::Migration;
 use 5.14.1;
 use Carp;
 use Moo::Role;
+use Ref::Util qw/is_ref/;
 use namespace::clean;
 
 has [ qw/request_token request_token_secret/ ] => (
@@ -41,7 +42,7 @@ sub ua { shift->user_agent(@_) }
 
 sub _get_auth_url {
     my ( $self, $endpoint ) = splice @_, 0, 2;
-    my %args = @_ == 1 && ref $_[0] ? %{ $_[0] } : @_;
+    my %args = @_ == 1 && is_ref($_[0]) ? %{ $_[0] } : @_;
 
     my $callback = delete $args{callback} // 'oob';
     my ( $r, $c ) = $self->oauth_request_token(callback => $callback);

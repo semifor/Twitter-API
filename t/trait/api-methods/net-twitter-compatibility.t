@@ -1,6 +1,7 @@
 #!perl
 use 5.14.1;
 use warnings;
+use Ref::Util qw/is_hashref/;
 use Test::Spec;
 use HTTP::Response;
 use Test::Fatal;
@@ -58,7 +59,7 @@ sub new_client {
         my ( $self, $method, $path, $args ) = @_;
         die 'too many args' if @_ > 4;
         die 'too few args'  if @_ < 3;
-        die 'final arg must be HASH' if @_ > 3 && ref $args ne 'HASH';
+        die 'final arg must be HASH' if @_ > 3 && !is_hashref($args);
 
         return ( uc $method, $args );
     });

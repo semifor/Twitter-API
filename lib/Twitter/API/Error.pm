@@ -2,6 +2,7 @@ package Twitter::API::Error;
 # ABSTRACT: Twitter API exception
 
 use Moo;
+use Ref::Util qw/is_arrayref is_hashref/;
 use Try::Tiny;
 use namespace::clean;
 
@@ -86,18 +87,18 @@ sub twitter_error_text {
     return '' unless $self->twitter_error;
     my $e = $self->twitter_error;
 
-    return ref $e eq 'HASH' && (
+    return is_hash($e) && (
         # the newest variant: array of errors
         exists $e->{errors}
-            && ref $e->{errors} eq 'ARRAY'
+            && is_arrayref($e->{errors})
             && exists $e->{errors}[0]
-            && ref $e->{errors}[0] eq 'HASH'
+            && is_hashref($e->{errors}[0])
             && exists $e->{errors}[0]{message}
             && $e->{errors}[0]{message}
 
         # it's single error variant
         || exists $e->{error}
-            && ref $e->{error} eq 'HASH'
+            && is_hashref($e->{error})
             && exists $e->{error}{message}
             && $e->{error}{message}
 
@@ -121,7 +122,7 @@ sub twitter_error_code {
     my $self = shift;
 
     for ( $self->twitter_error ) {
-        return ref $_ eq 'HASH'
+        return is_hashref($_)
             && exists $_->{errors}
             && exists $_->{errors}[0]
             && exists $_->{errors}[0]{code}

@@ -7,13 +7,14 @@ use Test::Spec;
 package Foo {
     use Moo;
     use Carp;
+    use Ref::Util qw/is_hashref/;
     with 'Twitter::API::Role::RequestArgs';
 
     sub request {
         my ( $self, $http_method, $url, $args ) = @_;
         croak 'too many args' if @_ > 4;
         croak 'too few args'  if @_ < 4;
-        croak 'final arg must be HASH' unless ref $args eq 'HASH';
+        croak 'final arg must be HASH' unless is_hashref($args);
 
         return $args;
     }

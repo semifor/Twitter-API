@@ -5,6 +5,7 @@ use 5.14.1;
 use Carp;
 use Moo::Role;
 use MooX::Aliases;
+use Ref::Util qw/is_hashref is_ref/;
 use namespace::clean;
 
 requires 'request';
@@ -644,7 +645,7 @@ L<https://dev.twitter.com/rest/reference/get/users/suggestions/:slug/members>
 my $rename_category = sub {
     my $self = shift;
 
-    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+    my $args = is_hashref($_[-1]) ? pop : {};
     $args->{slug} = delete $args->{category} if exists $args->{category};
     return ( @_, $args );
 };
@@ -798,7 +799,7 @@ sub create_media_metadata {
     my ( $self, $to_json ) = @_;
 
     croak 'expected a single hashref argument'
-        unless @_ == 2 && ref $_[1] eq 'HASH';
+        unless @_ == 2 && is_hashref($_[1]);
 
     $self->request(post => 'media/metadata/create', {
         -to_json => $to_json,
@@ -1175,10 +1176,10 @@ sub upload_media {
     # Used to require media. Now requires media *or* media_data.
     # Handle either as a positional parameter, like we do with
     # screen_name or user_id on other methods.
-    if ( @_ && ref $_[0] ne 'HASH' ) {
+    if ( @_ && !is_hashref($_[0]) ) {
         my $media = shift;
-        my $key = ref $media ? 'media' : 'media_data';
-        my $args = @_ && ref $_[0] eq 'HASH' ? pop : {};
+        my $key = is_ref($media) ? 'media' : 'media_data';
+        my $args = @_ && is_hashref($_[0]) ? pop : {};
         $args->{$key} = $media;
         unshift @_, $args;
     }

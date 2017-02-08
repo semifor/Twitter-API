@@ -5,6 +5,7 @@ use 5.14.1;
 use warnings;
 use Carp;
 use Moo::Role;
+use Ref::Util qw/is_arrayref is_hashref/;
 use namespace::clean;
 
 requires 'request';
@@ -46,7 +47,7 @@ Examples:
 # if there is a positional arg, it's an :ID (screen_name or user_id)
 sub request_with_id {
     splice @_, 1, 0, [];
-    push @{$_[1]}, ':ID' if @_ > 4 && ref $_[4] ne 'HASH';
+    push @{$_[1]}, ':ID' if @_ > 4 && !is_hashref($_[4]);
     goto $_[0]->can('request_with_pos_args');
 }
 
@@ -108,16 +109,16 @@ sub request_with_pos_args {
     my %args;
 
     # names can be a single value or an arrayref
-    @pos_names = @{ $pos_names[0] } if ref $pos_names[0] eq 'ARRAY';
+    @pos_names = @{ $pos_names[0] } if is_arrayref($pos_names[0]);
 
     # gather positional arguments and name them
     while ( @pos_names ) {
-        last if @_ == 0 || ref $_[0] eq 'HASH';
+        last if @_ == 0 || is_hashref($_[0]);
         $args{shift @pos_names} = shift;
     }
 
     # get the optional, following args hashref and expand it
-    my %args_hash; %args_hash = %{ shift() } if ref $_[0] eq 'HASH';
+    my %args_hash; %args_hash = %{ shift() } if is_hashref($_[0]);
 
     # extract any required args if we still have names
     while ( my $name = shift @pos_names ) {
