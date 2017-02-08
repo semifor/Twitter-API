@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '0.0109';
+our $VERSION = '0.0110';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -429,7 +429,6 @@ __END__
 =begin :buttons
 
 =for html
-<img src="https://img.shields.io/badge/stability-experimental-orange.svg" alt="experimental" />
 <a href="https://travis-ci.org/semifor/Twitter-API"><img src="https://travis-ci.org/semifor/Twitter-API.svg?branch=master" alt="Build Status" /></a>
 
 =end :buttons

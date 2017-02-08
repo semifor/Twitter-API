@@ -37,8 +37,6 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Class::Load" : "0",
-            "Data::Visitor::Lite" : "0",
             "Digest::SHA" : "0",
             "Encode" : "0",
             "HTML::Entities" : "0",
@@ -46,10 +44,12 @@
             "HTTP::Thin" : "0",
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
+            "Module::Runtime" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
             "MooX::Aliases" : "0",
             "MooX::Traits" : "0",
+            "Ref::Util" : "0",
             "Scalar::Util" : "0",
             "StackTrace::Auto" : "0",
             "Sub::Exporter::Progressive" : "0",
@@ -86,11 +86,12 @@
       },
       "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "0.0109",
+   "version" : "0.0110",
    "x_contributors" : [
+      "Karen Etheridge <ether@cpan.org>",
       "Marc Mims <marc@moz.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

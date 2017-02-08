@@ -1,6 +1,5 @@
 Twitter-API
 ===========
-![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)
 [![Build Status](https://travis-ci.org/semifor/Twitter-API.svg?branch=master)](https://travis-ci.org/semifor/Twitter-API)
 [![CPAN](https://img.shields.io/cpan/v/Twitter-API.svg)](https://metacpan.org/pod/Twitter::API)
 

@@ -1,6 +1,10 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - remove experimental status; ready for production
+  - drop dependency on Data::Visitor::Lite and Class::Load
+  - Fix create_mute and destroy_mute required parameters
+  - Add Twitter error codes 99, 135, and 136 for is_token_error
 
 0.0109  2016-12-17 07:29:53 PST
   - Added Twitter API error code 215 to is_token_error
