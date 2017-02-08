@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0110  2017-02-08 15:59:31 PST
   - remove experimental status; ready for production
   - drop dependency on Data::Visitor::Lite and Class::Load
   - Fix create_mute and destroy_mute required parameters
