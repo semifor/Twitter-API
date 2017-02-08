@@ -1,7 +1,6 @@
 requires perl => '5.14.1';
 
 requires 'Carp';
-requires 'Class::Load';
 requires 'Digest::SHA';
 requires 'Encode';
 requires 'HTML::Entities';
@@ -9,6 +8,7 @@ requires 'HTTP::Request::Common';
 requires 'HTTP::Thin';
 requires 'IO::Socket::SSL';
 requires 'JSON::MaybeXS';
+requires 'Module::Runtime';
 requires 'Moo';
 requires 'Moo::Role';
 requires 'MooX::Aliases';

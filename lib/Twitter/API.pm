@@ -5,11 +5,11 @@ our $VERSION = '0.0109';
 use 5.14.1;
 use Moo;
 use Carp;
-use Class::Load qw/load_class/;
 use Digest::SHA;
 use Encode qw/encode_utf8/;
 use HTTP::Request::Common qw/GET POST/;
 use JSON::MaybeXS ();
+use Module::Runtime qw/use_module/;
 use Ref::Util qw/is_arrayref is_ref/;
 use Try::Tiny;
 use Twitter::API::Context;
@@ -84,7 +84,7 @@ has user_agent => (
     default => sub {
         my $self = shift;
 
-        load_class 'HTTP::Thin';
+        use_module 'HTTP::Thin';
         HTTP::Thin->new(
             timeout => $self->timeout,
             agent   => $self->agent,
