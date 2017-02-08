@@ -2,7 +2,6 @@ requires perl => '5.14.1';
 
 requires 'Carp';
 requires 'Class::Load';
-requires 'Data::Visitor::Lite';
 requires 'Digest::SHA';
 requires 'Encode';
 requires 'HTML::Entities';
@@ -15,6 +14,7 @@ requires 'Moo::Role';
 requires 'MooX::Aliases';
 requires 'MooX::Traits';
 requires 'namespace::clean';
+requires 'Ref::Util';
 requires 'Scalar::Util';
 requires 'StackTrace::Auto';
 requires 'Sub::Exporter::Progressive';
