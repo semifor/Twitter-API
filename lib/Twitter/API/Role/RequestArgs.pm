@@ -102,6 +102,24 @@ Examples:
 =cut
 
 sub request_with_pos_args {
+    my $self = shift;
+
+    $self->request($self->normalize_pos_args(@_));
+}
+
+=method normalize_pos_args
+
+Helper method for C<request_with_pos_args>. Takes the same arguments described in
+C<request_with_pos_args> above, and returns a list of arguments ready for a
+call to C<request>.
+
+Individual methods in L<Twitter::API::Trait::ApiMethods> use
+C<normalize_pos_args> if they need to do further processing on the args hashref
+before calling C<request>.
+
+=cut
+
+sub normalize_pos_args {
     my $self        = shift;
     my @pos_names   = shift;
     my $http_method = shift;
@@ -143,7 +161,26 @@ sub request_with_pos_args {
         $args{$name} = $args_hash{$name};
     }
 
-    $self->request($http_method, $path, \%args, @_);
+    return ($http_method, $path, \%args, @_);
+}
+
+=method flatten_list_args([ $key | \@keys ], \%args)
+
+Some Twitter API arguments take a list of values as a string of comma separated
+items. To allow callers to pass an array reference of items instead, this
+method is used to flatten array references to strings. The key or keys identify
+which values to flatten in the C<\%args> hash reference, if they exist.
+
+=cut
+
+sub flatten_list_args {
+    my ( $self, $keys, $args ) = @_;
+
+    for my $key ( is_arrayref($keys) ? @$keys : $keys ) {
+        if ( my $value = $args->{$key} ) {
+            $args->{$key} = join ',' => @$value if is_arrayref($value);
+        }
+    }
 }
 
 1;

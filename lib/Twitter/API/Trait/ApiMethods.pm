@@ -5,7 +5,7 @@ use 5.14.1;
 use Carp;
 use Moo::Role;
 use MooX::Aliases;
-use Ref::Util qw/is_hashref is_ref/;
+use Ref::Util qw/is_hashref is_arrayref/;
 use namespace::clean;
 
 requires 'request';
@@ -1079,7 +1079,13 @@ L<https://dev.twitter.com/rest/reference/post/statuses/update>
 =cut
 
 sub update {
-    shift->request_with_pos_args(status => post => 'statuses/update', @_);
+    my $self = shift;
+
+    my ( $http_method, $path, $args, @rest ) =
+        $self->normalize_pos_args(status => post => 'statuses/update', @_);
+
+    $self->flatten_list_args(media_ids => $args);
+    return $self->request($http_method, $path, $args, @rest);
 }
 
 =method update_account_settings([ \%args ])
@@ -1178,7 +1184,7 @@ sub upload_media {
     # screen_name or user_id on other methods.
     if ( @_ && !is_hashref($_[0]) ) {
         my $media = shift;
-        my $key = is_ref($media) ? 'media' : 'media_data';
+        my $key = is_arrayref($media) ? 'media' : 'media_data';
         my $args = @_ && is_hashref($_[0]) ? pop : {};
         $args->{$key} = $media;
         unshift @_, $args;
@@ -1186,12 +1192,8 @@ sub upload_media {
 
     my $args = shift;
     $args->{-multipart_form_data} = 1;
+    $self->flatten_list_args(additional_owners => $args);
 
-    # We normally only flatten arrays for GET requests, because we assume
-    # arrayrefs in POST requests represent file uploads.
-    if ( my $owners = delete $args->{additional_owners} ) {
-        $args->{additional_owners} = join ',' => @$owners;
-    }
     $self->request(post => $self->upload_url_for('media/upload'), $args, @_);
 }
 alias upload => 'upload_media';
