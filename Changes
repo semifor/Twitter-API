@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0111  2017-03-18 18:43:33 PDT
   - allow array ref for media_ids parameter to update
 
 0.0110  2017-02-08 15:59:31 PST

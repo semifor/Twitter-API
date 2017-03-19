@@ -86,7 +86,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "0.0110",
+   "version" : "0.0111",
    "x_contributors" : [
       "Karen Etheridge <ether@cpan.org>",
       "Marc Mims <marc@moz.com>",
