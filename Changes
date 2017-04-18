@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0112  2017-04-18 15:45:24 PDT
   - fixed typo: Undefined subroutine &Twitter::API::Error::is_hash
   - fixed documentation for OAuth methods, s/get_/oauth_/
 
