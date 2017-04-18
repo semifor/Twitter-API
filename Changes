@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - fixed typo: Undefined subroutine &Twitter::API::Error::is_hash
+  - fixed documentation for OAuth methods, s/get_/oauth_/
 
 0.0111  2017-03-18 18:43:33 PDT
   - allow array ref for media_ids parameter to update

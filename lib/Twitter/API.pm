@@ -604,7 +604,7 @@ See C<get> above, for a discussion C<$url>. For file upload, pass an array
 reference as described in
 L<https://metacpan.org/pod/distribution/HTTP-Message/lib/HTTP/Request/Common.pm#POST-url-Header-Value-...-Content-content>.
 
-=method get_request_token([ \%args ])
+=method oauth_request_token([ \%args ])
 
 This is the first step in the OAuth handshake. The only argument expected is
 C<callback>, which defaults to C<oob> for PIN based verification. Web
@@ -616,20 +616,27 @@ See L<https://dev.twitter.com/oauth/reference/post/oauth/request_token>.
 
 =method oauth_authentication_url(\%args)
 
-This is the second step in the OAuth handshake. The only required argument is C<oauth_token>. Use the value returned by C<get_request_token>. Optional arguments: C<force_login> and C<screen_name> to prefill Twitter's authentication form.
+This is the second step in the OAuth handshake. The only required argument is
+C<oauth_token>. Use the value returned by C<get_request_token>. Optional
+arguments: C<force_login> and C<screen_name> to prefill Twitter's
+authentication form.
 
 See L<https://dev.twitter.com/oauth/reference/get/oauth/authenticate>.
 
-=method get_authorization_url(\%args)
+=method oauth_authorization_url(\%args)
 
 Identical to C<oauth_authentication_url>, but uses authorization flow, rather
 than authentication flow.
 
 See L<https://dev.twitter.com/oauth/reference/get/oauth/authorize>.
 
-=method get_access_token(\%ags)
+=method oauth_access_token(\%ags)
 
-This is the third and final step in the OAuth handshake. Pass the request C<token>, request C<token_secret> obtained in the C<get_request_token> call, and either the PIN number if you used C<oob> for the callback value in C<get_request_token> or the C<verifier> parameter returned in the web callback, as C<verfier>.
+This is the third and final step in the OAuth handshake. Pass the request
+C<token>, request C<token_secret> obtained in the C<get_request_token> call,
+and either the PIN number if you used C<oob> for the callback value in
+C<get_request_token> or the C<verifier> parameter returned in the web callback,
+as C<verfier>.
 
 See L<https://dev.twitter.com/oauth/reference/post/oauth/access_token>.
 
