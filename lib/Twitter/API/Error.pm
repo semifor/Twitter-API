@@ -87,7 +87,7 @@ sub twitter_error_text {
     return '' unless $self->twitter_error;
     my $e = $self->twitter_error;
 
-    return is_hash($e) && (
+    return is_hashref($e) && (
         # the newest variant: array of errors
         exists $e->{errors}
             && is_arrayref($e->{errors})

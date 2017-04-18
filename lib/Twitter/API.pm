@@ -598,7 +598,7 @@ specified, e.g. C<https://api.twitter.com/1.1/account/verify_credentials.json>.
 This should accommodate any new API endpoints Twitter adds without requiring an
 update to this module.
 
-=method put($url, [ \%args ])
+=method post($url, [ \%args ])
 
 See C<get> above, for a discussion C<$url>. For file upload, pass an array
 reference as described in
