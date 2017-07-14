@@ -1218,7 +1218,7 @@ calls are equivalent:
     $client->mentions;
     $client->mentions({});
     $client->get('statuses/mentions_timeline');
-    $client->get('statuses/mentions_timelien', {});
+    $client->get('statuses/mentions_timeline', {});
 
 Use the parameters hashref to pass optional parameters. For example,
 
