@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+0.0113  2017-07-18 16:20:14 PDT
   - make Dist::Zilla happy again
   - minor POD fixes
 
