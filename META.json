@@ -4,7 +4,7 @@
       "Marc Mims <marc@questright.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -115,6 +115,10 @@
          "file" : "lib/Twitter/API/Trait/NormalizeBooleans.pm",
          "version" : "0.0113"
       },
+      "Twitter::API::Trait::RateLimiting" : {
+         "file" : "lib/Twitter/API/Trait/RateLimiting.pm",
+         "version" : "0.0113"
+      },
       "Twitter::API::Trait::RetryOnError" : {
          "file" : "lib/Twitter/API/Trait/RetryOnError.pm",
          "version" : "0.0113"
@@ -140,11 +144,13 @@
    "version" : "0.0113",
    "x_contributors" : [
       "Andrew Grangaard <granny-github@ofb.net>",
+      "Dave Jacoby <jacoby.david@gmail.com>",
       "Desmond Daignault <nawglan@cpan.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Marc Mims <marc@moz.com>",
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Rob Hoelz <rob@hoelz.ro>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

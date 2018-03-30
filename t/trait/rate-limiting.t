@@ -8,7 +8,7 @@ use Test::Spec;
 
 BEGIN {
     my $time = 1_500_000_000;
-    *CORE::GLOBAL::time = sub :prototype() {
+    *CORE::GLOBAL::time = sub () {
         my ( $caller ) = caller();
         if($caller eq 'main' || $caller =~ /^Twitter::API/) {
             return $time++;
