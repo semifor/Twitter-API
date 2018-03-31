@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '0.0113';
+our $VERSION = '1.0001';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -495,18 +495,16 @@ __END__
 
 Twitter::API provides an interface to the Twitter REST API for perl.
 
-This in an alpha release. The interface may change. Feedback welcome.
-
 Features:
 
 =for :list
 * full support for all Twitter REST API endpoints
 * not dependent on a new distribution for new endpoint support
 * optionally specify access tokens per API call
-* error handling via an exception object that captures the full reqest/response context
-* full support for OAuth handshake and xauth authentication
+* error handling via an exception object that captures the full request/response context
+* full support for OAuth handshake and Xauth authentication
 
-Additionl features are availble via optional traits:
+Additional features are available via optional traits:
 
 =for :list
 * convenient methods for API endpoints with simplified argument handling via
@@ -520,8 +518,9 @@ Additionl features are availble via optional traits:
 * "the whole enchilada" combines all the above traits via
   L<Enchilada|Twitter::API::Trait::Enchilada>
 * app-only (OAuth2) support via L<AppAuth|Twitter::API::Trait::AppAuth>
+* automatic rate limiting via L<RateLimiting|Twitter::API::Trait::RateLimiting>
 
-Some featuers are provided by separate distributions to avoid additional
+Some features are provided by separate distributions to avoid additional
 dependencies most users won't want or need:
 
 =for :list
@@ -618,7 +617,7 @@ See L<https://dev.twitter.com/oauth/reference/post/oauth/request_token>.
 
 This is the second step in the OAuth handshake. The only required argument is
 C<oauth_token>. Use the value returned by C<get_request_token>. Optional
-arguments: C<force_login> and C<screen_name> to prefill Twitter's
+arguments: C<force_login> and C<screen_name> to pre-fill Twitter's
 authentication form.
 
 See L<https://dev.twitter.com/oauth/reference/get/oauth/authenticate>.
