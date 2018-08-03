@@ -190,8 +190,8 @@ sub prepare_request {
             : $c->has_option('to_json')   ? $self->prepare_json_post($c)
             : $self->prepare_post($c)
         )
-        : $method eq 'GET' ? $self->prepare_get($c)
-        : croak "unexpected HTTP method: $_"
+        : $method eq 'GET' || $method eq 'DELETE' ? $self->prepare_method_urlonly($c)
+        : croak "unexpected HTTP method: $method"
     );
 }
 
@@ -224,7 +224,7 @@ sub prepare_post {
         Content => $self->encode_args_string($c->args);
 }
 
-sub prepare_get {
+sub prepare_method_urlonly {
     my ( $self, $c ) = @_;
 
     my $uri = URI->new($c->url);
@@ -232,7 +232,8 @@ sub prepare_get {
         $uri->query($encoded);
     }
 
-    GET $uri, %{ $c->headers };
+    my $methodsubname = 'HTTP::Request::Common::' . $c->http_method;
+    (\&$methodsubname)->($uri, %{ $c->headers });
 }
 
 sub add_authorization {

@@ -1198,6 +1198,56 @@ sub upload_media {
 }
 alias upload => 'upload_media';
 
+=method direct_messages_events([ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/list-events.html>
+
+=cut
+
+sub direct_messages_events {
+    shift->request(get => 'direct_messages/events/list', @_);
+}
+
+=method show_direct_messages_event([ $id, ][ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-event>
+
+=cut
+
+sub show_direct_messages_event {
+    shift->request_with_pos_args(id => get => 'direct_messages/events/show', @_);
+}
+
+=method destroy_direct_messages_event([ $id, ][ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message-event>
+
+=cut
+
+sub destroy_direct_messages_event {
+    shift->request_with_pos_args(id => delete => 'direct_messages/events/destroy', @_);
+}
+
+=method new_direct_messages_event([ $text, [ $recipient_id, ]][ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
+
+=cut
+
+sub new_direct_messages_event {
+    shift->request(post => 'direct_messages/events/new', {
+        -to_json => {
+            event => {
+                type => 'message_create',
+                message_create => {
+                    message_data => { text => shift },
+                    target => { recipient_id => shift },
+                }
+            },
+        }
+    }, @_);
+}
+
 1;
 
 =pod
