@@ -164,7 +164,7 @@ Twitter::API supports the following traits:
 
 B<ApiMethods >is a direct replacement for Net::Twitter's API::RESTv1_1 trait.
 
-Net::Twitter's B<InflateObjects > trait will be released as a separate distribution
+Net::Twitter's B<InflateObjects> trait will be released as a separate distribution
 to minimize Twitter::API's dependencies.
 
 If you are using the Net::Twitter's B<WrapResults> trait, Twitter::API provides

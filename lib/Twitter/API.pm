@@ -549,8 +549,8 @@ Some features are provided by separate distributions to avoid additional
 dependencies most users won't want or need:
 
 =for :list
-* async support via subclass L<Twitter::API::AnyEvent>
-* inflate API call results to objects via L<Twitter::API::Trait::InflateObjects>
+* async support via subclass L<Twitter::API::AnyEvent|https://github.com/semifor/Twitter-API-AnyEvent>
+* inflate API call results to objects via L<Twitter::API::Trait::InflateObjects|https://github.com/semifor/Twitter-API-Trait-InflateObjects>
 
 =head1 OVERVIEW
 
