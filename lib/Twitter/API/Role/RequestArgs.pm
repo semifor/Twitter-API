@@ -29,7 +29,7 @@ Examples:
     $self->request(get => 'some/endpoint', { screen_name => 'foo' });
 
     $self->request_with_id(get => 'some/endpoint', 8575429);
-    # is transfromed to:
+    # is transformed to:
     $self->request(get => 'some/endpoint', { user_id => 8675429 });
 
     $self->request_with_id(get => 'some/endpoint', {
@@ -209,7 +209,7 @@ Then, in your application code:
 
     my $statuses = $client->timeline('semifor');
 
-    # equvalent to:
+    # equivalent to:
     my $statuses = $client->get('statuses/user_timeline', {
         screen_name => 'semifor',
     });
