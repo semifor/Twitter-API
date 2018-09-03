@@ -275,7 +275,7 @@ during migration. It will be removed in a future release.
 
 The discussion, above applies for L<Net::Twitter::Lite> with a few exceptions.
 
-Net::Twitter::Lite does not use traits. Change your contructor call from:
+Net::Twitter::Lite does not use traits. Change your constructor call from:
 
     my $client = Net::Twitter::Lite::WithAPIv1_1->new(%args);
 
