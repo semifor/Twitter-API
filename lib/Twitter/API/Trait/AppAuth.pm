@@ -34,7 +34,7 @@ Call the C<oauth2/token> endpoint to get a bearer token. The token is not
 stored in Twitter::API's state. If you want that, set the C<access_token>
 attribute with the returned token.
 
-See L<https://dev.twitter.com/oauth/reference/post/oauth2/token> for details.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/token> for details.
 
 =cut
 
@@ -56,7 +56,7 @@ sub oauth2_token {
 =method invalidate_token($token)
 
 Calls the C<oauth2/invalidate_token> endpoint to revoke a token. See
-L<https://dev.twitter.com/oauth/reference/post/oauth2/invalidate/token> for
+L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/invalidate_token> for
 details.
 
 =cut

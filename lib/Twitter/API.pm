@@ -636,7 +636,7 @@ applications will pass a callback URL.
 
 Returns a hashref that includes C<oauth_token> and C<oauth_token_secret>.
 
-See L<https://dev.twitter.com/oauth/reference/post/oauth/request_token>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/request_token>.
 
 =method oauth_authentication_url(\%args)
 
@@ -645,14 +645,14 @@ C<oauth_token>. Use the value returned by C<get_request_token>. Optional
 arguments: C<force_login> and C<screen_name> to pre-fill Twitter's
 authentication form.
 
-See L<https://dev.twitter.com/oauth/reference/get/oauth/authenticate>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/authenticate>.
 
 =method oauth_authorization_url(\%args)
 
 Identical to C<oauth_authentication_url>, but uses authorization flow, rather
 than authentication flow.
 
-See L<https://dev.twitter.com/oauth/reference/get/oauth/authorize>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/authorize>.
 
 =method oauth_access_token(\%ags)
 
@@ -662,7 +662,7 @@ and either the PIN number if you used C<oob> for the callback value in
 C<get_request_token> or the C<verifier> parameter returned in the web callback,
 as C<verfier>.
 
-See L<https://dev.twitter.com/oauth/reference/post/oauth/access_token>.
+See L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/access_token>.
 
 =method xauth(\%args)
 

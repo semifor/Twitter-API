@@ -87,7 +87,7 @@ Returns the result data for the API call.
 
 Every API endpoint has a rate limit. This method returns the rate limit for the
 endpoint of the API call. See
-L<https://dev.twitter.com/rest/public/rate-limiting> for details.
+L<https://developer.twitter.com/en/docs/basics/rate-limiting> for details.
 
 =method rate_limit_remaining
 
