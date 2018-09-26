@@ -114,7 +114,7 @@ sub twitter_error_text {
 =method twitter_error_code
 
 Returns the numeric error code returned by Twitter, or 0 if there is none. See
-L<https://dev.twitter.com/overview/api/response-codes> for details.
+L<https://developer.twitter.com/en/docs/basics/response-codes> for details.
 
 =cut
 
