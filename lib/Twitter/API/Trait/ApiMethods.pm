@@ -1248,6 +1248,63 @@ sub new_direct_messages_event {
     }, @_);
 }
 
+=method invalidate_access_token([ \%args ])
+
+Calling this method has the same effect as a user revoking access to the
+application via Twitter settings. The access token/secret pair will no longer
+be valid.
+
+This method can be called with client that has been initialized with
+C<access_token> and C<access_token_secret> attributes, by passing C<-token> and
+C<-token_secret> parameters, or by passing C<access_token> and
+C<access_token_secret> parameters.
+
+    $client->invalidate_access_token;
+    $client->invalidate_access_token({ -token => $token, -token_secret => $secret });
+    $client->invalidate_access_token({
+        access_token        => $token,
+        access_token_secret => $secret,
+    });
+
+Twitter added this method to the API on 2018-09-20.
+
+See
+L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/invalidate_access_token>
+
+=cut
+
+# We've already used invalidate_token for oauth2/invalidate_otkon in
+# Trait::AppAuth, so we'll name this method invalidate_acccess_token to avoid
+# any conflict.
+
+sub invalidate_access_token {
+    my ( $self, $args ) = @_;
+
+    $args //= {};
+
+    # For consistency with Twitter::API calling conventions:
+    # - accept -token/-token_secret synthetic arguments
+    # - or use access_token/access_token_secret attributes
+    #
+    # Or, allow passing access_token/access_token secrets parameters as
+    # specified in Twitter's API documentation.
+
+    my $access_token = $$args{'-token'} // $self->access_token
+        // ( $$args{'-token'} = delete $$args{access_token} )
+        // croak 'requires an oauth token';
+
+    my $access_token_secret = $$args{'-token_secret'}
+        // $self->access_token_secret
+        // ( $$args{'-token_secret'} = delete $$args{access_token_secret} )
+        // croak 'requires an oauth token secret';
+
+    return $self->request(post => 'oauth/invalidate_token', {
+        access_token        => $access_token,
+        access_token_secret => $access_token_secret,
+        %$args
+    });
+}
+
 1;
 
 =pod

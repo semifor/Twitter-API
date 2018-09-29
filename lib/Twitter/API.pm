@@ -216,7 +216,6 @@ sub mk_post_request {
     return $self->mk_form_urlencoded_post($c);
 }
 
-
 sub mk_multipart_post {
     my ( $self, $c ) = @_;
 

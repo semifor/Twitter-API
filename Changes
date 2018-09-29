@@ -1,6 +1,7 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - added invalidate_access_token method
 
 1.0003  2018-08-04 10:37:24 PDT
   - add support for new Direct Messages API endpoints (drumsoft)
