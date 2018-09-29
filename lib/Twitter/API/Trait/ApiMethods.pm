@@ -1194,7 +1194,7 @@ sub destroy_direct_messages_event {
     shift->request_with_pos_args(id => delete => 'direct_messages/events/destroy', @_);
 }
 
-=method new_direct_messages_event([ $text, $recipient_id ] | [ \%event ])
+=method new_direct_messages_event([$text, $recipient_id ] | [ \%event ], [ \%args ])
 
 For simple usage, pass text and recipient ID:
 
@@ -1222,19 +1222,24 @@ L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/ap
 
 sub new_direct_messages_event {
     my $self = shift;
-    my $event = shift if ref $_[0];
-    my ( $text, $recipient_id ) = @_;
 
-    $event //= {
+    # The first argument is either an event hashref, or we'll create one with
+    # the first two arguments: text and recipient_id.
+    my $event = ref $_[0] ? shift : {
         type => 'message_create',
         message_create => {
-            message_data => { text => $text },
-            target => { recipient_id => $recipient_id },
+            message_data => { text => shift },
+            target => { recipient_id => shift },
         },
     };
 
+    # only synthetic args are appropriate, here, e.g.
+    # { -token => '...', -token_secret => '...' }
+    my $args = shift // {};
+
+
     $self->request(post => 'direct_messages/events/new', {
-        -to_json => { event => $event }
+        -to_json => { event => $event }, %$args
     });
 }
 

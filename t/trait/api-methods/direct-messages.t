@@ -46,6 +46,30 @@ describe direct_messages => sub {
             $new_message_id = $context->{event}->{id};
         }
     };
+    it 'new_direct_messages_event with synthetic args' => sub {
+        if ($is_stub_test) {
+            my $user_id_str = '666';
+            my $text = 'test message ' . time;
+            my $context = $client->new_direct_messages_event($text, $user_id_str, {
+                -token        => 'passed-token',
+                -token_secret => 'passed-secret',
+            });
+
+           ok $context->http_request->method eq 'POST'
+            && $context->http_request->uri =~ m'/direct_messages/events/new\.json$'
+            && eq_hash(decode_json($context->http_request->content), {
+                event => {
+                    type => 'message_create',
+                    message_create => {
+                        target => { recipient_id => $user_id_str },
+                        message_data => { text => $text },
+                    },
+                },
+            })
+            && $context->http_request->header('authorization')
+                =~ /oauth_token="passed-token"/;
+        }
+    };
     it 'new_direct_messages_event with event paylod' => sub {
         if ($is_stub_test) {
             my $event =  {
