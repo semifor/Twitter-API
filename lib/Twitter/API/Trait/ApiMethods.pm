@@ -68,15 +68,7 @@ sub collections {
     shift->request_with_pos_args(':ID', get => 'collections/list', @_);
 }
 
-=method direct_messages([ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-messages>
-
-=cut
-
-sub direct_messages {
-    shift->request(get => 'direct_messages', @_);
-}
+sub direct_messages { croak 'DEPRECATED - use direct_messages_events instead' }
 
 =method favorites([ \%args ])
 
@@ -506,20 +498,10 @@ L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/ap
 
 =cut
 
-sub sent_direct_messages {
-    shift->request(get => 'direct_messages/sent', @_);
-}
+sub sent_direct_messages { croak 'DEPRECATED - use direct_messages_events instead' }
 alias direct_messages_sent => 'sent_direct_messages';
 
-=method show_direct_message([ $id, ][ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-message>
-
-=cut
-
-sub show_direct_message {
-    shift->request_with_pos_args(id => get => 'direct_messages/show', @_);
-}
+sub show_direct_message { croak 'DEPRECATED - show_direct_messages_event instead' }
 
 =method show_friendship([ \%args ])
 
@@ -885,15 +867,7 @@ sub destroy_collection {
     shift->request_with_pos_args(id => post => 'collections/destroy', @_);
 }
 
-=method destroy_direct_message([ $id, ][ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message>
-
-=cut
-
-sub destroy_direct_message {
-    shift->request_with_pos_args(id => post => 'direct_messages/destroy', @_);
-}
+sub destroy_direct_message { croak 'DEPRECATED - use destroy_direct_messages_event instead' }
 
 =method destroy_favorite([ $id, ][ \%args ])
 
@@ -991,15 +965,7 @@ sub move_collection_entry {
         post => 'collections/entries/move', @_);
 }
 
-=method new_direct_message([ $text, [ $screen_name | $user_id, ]][ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
-
-=cut
-
-sub new_direct_message {
-    shift->request_with_pos_args([ qw/text :ID/ ], post => 'direct_messages/new', @_);
-}
+sub new_direct_message { croak 'DEPRECATED - use new_direct_messages_event instead' }
 
 =method remove_collection_entry([ $id, [ $tweet_id, ]][ \%args ])
 
