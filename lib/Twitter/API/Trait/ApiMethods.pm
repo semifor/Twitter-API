@@ -1228,24 +1228,48 @@ sub destroy_direct_messages_event {
     shift->request_with_pos_args(id => delete => 'direct_messages/events/destroy', @_);
 }
 
-=method new_direct_messages_event([ $text, [ $recipient_id, ]][ \%args ])
+=method new_direct_messages_event([ $text, $recipient_id ] | [ \%event ])
+
+For simple usage, pass text and recipient ID:
+
+    $client->new_dirrect_messages_event($text, $recipient_id)
+
+For more complex messages, pass a full event structure, for example:
+
+    $client->new_direct_massages_event({
+        type => 'message_create',
+        message_create => {
+            target => { recipient_id => $user_id },
+            message_data => {
+                text => $text,
+                attachment => {
+                    type  => 'media',
+                    media => { id => $media->{id} },
+                },
+            },
+        },
+    })
 
 L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
 
 =cut
 
 sub new_direct_messages_event {
-    shift->request(post => 'direct_messages/events/new', {
-        -to_json => {
-            event => {
-                type => 'message_create',
-                message_create => {
-                    message_data => { text => shift },
-                    target => { recipient_id => shift },
-                }
-            },
-        }
-    }, @_);
+    my $self = shift;
+    my $event = shift if ref $_[0];
+    my ( $text, $recipient_id ) = @_;
+
+    $event //= {
+        type => 'message_create',
+        message_create => {
+            message_data => { text => $text },
+            target => { recipient_id => $recipient_id },
+        },
+    };
+
+    $self->request(post => 'direct_messages/events/new', {
+        -to_json => { event => $event }
+    });
 }
 
 =method invalidate_access_token([ \%args ])
