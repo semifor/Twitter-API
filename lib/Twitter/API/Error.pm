@@ -228,7 +228,7 @@ __END__
         my $r = $client->get('account/verify_credentials');
     }
     catch {
-        die $_ unless is_twitter_api_error;
+        die $_ unless is_twitter_api_error($_);
 
         warn "Twitter says: ", $_->twitter_error_text;
     };
