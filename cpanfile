@@ -27,6 +27,9 @@ requires 'URL::Encode';
 requires 'WWW::OAuth' => '0.006';
 
 on test => sub {
+    requires 'HTTP::Response';
+    requires 'HTTP::Status';
+    requires 'List::Util', '1.35'; # for function all added in 1.33
     requires 'Test::Pod';
     requires 'Test::Fatal';
     requires 'Test::More';
