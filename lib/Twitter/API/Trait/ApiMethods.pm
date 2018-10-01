@@ -68,15 +68,7 @@ sub collections {
     shift->request_with_pos_args(':ID', get => 'collections/list', @_);
 }
 
-=method direct_messages([ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-messages>
-
-=cut
-
-sub direct_messages {
-    shift->request(get => 'direct_messages', @_);
-}
+sub direct_messages { croak 'DEPRECATED - use direct_messages_events instead' }
 
 =method favorites([ \%args ])
 
@@ -506,20 +498,10 @@ L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/ap
 
 =cut
 
-sub sent_direct_messages {
-    shift->request(get => 'direct_messages/sent', @_);
-}
+sub sent_direct_messages { croak 'DEPRECATED - use direct_messages_events instead' }
 alias direct_messages_sent => 'sent_direct_messages';
 
-=method show_direct_message([ $id, ][ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-message>
-
-=cut
-
-sub show_direct_message {
-    shift->request_with_pos_args(id => get => 'direct_messages/show', @_);
-}
+sub show_direct_message { croak 'DEPRECATED - show_direct_messages_event instead' }
 
 =method show_friendship([ \%args ])
 
@@ -885,15 +867,7 @@ sub destroy_collection {
     shift->request_with_pos_args(id => post => 'collections/destroy', @_);
 }
 
-=method destroy_direct_message([ $id, ][ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message>
-
-=cut
-
-sub destroy_direct_message {
-    shift->request_with_pos_args(id => post => 'direct_messages/destroy', @_);
-}
+sub destroy_direct_message { croak 'DEPRECATED - use destroy_direct_messages_event instead' }
 
 =method destroy_favorite([ $id, ][ \%args ])
 
@@ -991,15 +965,7 @@ sub move_collection_entry {
         post => 'collections/entries/move', @_);
 }
 
-=method new_direct_message([ $text, [ $screen_name | $user_id, ]][ \%args ])
-
-L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
-
-=cut
-
-sub new_direct_message {
-    shift->request_with_pos_args([ qw/text :ID/ ], post => 'direct_messages/new', @_);
-}
+sub new_direct_message { croak 'DEPRECATED - use new_direct_messages_event instead' }
 
 =method remove_collection_entry([ $id, [ $tweet_id, ]][ \%args ])
 
@@ -1228,24 +1194,53 @@ sub destroy_direct_messages_event {
     shift->request_with_pos_args(id => delete => 'direct_messages/events/destroy', @_);
 }
 
-=method new_direct_messages_event([ $text, [ $recipient_id, ]][ \%args ])
+=method new_direct_messages_event([$text, $recipient_id ] | [ \%event ], [ \%args ])
+
+For simple usage, pass text and recipient ID:
+
+    $client->new_dirrect_messages_event($text, $recipient_id)
+
+For more complex messages, pass a full event structure, for example:
+
+    $client->new_direct_massages_event({
+        type => 'message_create',
+        message_create => {
+            target => { recipient_id => $user_id },
+            message_data => {
+                text => $text,
+                attachment => {
+                    type  => 'media',
+                    media => { id => $media->{id} },
+                },
+            },
+        },
+    })
 
 L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
 
 =cut
 
 sub new_direct_messages_event {
-    shift->request(post => 'direct_messages/events/new', {
-        -to_json => {
-            event => {
-                type => 'message_create',
-                message_create => {
-                    message_data => { text => shift },
-                    target => { recipient_id => shift },
-                }
-            },
-        }
-    }, @_);
+    my $self = shift;
+
+    # The first argument is either an event hashref, or we'll create one with
+    # the first two arguments: text and recipient_id.
+    my $event = ref $_[0] ? shift : {
+        type => 'message_create',
+        message_create => {
+            message_data => { text => shift },
+            target => { recipient_id => shift },
+        },
+    };
+
+    # only synthetic args are appropriate, here, e.g.
+    # { -token => '...', -token_secret => '...' }
+    my $args = shift // {};
+
+
+    $self->request(post => 'direct_messages/events/new', {
+        -to_json => { event => $event }, %$args
+    });
 }
 
 =method invalidate_access_token([ \%args ])
