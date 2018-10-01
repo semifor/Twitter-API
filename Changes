@@ -1,7 +1,12 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+1.0004  2018-10-01 07:58:26 PDT
   - added invalidate_access_token method
+  - added undeclared test dependencies
+  - new_direct_messages_event now takes an optional event structure
+  - updated links to Twitter documentation (thanks Rob Hoelz)
 
 1.0003  2018-08-04 10:37:24 PDT
   - add support for new Direct Messages API endpoints (drumsoft)
