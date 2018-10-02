@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+
+1.0005  2018-10-02 10:45:08 PDT
   - force fallback to WWW::Form::UrlEncoded::PP for tests
   - recommend appropriate XS modules
 
