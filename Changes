@@ -1,6 +1,8 @@
 Revision history for Twitter::API
 
 {{$NEXT}}
+  - force fallback to WWW::Form::UrlEncoded::PP for tests
+  - recommend appropriate XS modules
 
 1.0004  2018-10-01 07:58:26 PDT
   - added invalidate_access_token method

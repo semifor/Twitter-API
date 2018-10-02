@@ -26,6 +26,9 @@ requires 'URI';
 requires 'URL::Encode';
 requires 'WWW::OAuth' => '0.006';
 
+recommends 'Cpanel::JSON::XS';
+recommends 'WWW::Form::UrlEncoded::XS';
+
 on test => sub {
     requires 'HTTP::Response';
     requires 'HTTP::Status';
