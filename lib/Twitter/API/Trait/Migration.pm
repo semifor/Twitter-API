@@ -257,7 +257,7 @@ To disable the warnings, set C<$ENV{TWITTER_API_NO_MIGRATION_WARNINGS} = 1>.
 replace with L<oauth_authentication_url|Twitter::API/oauth_athentication_url>
   or L<oauth_request_token|Twitter::API/oauth_request_token> and
   L<oauth_authentication_url|Twitter::API/oauth_athentication_url>
-* B<get_autorization_url>
+* B<get_authorization_url>
 replace with L<oauth_authorization_url|Twitter::API/oauth_authorization_url> or
   L<oauth_request_token|Twitter::API/oauth_request_token> and
   L<oauth_authorization_url|Twitter::API/oauth_authorization_url>
