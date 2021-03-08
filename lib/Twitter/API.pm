@@ -23,6 +23,16 @@ use namespace::clean;
 with qw/MooX::Traits/;
 sub _trait_namespace { 'Twitter::API::Trait' }
 
+has api_version => (
+    is      => 'ro',
+    default => '1.1',
+);
+
+has api_ext => (
+    is      => 'ro',
+    default => '.json',
+);
+
 has [ qw/consumer_key consumer_secret/ ] => (
     is       => 'ro',
     required => 1,
@@ -47,11 +57,6 @@ has api_url => (
 has upload_url => (
     is      => 'ro',
     default => sub { 'https://upload.twitter.com' },
-);
-
-has api_version => (
-    is      => 'ro',
-    default => sub { '1.1' },
 );
 
 has agent => (
@@ -365,13 +370,13 @@ sub process_error_response {
 sub api_url_for {
     my $self = shift;
 
-    $self->_url_for('.json', $self->api_url, $self->api_version, @_);
+    $self->_url_for($self->api_ext, $self->api_url, $self->api_version, @_);
 }
 
 sub upload_url_for {
     my $self = shift;
 
-    $self->_url_for('.json', $self->upload_url, $self->api_version, @_);
+    $self->_url_for($self->api_ext, $self->upload_url, $self->api_version, @_);
 }
 
 sub oauth_url_for {
@@ -386,7 +391,10 @@ sub _url_for {
     # If we already have a fully qualified URL, just return it
     return $_[-1] if $_[-1] =~ m(^https?://);
 
-    join('/', @parts) . $ext;
+    my $url = join('/', @parts);
+    $url .= $ext if $ext;
+
+    return $url;
 }
 
 # OAuth handshake
