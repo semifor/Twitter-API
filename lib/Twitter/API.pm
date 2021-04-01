@@ -587,6 +587,26 @@ structures decoded from the JSON responses. Refer to the L<Twitter API
 Documentation|https://dev.twitter.com/rest/public> for available endpoints,
 parameters, and responses.
 
+=head2 Twitter API V2 Beta Support
+
+Twitter intends to replace the current public API, version 1.1, with version 2.
+
+See L<https://developer.twitter.com/en/docs/twitter-api/early-access>.
+
+You can use Twitter::API for the V2 beta with the minimalist usage described
+just above by passing values in the constructor for C<api_version> and
+C<api_ext>.
+
+    my $client = Twitter::API->new_with_traits(
+        api_version => '2',
+        api_ext     => '',
+        %oauth_credentials,
+    );
+
+    my $user = $client->get("users/by/username/$username");
+
+More complete V2 support is anticipated in a future release.
+
 =attr consumer_key, consumer_secret
 
 Required. Every application has it's own application credentials.
@@ -609,6 +629,10 @@ Optional. Defaults to C<https://upload.twitter.com>.
 =attr api_version
 
 Optional. Defaults to C<1.1>.
+
+=attr api_ext
+
+Optional. Defaults to C<.json>.
 
 =attr agent
 
