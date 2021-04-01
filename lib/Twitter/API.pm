@@ -25,12 +25,12 @@ sub _trait_namespace { 'Twitter::API::Trait' }
 
 has api_version => (
     is      => 'ro',
-    default => '1.1',
+    default => sub { '1.1' },
 );
 
 has api_ext => (
     is      => 'ro',
-    default => '.json',
+    default => sub { '.json' },
 );
 
 has [ qw/consumer_key consumer_secret/ ] => (
