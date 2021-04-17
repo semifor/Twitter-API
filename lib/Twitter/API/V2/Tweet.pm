@@ -11,6 +11,8 @@ use Twitter::API::V2::Util qw/time_from_iso_8601/;
 
 use namespace::clean;
 
+extends 'Twitter::API::V2::Object';
+
 has data => (
     is  => 'ro',
     isa => quote_sub(q{
@@ -51,28 +53,35 @@ sub _build_author {
 }
 
 # default attributes
-sub id   { shift->{data}{id} }
-sub text { shift->{data}{text} }
+__PACKAGE__->_mk_deep_accessor(qw/data/, $_) for qw/
+    attachments
+    author_id
+    context_annotations
+    conversation_id
+    created_at
+    entities
+    geo
+    id
+    in_reply_to_user_id
+    lang
+    non_public_metrics
+    organic_metrics
+    possibly_sensitive
+    promoted_metrics
+    public_metrics
+    referenced_tweets
+    reply_settings
+    source
+    text
+    withheld
+/;
 
-# when included in tweet.fields parameter
-sub attachments         { shift->{data}{attachments} }
-sub author_id           { shift->{data}{author_id} }
-sub context_annotations { shift->{data}{context_annotations} }
-sub conversation_id     { shift->{data}{conversation_id} }
-sub created_at          { shift->{data}{created_at} }
-sub entities            { shift->{data}{entities} }
-sub geo                 { shift->{data}{geo} }
-sub in_reply_to_user_id { shift->{data}{in_reply_to_user_id} }
-sub lang                { shift->{data}{lang} }
-sub non_public_metrics  { shift->{data}{non_public_metrics} }
-sub public_metrics      { shift->{data}{public_metrics} }
-sub organic_metrics     { shift->{data}{organic_metrics} }
-sub promoted_metrics    { shift->{data}{promoted_metrics} }
-sub possibly_sensitive  { shift->{data}{possibly_sensitive} }
-sub referenced_tweets   { shift->{data}{referenced_tweets} }
-sub reply_settings      { shift->{data}{reply_settings} }
-sub source              { shift->{data}{source} }
-sub withheld            { shift->{data}{withheld} }
+__PACKAGE__->_mk_deep_accessor(qw/data public_metrics/, $_) for qw/
+    quote_count
+    retweet_count
+    like_count
+    reply_count
+/;
 
 sub created_at_time {
     time_from_iso_8601(shift->created_at // return);

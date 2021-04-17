@@ -14,31 +14,19 @@ has meta => (
     required => 1,
 );
 
+__PACKAGE__->_mk_deep_accessor(qw/meta/, $_) for qw/
+    next_token
+    previous_token
+    newest_id
+    oldest_id
+    result_count
+/;
+
 has errors => (
     is => 'ro',
     isa => quote_sub(q{
         die 'is not a ARRAY' unless ref $_[0] eq 'ARRAY';
     }),
 );
-
-sub next_token {
-    shift->meta->{next_token};
-}
-
-sub previous_token {
-    shift->meta->{previous_token};
-}
-
-sub newest_id {
-    shift->meta->{newest_id};
-}
-
-sub oldest_id {
-    shift->meta->{oldest_id};
-}
-
-sub result_count {
-    shift->meta->{result_count};
-}
 
 1;

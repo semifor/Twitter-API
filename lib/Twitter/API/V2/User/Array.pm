@@ -6,13 +6,17 @@ use Twitter::API::V2::Response::UserLookupResponse;
 
 use namespace::clean;
 
-use overload '@{}' => sub {
-    my $self = shift;
+use overload
+    '@{}' => sub {
+        my $self = shift;
 
-    my @array;
-    tie @array, ref $self, $self;
-    return \@array;
-};
+        my @array;
+        tie @array, ref $self, $self;
+        return \@array;
+    },
+    fallback => 1;
+
+extends 'Twitter::API::V2::Object';
 
 has data => (
     is  => 'ro',
@@ -31,6 +35,10 @@ has includes => (
     default => sub { {} },
     clearer => '_clear_includes',
 );
+
+sub get_ids {
+    return [ map $$_{id}, @{ shift->{data} } ];
+}
 
 sub _inflate_user {
     my ( $self, $user ) = @_;

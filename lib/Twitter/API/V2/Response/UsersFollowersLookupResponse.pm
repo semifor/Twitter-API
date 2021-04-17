@@ -1,12 +1,10 @@
-package Twitter::API::V2::Response::TweetSearchResponse;
+package Twitter::API::V2::Response::UsersFollowersLookupResponse;
 use Moo;
 use Sub::Quote;
 
-# Same as GenericTweetsTimelineResponse but without previous_token
-
 use namespace::clean;
 
-extends 'Twitter::API::V2::Tweet::Array';
+extends 'Twitter::API::V2::User::Array';
 
 has meta => (
     is => 'ro',
@@ -16,6 +14,12 @@ has meta => (
     required => 1,
 );
 
+__PACKAGE__->_mk_deep_accessor(qw/meta/, $_) for qw/
+    result_count
+    next_token
+    previous_token
+/;
+
 has errors => (
     is => 'ro',
     isa => quote_sub(q{
@@ -23,11 +27,5 @@ has errors => (
     }),
 );
 
-__PACKAGE__->_mk_deep_accessor(qw/meta/, $_) for qw/
-    next_token
-    newest_id
-    oldest_id
-    result_count
-/;
-
 1;
+

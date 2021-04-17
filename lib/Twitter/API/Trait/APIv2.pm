@@ -34,6 +34,7 @@ use Twitter::API::V2::Response::SingleUserLookupResponse;
 use Twitter::API::V2::Response::TweetLookupResponse;
 use Twitter::API::V2::Response::TweetSearchResponse;
 use Twitter::API::V2::Response::UserLookupResponse;
+use Twitter::API::V2::Response::UsersFollowersLookupResponse;
 
 use namespace::clean;
 
@@ -129,7 +130,7 @@ sub find_user_by_username {
 }
 
 sub find_user_by_id {
-    shift->api_v2_call('users/{id}', 'SingleUserLookupResponse', @_);
+    shift->api_v2_call(get => 'users/{id}', 'SingleUserLookupResponse', @_);
 }
 
 sub users_id_block {
@@ -138,13 +139,13 @@ sub users_id_block {
 }
 
 sub users_id_followers {
-    ...;
-    # shift->api_v2_call(get => 'users/{id}/followers', 'UsersFollowersLookupResponse', @_);
+    shift->api_v2_call(get => 'users/{id}/followers', 'UsersFollowersLookupResponse', @_);
 }
 
 sub users_id_following {
-    ...;
-    # shift->api_v2_call(get => 'users/{id}/following', 'UsersFollowingLookupResponse', @_);
+    # Just use the followers response type. There is no difference.
+    # API spec uses UsersFollowingLookupResponse
+    shift->api_v2_call(get => 'users/{id}/following', 'UsersFollowersLookupResponse', @_);
 }
 
 sub users_id_follow {

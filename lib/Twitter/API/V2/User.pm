@@ -7,6 +7,8 @@ use Twitter::API::V2::Tweet;
 use Twitter::API::V2::Util qw/time_from_iso_8601/;
 use namespace::clean;
 
+extends 'Twitter::API::V2::Object';
+
 has data => (
     is       => 'ro',
     isa      => quote_sub(q{
@@ -42,28 +44,32 @@ sub _build_pinned_tweet {
     );
 }
 
-# default attributes
-sub id                { shift->{data}{id} }
-sub name              { shift->{data}{name} }
-sub username          { shift->{data}{username} }
+__PACKAGE__->_mk_deep_accessor(qw/data/, $_) for qw/
+    created_at
+    description
+    entities
+    id
+    location
+    name
+    pinned_tweet_id
+    profile_image_url
+    protected
+    public_metrics
+    url
+    username
+    verified
+    withheld
+/;
 
-sub created_at        { shift->{data}{created_at} }
-sub description       { shift->{data}{description} }
-sub location          { shift->{data}{location} }
-sub pinned_tweet_id   { shift->{data}{pinned_tweet_id} }
-sub profile_image_url { shift->{data}{profile_image_url} }
-sub protected         { shift->{data}{protected} }
-sub public_metrics    { shift->{data}{public_metrics} }
-sub url               { shift->{data}{url} }
-sub verified          { shift->{data}{verified} }
-sub withheld          { shift->{data}{withheld} }
+__PACKAGE__->_mk_deep_accessor(qw/data public_metrics/, $_) for qw/
+    followers_count
+    following_count
+    listed_count
+    tweet_count
+/;
 
-sub entities          { shift->{data}{entities} }
-
-# from public metrics
-sub followers_count { shift->{data}{public_metrics}{followers_count} }
-sub following_count { shift->{data}{public_metrics}{following_count} }
-sub listed_count    { shift->{data}{public_metrics}{listed_count} }
-sub tweet_count     { shift->{data}{public_metrics}{tweet_count} }
+sub created_at_time {
+    time_from_iso_8601(shift->created_at // return);
+}
 
 1;

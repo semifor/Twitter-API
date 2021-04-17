@@ -7,14 +7,17 @@ use Twitter::API::V2::Response::TweetLookupResponse;
 
 use namespace::clean;
 
-use overload '@{}' => sub {
-    my $self = shift;
+use overload
+    '@{}' => sub {
+        my $self = shift;
 
-    my @array;
-    tie @array, ref $self, $self;
-    return \@array;
-};
+        my @array;
+        tie @array, ref $self, $self;
+        return \@array;
+    },
+    fallback => 1;
 
+extends 'Twitter::API::V2::Object';
 
 has data => (
     is  => 'ro',
