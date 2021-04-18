@@ -69,7 +69,7 @@ __PACKAGE__->_mk_deep_accessor(qw/data public_metrics/, $_) for qw/
 /;
 
 sub created_at_time {
-    time_from_iso_8601(shift->created_at // return);
+    time_from_iso_8601(shift->created_at);
 }
 
 1;
