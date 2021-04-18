@@ -112,9 +112,22 @@ sub find_tweet_by_id {
     shift->api_v2_call(get => 'tweets/{id}', 'SingleTweetLookupResponse', @_);
 }
 
+# The spec has hide_reply_by_id taking a ( hidden => true/false ) parameter.
+# We'll provide hide-reply_by_id and unhide_relpy_id taking just the ID.
+sub _hide_unhide_reply_by_id {
+    my ( $self, $bool ) = ( shift, shift );
+    my %args = ref $_[-1] eq 'HASH' ? %{ pop() } : ();
+
+    $args{-to_json} = { hidden => $bool };
+    $self->api_v2_call(PUT => 'tweets/{id}/hidden', '', @_, \%args);
+}
+
 sub hide_reply_by_id {
-    ...;
-    # shift->api_v2_call(put => 'tweets/{id}/hidden', '', @_);
+    shift->_hide_unhide_reply_by_id(JSON->true, @_);
+}
+
+sub unhide_reply_by_id {
+    shift->_hide_unhide_reply_by_id(JSON->false, @_);
 }
 
 sub find_users_by_id {

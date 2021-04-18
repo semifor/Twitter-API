@@ -207,6 +207,16 @@ sub mk_delete_request {
     shift->mk_simple_request(DELETE => @_);
 }
 
+sub mk_put_request {
+    my ( $self, $c ) = @_;
+
+    if ( $c->has_option('to_json') ) {
+        return $self->mk_json_request(PUT => $c);
+    }
+
+    shift->mk_simple_request(PUT => @_);
+}
+
 sub mk_post_request {
     my ( $self, $c ) = @_;
 
@@ -215,7 +225,7 @@ sub mk_post_request {
     }
 
     if ( $c->has_option('to_json') ) {
-        return $self->mk_json_post($c);
+        return $self->mk_json_request(POST => $c);
     }
 
     return $self->mk_form_urlencoded_post($c);
@@ -232,12 +242,14 @@ sub mk_multipart_post {
         ];
 }
 
-sub mk_json_post {
-    my ( $self, $c ) = @_;
+sub mk_json_request {
+    my ( $self, $http_method, $c ) = @_;
 
-    POST $c->url,
-        %{ $c->headers },
-        Content => $self->to_json($c->get_option('to_json'));
+    HTTP::Request->new(
+        $http_method, $c->url,
+        [ %{ $c->headers } ],
+        $self->to_json($c->get_option('to_json')),
+    );
 }
 
 sub mk_form_urlencoded_post {
