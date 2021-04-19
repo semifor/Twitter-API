@@ -26,6 +26,7 @@ The Twitter API v2 is in beta, has some bugs, and may change, itself.
 =cut
 
 use Moo::Role;
+use Carp;
 
 # TODO: automatically require Twitter::API::V2::Repsonse::*
 use Twitter::API::V2::Response::GenericTweetsTimelineResponse;
@@ -34,7 +35,10 @@ use Twitter::API::V2::Response::SingleUserLookupResponse;
 use Twitter::API::V2::Response::TweetLookupResponse;
 use Twitter::API::V2::Response::TweetSearchResponse;
 use Twitter::API::V2::Response::UserLookupResponse;
+use Twitter::API::V2::Response::UsersBlockingMutationResponse;
 use Twitter::API::V2::Response::UsersFollowersLookupResponse;
+use Twitter::API::V2::Response::UsersFollowingCreateResponse;
+use Twitter::API::V2::Response::UsersFollowingDeleteResponse;
 
 use namespace::clean;
 
@@ -55,13 +59,13 @@ sub api_v2_call {
     # path-part args passed as method argumens
     while ( @_ ) {
         my $path_part = shift;
-        die 'expected scalar path-part argument' if ref $path_part;
+        croak 'expected scalar path-part argument' if ref $path_part;
 
-        $path =~ s/\{\w+\}/$path_part/ || die 'too many path-part aguments';
+        $path =~ s/\{\w+\}/$path_part/ || croak 'too many path-part aguments';
     }
 
     # path-part args as named args in $args
-    $path =~ s|\{(\w+)\}|delete $$args{$1} // die "$1 required"|ge;
+    $path =~ s|\{(\w+)\}|delete $$args{$1} // croak "$1 required"|ge;
 
     my ( $r, $c ) = $self->request($method, $path, $args);
     if ( $return_type ) {
@@ -146,11 +150,6 @@ sub find_user_by_id {
     shift->api_v2_call(get => 'users/{id}', 'SingleUserLookupResponse', @_);
 }
 
-sub users_id_block {
-    ...;
-    # shift->api_v2_call(past => 'users/{id}/blocking', 'UsersBlockingMutationResponse', @_);
-}
-
 sub users_id_followers {
     shift->api_v2_call(get => 'users/{id}/followers', 'UsersFollowersLookupResponse', @_);
 }
@@ -161,11 +160,6 @@ sub users_id_following {
     shift->api_v2_call(get => 'users/{id}/following', 'UsersFollowersLookupResponse', @_);
 }
 
-sub users_id_follow {
-    ...;
-    # shift->api_v2_call(post => 'users/{id}/following', 'UsersFollowingCreateResponse', @_);
-}
-
 sub users_id_mentions {
     shift->api_v2_call(get => 'users/{id}/mentions', 'GenericTweetsTimelineResponse', @_);
 }
@@ -174,16 +168,68 @@ sub users_id_tweets {
     shift->api_v2_call(get => 'users/{id}/tweets', 'GenericTweetsTimelineResponse', @_);
 }
 
-sub users_id_unblock {
-    ...;
-    # shift->api_v2_call(DELETE => 'users/{ source_user_id }/blocking/(target_user_id)',
-    # 'UsersBlockingMutationResponse', @_);
+sub _user_id_from_oauth_token {
+    my ( $self, $args ) = @_;
+
+    # extract the user ID from the OAuth token
+    # -token has precedence if we have both -token and $self->access_token
+    my $token = $$args{-token} // $self->access_token // croak 'OAuth tokens required';
+    my ( $id ) = $token =~ /^(\d+)/;
+
+    return $id;
 }
 
-sub users_id_unfollow {
-    ...;
-    # shift->api_v2_call(DELETE => 'users/{ source_user_id }/following/{ target_user_id }',
-    # 'UsersFollowingDeleteResponse', @_);
+# Twitter's Open API spec provides overly complex semantics for following,
+# unfollowing, blocking, and unblocking. Instead of using methods named for
+# each operationId, we use simpler semantics requiring just one argument, the
+# target user ID.
+
+sub follow {
+    my ( $self, $target_user_id ) = ( shift, shift );
+    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+
+    $self->api_v2_call(post => 'users/{id}/following', 'UsersFollowingCreateResponse', {
+        id => $self->_user_id_from_oauth_token($args),
+        # stringify or Twitter chokes
+        -to_json => { target_user_id => "$target_user_id" },
+        %$args,
+    });
+}
+
+sub unfollow {
+    my ( $self, $target_user_id ) = ( shift, shift );
+    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+
+    $self->api_v2_call(delete => 'users/{id}/following/{target_user_id}', 'UsersFollowingDeleteResponse', {
+        id => $self->_user_id_from_oauth_token($args),
+        # stringify or Twitter chokes
+        target_user_id => "$target_user_id",
+        %$args,
+    });
+}
+
+sub block {
+    my ( $self, $target_user_id ) = ( shift, shift );
+    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+
+    $self->api_v2_call(post => 'users/{id}/blocking', 'UsersBlockingMutationResponse', {
+        id => $self->_user_id_from_oauth_token($args),
+        # stringify or Twitter chokes
+        -to_json => { target_user_id => "$target_user_id" },
+        %$args,
+    });
+}
+
+sub unblock {
+    my ( $self, $target_user_id ) = ( shift, shift );
+    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+
+    $self->api_v2_call(delete => 'users/{id}/blocking/{target_user_id}', 'UsersBlockingMutationResponse', {
+        id => $self->_user_id_from_oauth_token($args),
+        # stringify or Twitter chokes
+        target_user_id => "$target_user_id",
+        %$args,
+    });
 }
 
 1;

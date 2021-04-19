@@ -1,12 +1,12 @@
-package Twitter::API::V2::Response::UsersFollowersLookupResponse;
+package Twitter::API::V2::Response::UsersFollowingCreateResponse;
 use Moo;
 use Sub::Quote;
 
 use namespace::clean;
 
-extends 'Twitter::API::V2::User::Array';
+extends 'Twitter::API::V2::Object';
 
-has meta => (
+has data => (
     is => 'ro',
     isa => quote_sub(q{
         die 'is not a HASH' unless ref $_[0] eq 'HASH';
@@ -14,10 +14,9 @@ has meta => (
     required => 1,
 );
 
-__PACKAGE__->_mk_deep_accessor(qw/meta/, $_) for qw/
-    result_count
-    next_token
-    previous_token
+__PACKAGE__->_mk_deep_accessor(qw/data/, $_) for qw/
+    following
+    pending_follow
 /;
 
 has errors => (
