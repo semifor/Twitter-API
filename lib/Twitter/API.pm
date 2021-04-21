@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '1.0006';
+our $VERSION = '1.0007';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -610,14 +610,13 @@ just above by passing values in the constructor for C<api_version> and
 C<api_ext>.
 
     my $client = Twitter::API->new_with_traits(
-        api_version => '2',
-        api_ext     => '',
         %oauth_credentials,
+        traits => [ 'APIv2' ],
     );
 
-    my $user = $client->get("users/by/username/$username");
+    my $user = $client->find_user_by_username('perl_api');
 
-More complete V2 support is anticipated in a future release.
+See L<Twitter::API::Trait::APIv2> for more information.
 
 =attr consumer_key, consumer_secret
 

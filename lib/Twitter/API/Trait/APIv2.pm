@@ -5,16 +5,19 @@ package Twitter::API::Trait::APIv2;
 
     use Twitter::API;
 
-    my $v2 = Twitter::API->new_with_options(
+    my $app_client = Twitter::API->new_with_options(
         consumer_key    => $ENV{TWITTER_CONSUMER_KEY},
         consumer_secret => $ENV{TWITTER_CONSUMER_SECRET},
         traits => [ qw/APIv2 AppAuth RetryOnError/ ],
     );
 
-    # get a bearer token or App Auth
-    $v2->access_token($v2->oauth2_token);
+    # get a bearer token for App Auth
+    $app_client->access_token($app_client->oauth2_token);
 
-    $tweets = $v2->tweets_recent_search({ query => 'perl' });
+    my $user = $app_client->find_user_by_username('perl_api');
+    my $tweets = $app_client->users_id_tweets($user->id);
+
+    $tweets = $app_client->tweets_recent_search({ query => 'perl' });
     say $_->decoded_text for @$tweets;
 
 
