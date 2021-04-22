@@ -42,6 +42,7 @@ use Twitter::API::V2::Response::UsersBlockingMutationResponse;
 use Twitter::API::V2::Response::UsersFollowersLookupResponse;
 use Twitter::API::V2::Response::UsersFollowingCreateResponse;
 use Twitter::API::V2::Response::UsersFollowingDeleteResponse;
+use Twitter::API::V2::Response::UsersLikesMutationResponse;
 
 use namespace::clean;
 
@@ -231,6 +232,30 @@ sub unblock {
         id => $self->_user_id_from_oauth_token($args),
         # stringify or Twitter chokes
         target_user_id => "$target_user_id",
+        %$args,
+    });
+}
+
+sub like {
+    my ( $self, $tweet_id ) = ( shift, shift );
+    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+
+    $self->api_v2_call(post => 'users/{id}/likes', 'UsersLikesMutationResponse', {
+        id => $self->_user_id_from_oauth_token($args),
+        # stringify or Twitter chokes
+        -to_json => { tweet_id => "$tweet_id" },
+        %$args,
+    });
+}
+
+sub unlike {
+    my ( $self, $tweet_id ) = ( shift, shift );
+    my $args = ref $_[-1] eq 'HASH' ? pop : {};
+
+    $self->api_v2_call(delete => 'users/{id}/likes/{tweet_id}', 'UsersLikesMutationResponse', {
+        id => $self->_user_id_from_oauth_token($args),
+        # stringify or Twitter chokes
+        tweet_id => "$tweet_id",
         %$args,
     });
 }
