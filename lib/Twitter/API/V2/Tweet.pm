@@ -6,6 +6,7 @@ use HTML::Entities qw/decode_entities/;
 use List::Util qw/first/;
 use Sub::Quote;
 use Time::Local qw/timegm/;
+use Twitter::API::V2::Accessors qw/mk_deep_accessor/;
 use Twitter::API::V2::User;
 use Twitter::API::V2::Util qw/time_from_iso_8601/;
 
@@ -13,25 +14,9 @@ use namespace::clean;
 
 extends 'Twitter::API::V2::Object';
 
-has data => (
-    is  => 'ro',
+has '+data' => (
     isa => quote_sub(q{
         die 'is not a HASH' unless ref $_[0] eq 'HASH';
-    }),
-    required => 1,
-);
-
-has includes => (
-    is      => 'ro',
-    isa => quote_sub(q{
-        die 'is not a HASH' unless ref $_[0] eq 'HASH';
-    }),
-);
-
-has errors => (
-    is      => 'ro',
-    isa => quote_sub(q{
-        die 'is not a ARRAY' unless ref $_[0] eq 'ARRAY';
     }),
 );
 
@@ -52,36 +37,38 @@ sub _build_author {
     });
 }
 
+BEGIN {
 # default attributes
-__PACKAGE__->_mk_deep_accessor(qw/data/, $_) for qw/
-    attachments
-    author_id
-    context_annotations
-    conversation_id
-    created_at
-    entities
-    geo
-    id
-    in_reply_to_user_id
-    lang
-    non_public_metrics
-    organic_metrics
-    possibly_sensitive
-    promoted_metrics
-    public_metrics
-    referenced_tweets
-    reply_settings
-    source
-    text
-    withheld
-/;
+    __PACKAGE__->mk_deep_accessor(qw/data/, $_) for qw/
+        attachments
+        author_id
+        context_annotations
+        conversation_id
+        created_at
+        entities
+        geo
+        id
+        in_reply_to_user_id
+        lang
+        non_public_metrics
+        organic_metrics
+        possibly_sensitive
+        promoted_metrics
+        public_metrics
+        referenced_tweets
+        reply_settings
+        source
+        text
+        withheld
+    /;
 
-__PACKAGE__->_mk_deep_accessor(qw/data public_metrics/, $_) for qw/
-    quote_count
-    retweet_count
-    like_count
-    reply_count
-/;
+    __PACKAGE__->mk_deep_accessor(qw/data public_metrics/, $_) for qw/
+        quote_count
+        retweet_count
+        like_count
+        reply_count
+    /;
+}
 
 sub created_at_time {
     time_from_iso_8601(shift->created_at);

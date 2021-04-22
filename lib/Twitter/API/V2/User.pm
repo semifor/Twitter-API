@@ -3,23 +3,15 @@ package Twitter::API::V2::User;
 use Moo;
 use List::Util qw/first/;
 use Sub::Quote;
+use Twitter::API::V2::Accessors qw/mk_deep_accessor/;
 use Twitter::API::V2::Tweet;
 use Twitter::API::V2::Util qw/time_from_iso_8601/;
 use namespace::clean;
 
 extends 'Twitter::API::V2::Object';
 
-has data => (
-    is       => 'ro',
+has '+data' => (
     isa      => quote_sub(q{
-        die 'is not a HASH' unless ref $_[0] eq 'HASH';
-    }),
-    required => 1,
-);
-
-has includes => (
-    is      => 'ro',
-    isa     => quote_sub(q{
         die 'is not a HASH' unless ref $_[0] eq 'HASH';
     }),
 );
@@ -44,29 +36,31 @@ sub _build_pinned_tweet {
     );
 }
 
-__PACKAGE__->_mk_deep_accessor(qw/data/, $_) for qw/
-    created_at
-    description
-    entities
-    id
-    location
-    name
-    pinned_tweet_id
-    profile_image_url
-    protected
-    public_metrics
-    url
-    username
-    verified
-    withheld
-/;
+BEGIN {
+    __PACKAGE__->mk_deep_accessor(qw/data/, $_) for qw/
+        created_at
+        description
+        entities
+        id
+        location
+        name
+        pinned_tweet_id
+        profile_image_url
+        protected
+        public_metrics
+        url
+        username
+        verified
+        withheld
+    /;
 
-__PACKAGE__->_mk_deep_accessor(qw/data public_metrics/, $_) for qw/
-    followers_count
-    following_count
-    listed_count
-    tweet_count
-/;
+    __PACKAGE__->mk_deep_accessor(qw/data public_metrics/, $_) for qw/
+        followers_count
+        following_count
+        listed_count
+        tweet_count
+    /;
+}
 
 sub created_at_time {
     time_from_iso_8601(shift->created_at);

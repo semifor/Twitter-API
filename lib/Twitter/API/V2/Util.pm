@@ -1,7 +1,6 @@
 package Twitter::API::V2::Util;
 # ABSTRACT: Utility functions for Twitter API V2
 
-use 5.12.1;
 use warnings;
 use parent qw/Exporter/;
 use Time::Local qw/timegm/;
