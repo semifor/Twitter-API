@@ -57,6 +57,7 @@
             "Scalar::Util" : "0",
             "StackTrace::Auto" : "0",
             "Sub::Exporter::Progressive" : "0",
+            "Sub::Quote" : "0",
             "Throwable" : "0",
             "Time::HiRes" : "0",
             "Time::Local" : "0",
@@ -138,8 +139,20 @@
          "file" : "lib/Twitter/API/Util.pm",
          "version" : "1.0007"
       },
+      "Twitter::API::V2::Accessors" : {
+         "file" : "lib/Twitter/API/V2/Accessors.pm",
+         "version" : "1.0007"
+      },
+      "Twitter::API::V2::Errors" : {
+         "file" : "lib/Twitter/API/V2/Errors.pm",
+         "version" : "1.0007"
+      },
       "Twitter::API::V2::Object" : {
          "file" : "lib/Twitter/API/V2/Object.pm",
+         "version" : "1.0007"
+      },
+      "Twitter::API::V2::Response" : {
+         "file" : "lib/Twitter/API/V2/Response.pm",
          "version" : "1.0007"
       },
       "Twitter::API::V2::Response::GenericTweetsTimelineResponse" : {
@@ -166,8 +179,28 @@
          "file" : "lib/Twitter/API/V2/Response/UserLookupResponse.pm",
          "version" : "1.0007"
       },
-      "Twitter::API::V2::Response::UsersFollowingCreateResponse" : {
+      "Twitter::API::V2::Response::UsersBlockingMutationResponse" : {
+         "file" : "lib/Twitter/API/V2/Response/UsersBlockingMutationResponse.pm",
+         "version" : "1.0007"
+      },
+      "Twitter::API::V2::Response::UsersFollowersLookupResponse" : {
          "file" : "lib/Twitter/API/V2/Response/UsersFollowersLookupResponse.pm",
+         "version" : "1.0007"
+      },
+      "Twitter::API::V2::Response::UsersFollowingCreateResponse" : {
+         "file" : "lib/Twitter/API/V2/Response/UsersFollowingCreateResponse.pm",
+         "version" : "1.0007"
+      },
+      "Twitter::API::V2::Response::UsersFollowingDeleteResponse" : {
+         "file" : "lib/Twitter/API/V2/Response/UsersFollowingDeleteResponse.pm",
+         "version" : "1.0007"
+      },
+      "Twitter::API::V2::Response::UsersLikesMutationResponse" : {
+         "file" : "lib/Twitter/API/V2/Response/UsersLikesMutationResponse.pm",
+         "version" : "1.0007"
+      },
+      "Twitter::API::V2::TiedArray" : {
+         "file" : "lib/Twitter/API/V2/TiedArray.pm",
          "version" : "1.0007"
       },
       "Twitter::API::V2::Tweet" : {
@@ -217,6 +250,6 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Rob Hoelz <rob@hoelz.ro>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

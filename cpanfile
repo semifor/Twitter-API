@@ -18,6 +18,7 @@ requires 'Ref::Util';
 requires 'Scalar::Util';
 requires 'StackTrace::Auto';
 requires 'Sub::Exporter::Progressive';
+requires 'Sub::Quote';
 requires 'Throwable';
 requires 'Time::HiRes';
 requires 'Time::Local';
