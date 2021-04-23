@@ -23,13 +23,14 @@ package Twitter::API::Trait::APIv2;
 
 =head1 DESCRIPTION
 
-This is highly experimental code and will changed substantially before release.
-The Twitter API v2 is in beta, has some bugs, and may change, itself.
+This is highly experimental code and may change substantially before release.
+Twitter API v2 is in beta, has some bugs, and may change, itself.
 
 =cut
 
 use Moo::Role;
 use Carp;
+use HTTP::Status;
 
 # TODO: automatically require Twitter::API::V2::Repsonse::*
 use Twitter::API::V2::Response::GenericTweetsTimelineResponse;
@@ -55,6 +56,58 @@ has '+api_ext' => (
     is      => 'ro',
     default => sub { '' },
 );
+
+my %http_status_code_for = (
+    # best guess mapping
+    'client-disconnected'         => 400,
+    'client-forbidden'            => 403,
+    'disallowed-resource'         => 403,
+    'duplicate-rules'             => 409,
+    'invalid-request'             => 400,
+    'invalid-rules'               => 400,
+    'not-authorized-for-field'    => 403,
+    'not-authorized-for-resource' => 403,
+    'operational-disconnect'      => 503,
+    'resource-not-found'          => 404,
+    'rule-cap'                    => 400,
+    'streaming-connection'        => 503,
+    'unsupported-authentication'  => 401,
+    'usage-capped'                => 429,
+);
+
+around inflate_response => sub {
+    my ( $orig, $self, $c ) = @_;
+
+    $self->$orig($c);
+
+    my $result = $c->result;
+    if ( exists $$result{errors} && !exists $$result{data} ) {
+        # Twitter returns 200 OK with an errors body for various conditions:
+        # - target user not found
+        # - call made with OAuth tokens of a temporarily locked account
+        # - others?
+
+        # Get the problem type without autovivifying anything into the result.
+        my $type = $$result{errors} && $$result{errors}[0] && $$result{errors}[0]{type} // 'unknown';
+
+        # Just the problem identifier
+        $type =~ s{^https://api.twitter.com/2/problems/}{};
+
+        # Translate the Twitter problem ID to a sane HTTP status code.
+        # If we can't find one, punt.
+        my $http_status_code = $http_status_code_for{$type} // 400;
+
+        # Change the HTTP status code, add a custom header with Twitter's
+        # original status line, and throw an exception.
+        my $res = $c->http_response;
+        my $original_status = $res->status_line;
+        $res->code($http_status_code);
+        $res->message(HTTP::Status::status_message($http_status_code));
+        $res->header(x_twitter_original_status => $original_status);
+
+        $self->process_error_response($c);
+    }
+};
 
 sub api_v2_call {
     my ( $self, $method, $path, $return_type ) = splice @_, 0, 4;
