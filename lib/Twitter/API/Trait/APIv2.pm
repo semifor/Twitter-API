@@ -38,6 +38,7 @@ use Twitter::API::V2::Response::SingleTweetLookupResponse;
 use Twitter::API::V2::Response::SingleUserLookupResponse;
 use Twitter::API::V2::Response::TweetLookupResponse;
 use Twitter::API::V2::Response::TweetSearchResponse;
+use Twitter::API::V2::Response::TweetsLikingUsersLookupResponse;
 use Twitter::API::V2::Response::UserLookupResponse;
 use Twitter::API::V2::Response::UsersBlockingMutationResponse;
 use Twitter::API::V2::Response::UsersFollowersLookupResponse;
@@ -311,6 +312,16 @@ sub unlike {
         tweet_id => "$tweet_id",
         %$args,
     });
+}
+
+sub users_id_liked_tweets {
+    shift->api_v2_call(get => 'users/{id}/liked_tweets',
+        'GenericTweetsTimelineResponse', @_);
+}
+
+sub tweets_id_liking_users {
+    shift->api_v2_call(get => 'tweets/{id}/liking_users',
+        'TweetsLikingUsersLookupResponse', @_);
 }
 
 1;
