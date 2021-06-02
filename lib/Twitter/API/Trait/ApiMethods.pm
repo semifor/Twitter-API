@@ -1198,11 +1198,11 @@ sub destroy_direct_messages_event {
 
 For simple usage, pass text and recipient ID:
 
-    $client->new_dirrect_messages_event($text, $recipient_id)
+    $client->new_direct_messages_event($text, $recipient_id)
 
 For more complex messages, pass a full event structure, for example:
 
-    $client->new_direct_massages_event({
+    $client->new_direct_messages_event({
         type => 'message_create',
         message_create => {
             target => { recipient_id => $user_id },
@@ -1268,7 +1268,7 @@ L<https://developer.twitter.com/en/docs/basics/authentication/api-reference/inva
 
 =cut
 
-# We've already used invalidate_token for oauth2/invalidate_otkon in
+# We've already used invalidate_token for oauth2/invalidate_token in
 # Trait::AppAuth, so we'll name this method invalidate_acccess_token to avoid
 # any conflict.
 
@@ -1353,7 +1353,7 @@ making the inferred ID ambiguous. These calls are equivalent:
    $client->create_block('realDonaldTrump');
    $client->create_block({ screen_name => 'realDonaldTrump' });
 
-Since all of these methods simple resolve to a C<get> or C<post> call, see the
+Since all of these methods simply resolve to a C<get> or C<post> call, see the
 L<Twitter::API> for details about return values and error handling.
 
 =cut
